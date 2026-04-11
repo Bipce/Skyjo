@@ -38,11 +38,11 @@ public sealed class Application : Game
 
 #if DEBUG
         const string url = "http://localhost:5173";
-        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, assetsDir: "data");
+        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, assetsDir: "data", enableLog: true);
 #else
         const string url = "file:///index.html";
         _renderer = new UltralightRendererSDLGPU(GraphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
-            shaders: GetShaders());
+            shaders: GetShaders(), enableLog: false);
 #endif
         _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
         _view.LoadUrl(url);
