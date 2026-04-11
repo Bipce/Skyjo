@@ -1,9 +1,14 @@
+import { Route, Routes } from "react-router";
+import Game from "./pages/Game.tsx";
+
 function App() {
   return (
     <>
-      <h1 className="text-4xl">Hello World!</h1>
+      <Routes>
+        <Route path="/" element={<Game />} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
