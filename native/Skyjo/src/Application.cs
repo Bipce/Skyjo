@@ -37,7 +37,13 @@ public sealed class Application : Game
 
         _renderer = new UltralightRendererSDLGPU(GraphicsDevice);
         _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
-        _view.LoadUrl("file:///index.html");
+
+#if DEBUG
+        const string url = "http://localhost:5173";
+#else
+        const string url = "file:///index.html";
+#endif
+        _view.LoadUrl(url);
     }
 
     protected override void Update(GameTime gameTime)
@@ -55,7 +61,7 @@ public sealed class Application : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        GraphicsDevice.Clear(new Color(30, 30, 46));
+        GraphicsDevice.Clear(Color.Black);
 
         _renderer.Render();
         _view.Render();
