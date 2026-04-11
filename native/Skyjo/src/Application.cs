@@ -35,14 +35,14 @@ public sealed class Application : Game
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _renderer = new UltralightRendererSDLGPU(GraphicsDevice);
-        _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
-
 #if DEBUG
         const string url = "http://localhost:5173";
+        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, assetsDir: "data");
 #else
         const string url = "file:///index.html";
+        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"));
 #endif
+        _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
         _view.LoadUrl(url);
     }
 
