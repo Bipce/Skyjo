@@ -30,4 +30,11 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include="lib\*.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Link>%(Filename)%(Extension)</Link>
+        </None>
+    </ItemGroup>
+
 </Project>
