@@ -35,6 +35,7 @@
         <None Include="lib\*.dll">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Link>%(Filename)%(Extension)</Link>
+            <Visible>false</Visible>
         </None>
     </ItemGroup>
 
