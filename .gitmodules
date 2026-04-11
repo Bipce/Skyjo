@@ -1,0 +1,3 @@
+[submodule "native/FNA"]
+	path = native/FNA
+	url = git@github.com:droyer57/FNA.git
