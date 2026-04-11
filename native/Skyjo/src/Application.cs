@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SteamDatabase.ValvePak;
 using Ultralight.FNA;
 
 namespace Skyjo;
@@ -40,7 +41,8 @@ public sealed class Application : Game
         _renderer = new UltralightRendererSDLGPU(GraphicsDevice, assetsDir: "data");
 #else
         const string url = "file:///index.html";
-        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"));
+        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
+            shaders: GetShaders());
 #endif
         _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
         _view.LoadUrl(url);
@@ -71,5 +73,30 @@ public sealed class Application : Game
         _spriteBatch.End();
 
         base.Draw(gameTime);
+    }
+
+    private static ShaderSources GetShaders()
+    {
+        var package = new Package();
+        package.OptimizeEntriesForBinarySearch(StringComparison.OrdinalIgnoreCase);
+        package.Read("data/shaders.vpk");
+
+        return new ShaderSources
+        {
+            FillVert = GetDataInPackage(package, "fill.vert.spv"),
+            FillFrag = GetDataInPackage(package, "fill.frag.spv"),
+            PathVert = GetDataInPackage(package, "fill_path.vert.spv"),
+            PathFrag = GetDataInPackage(package, "fill_path.frag.spv"),
+        };
+    }
+
+    private static byte[] GetDataInPackage(Package package, string path)
+    {
+        var entry = package.FindEntry(path);
+        if (entry == null)
+            throw new FileNotFoundException(path);
+
+        package.ReadEntry(entry, out var data);
+        return data;
     }
 }
