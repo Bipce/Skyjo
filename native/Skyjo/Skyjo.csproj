@@ -14,6 +14,7 @@
         <ProjectReference Include="..\FNA\FNA.Core.csproj"/>
         <PackageReference Include="Exec-Ultralight.FNA" Version="0.1.2"/>
         <PackageReference Include="ValvePak" Version="4.0.0.142"/>
+        <ProjectReference Include="..\Skyjo.Network\Skyjo.Network.csproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)' == 'Debug'">

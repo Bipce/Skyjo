@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="FNA/FNA.Core.csproj" />
+  <Project Path="Skyjo.Network/Skyjo.Network.csproj" />
   <Project Path="Skyjo/Skyjo.csproj" />
 </Solution>

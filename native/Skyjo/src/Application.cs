@@ -1,7 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SteamDatabase.ValvePak;
+using Microsoft.Xna.Framework.Input;
+using Skyjo.Network;
 using Ultralight.FNA;
+
+#if !DEBUG
+using SteamDatabase.ValvePak;
+#endif
 
 namespace Skyjo;
 
@@ -14,6 +19,11 @@ public sealed class Application : Game
 
     private int CurrentWidth => GraphicsDevice.Viewport.Width;
     private int CurrentHeight => GraphicsDevice.Viewport.Height;
+
+    private NetworkManager NetworkManager { get; } = new();
+
+    private KeyboardState _keyboard;
+    private KeyboardState _lastKeyboard;
 
     public Application()
     {
@@ -52,10 +62,9 @@ public sealed class Application : Game
     {
         base.Update(gameTime);
 
-        if (!IsActive)
-        {
-            return;
-        }
+        NetworkManager.Update();
+
+        UpdateInput();
 
         _renderer.Update();
         _view.Update();
@@ -75,6 +84,7 @@ public sealed class Application : Game
         base.Draw(gameTime);
     }
 
+#if !DEBUG
     private static ShaderSources GetShaders()
     {
         var package = new Package();
@@ -99,4 +109,26 @@ public sealed class Application : Game
         package.ReadEntry(entry, out var data);
         return data;
     }
+#endif
+
+    private void UpdateInput()
+    {
+        _lastKeyboard = _keyboard;
+        _keyboard = Keyboard.GetState();
+
+        if (IsKeyJustPressed(Keys.H)) // Host
+        {
+            if (NetworkManager.ServerManager.Start())
+                NetworkManager.ClientManager.Start();
+        }
+
+        if (IsKeyJustPressed(Keys.S)) // Server
+            NetworkManager.ServerManager.Start();
+        if (IsKeyJustPressed(Keys.C)) // Client
+            NetworkManager.ClientManager.Start();
+        if (IsKeyJustPressed(Keys.D)) // Disconnect
+            NetworkManager.Stop();
+    }
+
+    private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
 }
