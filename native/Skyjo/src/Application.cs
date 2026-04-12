@@ -25,6 +25,8 @@ public sealed class Application : Game
     private KeyboardState _keyboard;
     private KeyboardState _lastKeyboard;
 
+    private Texture2D _pixelTexture = null!;
+
     public Application()
     {
         var graphics = new GraphicsDeviceManager(this);
@@ -33,6 +35,9 @@ public sealed class Application : Game
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
         Window.ClientSizeChanged += OnResize;
+
+        NetworkManager.RegisterEntity<TestEntity>();
+        NetworkManager.RegisterEntity<OtherEntity>();
     }
 
     private void OnResize(object? sender, EventArgs e)
@@ -56,6 +61,9 @@ public sealed class Application : Game
 #endif
         _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
         _view.LoadUrl(url);
+
+        _pixelTexture = new Texture2D(GraphicsDevice, 1, 1);
+        _pixelTexture.SetData([Color.White]);
     }
 
     protected override void Update(GameTime gameTime)
@@ -79,6 +87,24 @@ public sealed class Application : Game
 
         _spriteBatch.Begin();
         _spriteBatch.Draw(_view.Texture, Vector2.Zero, Color.White);
+        _spriteBatch.End();
+
+        _spriteBatch.Begin();
+
+        var i = 0;
+        foreach (var _ in NetworkManager.GetEntities<TestEntity>())
+        {
+            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 0, 50, 50), Color.White);
+            i++;
+        }
+
+        i = 0;
+        foreach (var _ in NetworkManager.GetEntities<OtherEntity>())
+        {
+            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), Color.Red);
+            i++;
+        }
+
         _spriteBatch.End();
 
         base.Draw(gameTime);
@@ -128,6 +154,21 @@ public sealed class Application : Game
             NetworkManager.ClientManager.Start();
         if (IsKeyJustPressed(Keys.D)) // Disconnect
             NetworkManager.Stop();
+
+        if (NetworkManager.ServerManager.IsRunning)
+        {
+            if (IsKeyJustPressed(Keys.Enter))
+            {
+                var entity = new TestEntity();
+                NetworkManager.ServerManager.Spawn(entity);
+            }
+
+            if (IsKeyJustPressed(Keys.RightShift))
+            {
+                var entity = new OtherEntity();
+                NetworkManager.ServerManager.Spawn(entity);
+            }
+        }
     }
 
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);

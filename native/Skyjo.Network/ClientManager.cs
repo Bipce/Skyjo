@@ -1,10 +1,16 @@
 ﻿using LiteNetLib;
+using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
 
 public sealed class ClientManager : ManagerBase
 {
     protected override string Role => "Client";
+
+    public ClientManager()
+    {
+        AddPacketHandler<EntityPacket>(OnEntityPacket);
+    }
 
     public override bool Start()
     {
@@ -22,5 +28,12 @@ public sealed class ClientManager : ManagerBase
     {
         base.OnPeerDisconnected(peer, disconnectInfo);
         Stop();
+    }
+
+    private void OnEntityPacket(EntityPacket packet)
+    {
+        var entity = NetworkManager.CreateEntity(packet.TypeId);
+        entity.Id = packet.Id;
+        Entities[entity.Id] = entity;
     }
 }

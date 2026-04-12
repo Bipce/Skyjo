@@ -1,0 +1,34 @@
+﻿using LiteNetLib.Utils;
+using Skyjo.Network.Enums;
+
+namespace Skyjo.Network.Packets;
+
+internal sealed class EntityPacket : Packet
+{
+    public EntityPacket()
+    {
+    }
+
+    public EntityPacket(byte typeId, int id)
+    {
+        TypeId = typeId;
+        Id = id;
+    }
+
+    public override PacketType Type => PacketType.Entity;
+
+    public byte TypeId { get; private set; }
+    public int Id { get; private set; }
+
+    public override void Serialize(NetDataWriter writer)
+    {
+        writer.Put(TypeId);
+        writer.Put(Id);
+    }
+
+    public override void Deserialize(NetDataReader reader)
+    {
+        TypeId = reader.GetByte();
+        Id = reader.GetInt();
+    }
+}

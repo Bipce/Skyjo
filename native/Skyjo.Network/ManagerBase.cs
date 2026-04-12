@@ -1,6 +1,8 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using LiteNetLib;
+using LiteNetLib.Utils;
+using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
 
@@ -9,10 +11,15 @@ public abstract class ManagerBase : INetEventListener
     private NetManager? _netManager;
     protected const string Key = "dd3722c44d3ac0b3919ba75bdd738654";
 
+    internal Dictionary<int, Entity> Entities { get; } = [];
+    protected NetDataWriter Writer { get; private set; } = new();
+
+    private readonly Dictionary<Type, Action<Packet>> _packetHandlers = [];
+
     protected NetManager NetManager
     {
         get => _netManager ?? throw new NullReferenceException(nameof(_netManager));
-        set => _netManager = value;
+        private set => _netManager = value;
     }
 
     public int Port { get; set; } = 1995;
@@ -22,6 +29,8 @@ public abstract class ManagerBase : INetEventListener
     public bool IsRunning => _netManager?.IsRunning == true;
 
     protected NetworkManager NetworkManager => NetworkManager.Instance;
+    protected ServerManager ServerManager => NetworkManager.ServerManager;
+    protected ClientManager ClientManager => NetworkManager.ClientManager;
 
     public virtual bool Start()
     {
@@ -40,18 +49,20 @@ public abstract class ManagerBase : INetEventListener
         NetManager.PollEvents();
     }
 
-    public void Stop()
+    public virtual bool Stop()
     {
         if (!IsRunning)
-            return;
+            return false;
 
         NetManager.Stop();
         _netManager = null;
+        Entities.Clear();
 
         Console.WriteLine($"[{Role}] Stopped");
+        return true;
     }
 
-    public void OnPeerConnected(NetPeer peer)
+    public virtual void OnPeerConnected(NetPeer peer)
     {
         Console.WriteLine($"[{Role}] Peer connected");
     }
@@ -68,6 +79,13 @@ public abstract class ManagerBase : INetEventListener
     public void OnNetworkReceive(NetPeer peer, NetPacketReader reader, byte channelNumber,
         DeliveryMethod deliveryMethod)
     {
+        while (reader.AvailableBytes > 0)
+        {
+            var packet = NetworkManager.CreatePacket(reader.GetByte());
+            packet.Deserialize(reader);
+            _packetHandlers[packet.GetType()].Invoke(packet);
+        }
+
         reader.Recycle();
     }
 
@@ -82,5 +100,10 @@ public abstract class ManagerBase : INetEventListener
 
     public virtual void OnConnectionRequest(ConnectionRequest request)
     {
+    }
+
+    protected void AddPacketHandler<T>(Action<T> callback) where T : Packet
+    {
+        _packetHandlers[typeof(T)] = packet => callback((T)packet);
     }
 }
