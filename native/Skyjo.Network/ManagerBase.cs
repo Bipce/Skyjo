@@ -28,9 +28,9 @@ public abstract class ManagerBase : INetEventListener
     protected abstract string Role { get; }
     public bool IsRunning => _netManager?.IsRunning == true;
 
-    protected NetworkManager NetworkManager => NetworkManager.Instance;
-    protected ServerManager ServerManager => NetworkManager.ServerManager;
-    protected ClientManager ClientManager => NetworkManager.ClientManager;
+    protected static NetworkManager NetworkManager => NetworkManager.Instance;
+    protected static ServerManager ServerManager => NetworkManager.ServerManager;
+    protected static ClientManager ClientManager => NetworkManager.ClientManager;
 
     public virtual bool Start()
     {

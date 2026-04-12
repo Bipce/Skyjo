@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
 using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
@@ -6,6 +7,7 @@ namespace Skyjo.Network;
 public sealed class ClientManager : ManagerBase
 {
     protected override string Role => "Client";
+    public Action<NetDataWriter>? ConnectionData { get; set; }
 
     public ClientManager()
     {
@@ -19,7 +21,11 @@ public sealed class ClientManager : ManagerBase
         var state = NetManager.Start();
         if (!state)
             return false;
-        NetManager.Connect(Address, Port, Key);
+
+        var writer = new NetDataWriter();
+        writer.Put(Key);
+        ConnectionData?.Invoke(writer);
+        NetManager.Connect(Address, Port, writer);
         Console.WriteLine($"[{Role}] Connecting");
         return true;
     }

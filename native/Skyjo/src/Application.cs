@@ -1,4 +1,6 @@
-﻿using Microsoft.Xna.Framework;
+﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Skyjo.Network;
@@ -37,7 +39,18 @@ public sealed class Application : Game
         Window.ClientSizeChanged += OnResize;
 
         NetworkManager.RegisterEntity<TestEntity>();
-        NetworkManager.RegisterEntity<OtherEntity>();
+        NetworkManager.RegisterEntity<Player>();
+
+        NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
+
+        NetworkManager.ClientManager.ConnectionData = writer =>
+        {
+            var color = new Color(Random.Shared.NextSingle(), Random.Shared.NextSingle(),
+                Random.Shared.NextSingle());
+            writer.Put(color.R);
+            writer.Put(color.G);
+            writer.Put(color.B);
+        };
     }
 
     private void OnResize(object? sender, EventArgs e)
@@ -99,9 +112,9 @@ public sealed class Application : Game
         }
 
         i = 0;
-        foreach (var _ in NetworkManager.GetEntities<OtherEntity>())
+        foreach (var player in NetworkManager.GetEntities<Player>())
         {
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), Color.Red);
+            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), player.Color);
             i++;
         }
 
@@ -151,7 +164,10 @@ public sealed class Application : Game
         if (IsKeyJustPressed(Keys.S)) // Server
             NetworkManager.ServerManager.Start();
         if (IsKeyJustPressed(Keys.C)) // Client
+        {
             NetworkManager.ClientManager.Start();
+        }
+
         if (IsKeyJustPressed(Keys.D)) // Disconnect
             NetworkManager.Stop();
 
@@ -159,17 +175,22 @@ public sealed class Application : Game
         {
             if (IsKeyJustPressed(Keys.Enter))
             {
-                var entity = new TestEntity();
-                NetworkManager.ServerManager.Spawn(entity);
-            }
-
-            if (IsKeyJustPressed(Keys.RightShift))
-            {
-                var entity = new OtherEntity();
-                NetworkManager.ServerManager.Spawn(entity);
+                new TestEntity().Spawn();
             }
         }
     }
 
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
+
+    private void Server_OnPlayerConnected(NetPeer peer, NetDataReader reader)
+    {
+        var color = new Color(reader.GetByte(), reader.GetByte(), reader.GetByte());
+
+        var player = new Player
+        {
+            Owner = peer,
+            Color = color
+        };
+        player.Spawn();
+    }
 }

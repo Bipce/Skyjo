@@ -22,6 +22,8 @@ internal sealed class EntityPacket : Packet
 
     public override void Serialize(NetDataWriter writer)
     {
+        base.Serialize(writer);
+
         writer.Put(TypeId);
         writer.Put(Id);
     }

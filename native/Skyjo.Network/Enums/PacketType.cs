@@ -2,5 +2,6 @@
 
 public enum PacketType : byte
 {
-    Entity = 0
+    Entity = 0,
+    Connected = 1
 }
