@@ -56,7 +56,7 @@ public sealed class ServerManager : ManagerBase
         foreach (var entity in Entities.Values)
         {
             var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-            new EntityPacket(typeId, entity.Id).Serialize(Writer);
+            new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(Writer);
         }
 
         peer.Send(Writer, DeliveryMethod.ReliableOrdered);
@@ -65,12 +65,13 @@ public sealed class ServerManager : ManagerBase
     internal void Spawn(Entity entity)
     {
         entity.Id = _nextId++;
+        entity.OwnerId = entity.Owner?.Id ?? -1;
         Entities[entity.Id] = entity;
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
 
         Writer.Reset();
-        new EntityPacket(typeId, entity.Id).Serialize(Writer);
+        new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(Writer);
         NetManager.SendToAll(Writer, DeliveryMethod.ReliableOrdered);
     }
 }

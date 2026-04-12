@@ -14,6 +14,8 @@ public sealed class ClientManager : ManagerBase
         AddPacketHandler<EntityPacket>(OnEntityPacket);
     }
 
+    public NetPeer Peer => NetManager.FirstPeer;
+
     public override bool Start()
     {
         if (!base.Start())
@@ -40,6 +42,7 @@ public sealed class ClientManager : ManagerBase
     {
         var entity = NetworkManager.CreateEntity(packet.TypeId);
         entity.Id = packet.Id;
+        entity.OwnerId = packet.OwnerId;
         Entities[entity.Id] = entity;
     }
 }

@@ -114,7 +114,8 @@ public sealed class Application : Game
         i = 0;
         foreach (var player in NetworkManager.GetEntities<Player>())
         {
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), player.Color);
+            var color = player.IsOwner ? Color.Blue : Color.Red;
+            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), color);
             i++;
         }
 

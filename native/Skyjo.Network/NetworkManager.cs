@@ -39,7 +39,7 @@ public sealed class NetworkManager
     public IEnumerable<T> GetEntities<T>() where T : Entity
     {
         var data = ServerManager.IsRunning ? ServerManager.Entities : ClientManager.Entities;
-        return data.Values.OfType<T>();
+        return data.Values.OfType<T>().OrderBy(e => e.Id);
     }
 
     internal Packet CreatePacket(byte id)
