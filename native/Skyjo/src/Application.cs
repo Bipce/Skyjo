@@ -172,12 +172,10 @@ public sealed class Application : Game
         if (IsKeyJustPressed(Keys.D)) // Disconnect
             NetworkManager.Stop();
 
-        if (NetworkManager.ServerManager.IsRunning)
+        if (IsKeyJustPressed(Keys.Enter) && NetworkManager.IsRunning)
         {
-            if (IsKeyJustPressed(Keys.Enter))
-            {
-                new TestEntity().Spawn();
-            }
+            var player = NetworkManager.GetEntities<Player>().First(x => x.IsOwner);
+            player.Server_SpawnEntity();
         }
     }
 

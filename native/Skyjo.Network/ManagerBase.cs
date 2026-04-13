@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
@@ -15,6 +16,11 @@ public abstract class ManagerBase : INetEventListener
     protected NetDataWriter Writer { get; private set; } = new();
 
     private readonly Dictionary<Type, Action<Packet>> _packetHandlers = [];
+
+    public ManagerBase()
+    {
+        AddPacketHandler<RpcPacket>(OnRpcPacket);
+    }
 
     protected NetManager NetManager
     {
@@ -105,5 +111,19 @@ public abstract class ManagerBase : INetEventListener
     protected void AddPacketHandler<T>(Action<T> callback) where T : Packet
     {
         _packetHandlers[typeof(T)] = packet => callback((T)packet);
+    }
+
+    private void OnRpcPacket(RpcPacket packet)
+    {
+        var entity = Entities[packet.EntityId];
+        entity.InternalCallMethod(packet.MethodId, packet.Reader);
+    }
+
+    [NetworkInternal]
+    public NetDataWriter GetRpcPacketData(int entityId, int methodId)
+    {
+        Writer.Reset();
+        new RpcPacket(entityId, methodId).Serialize(Writer);
+        return Writer;
     }
 }

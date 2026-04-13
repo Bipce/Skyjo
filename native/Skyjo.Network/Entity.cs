@@ -1,12 +1,14 @@
 ﻿using LiteNetLib;
+using LiteNetLib.Utils;
+using Skyjo.Network.Attributes;
 
 namespace Skyjo.Network;
 
 public abstract class Entity
 {
-    private static NetworkManager NetworkManager => NetworkManager.Instance;
-    private static ServerManager ServerManager => NetworkManager.ServerManager;
-    private static ClientManager ClientManager => NetworkManager.ClientManager;
+    protected NetworkManager NetworkManager => NetworkManager.Instance;
+    protected ServerManager ServerManager => NetworkManager.ServerManager;
+    protected ClientManager ClientManager => NetworkManager.ClientManager;
 
     public int Id { get; internal set; }
     public NetPeer? Owner { get; init; }
@@ -29,5 +31,10 @@ public abstract class Entity
             throw new InvalidOperationException("Only the server can spawn entities");
 
         ServerManager.Spawn(this);
+    }
+
+    [NetworkInternal]
+    protected internal virtual void InternalCallMethod(int id, NetDataReader reader)
+    {
     }
 }

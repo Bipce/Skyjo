@@ -8,6 +8,13 @@
 
     <ItemGroup>
       <PackageReference Include="LiteNetLib" Version="2.1.2" />
+      <PackageReference Include="Metalama.Framework" Version="2026.0.20" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Skyjo.Network.Analyzers\Skyjo.Network.Analyzers.csproj"
+                        OutputItemType="Analyzer"
+                        ReferenceOutputAssembly="false" />
     </ItemGroup>
 
 </Project>

@@ -9,6 +9,7 @@ public sealed class NetworkManager
 
     public ServerManager ServerManager { get; }
     public ClientManager ClientManager { get; }
+    public bool IsRunning => ServerManager.IsRunning || ClientManager.IsRunning;
 
     private readonly Dictionary<byte, Func<Packet>> _packetFactories = [];
     private readonly Dictionary<Type, byte> _entityTypeIds = [];
@@ -22,6 +23,7 @@ public sealed class NetworkManager
         ClientManager = new ClientManager();
 
         _packetFactories.Add((byte)PacketType.Entity, () => new EntityPacket());
+        _packetFactories.Add((byte)PacketType.Rpc, () => new RpcPacket());
     }
 
     public void Update()

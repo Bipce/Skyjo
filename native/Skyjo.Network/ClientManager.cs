@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
@@ -44,5 +45,11 @@ public sealed class ClientManager : ManagerBase
         entity.Id = packet.Id;
         entity.OwnerId = packet.OwnerId;
         Entities[entity.Id] = entity;
+    }
+
+    [NetworkInternal]
+    public void Send(NetDataWriter writer)
+    {
+        NetManager.SendToAll(writer, DeliveryMethod.ReliableOrdered);
     }
 }
