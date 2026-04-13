@@ -43,6 +43,7 @@ public sealed class Application : Game
         NetworkManager.RegisterEntity<GameManager>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
+        NetworkManager.ServerManager.OnServerStarted += Server_OnStarted;
 
         NetworkManager.ClientManager.ConnectionData = writer =>
         {
@@ -179,11 +180,6 @@ public sealed class Application : Game
             var gameManager = NetworkManager.GetEntities<GameManager>().First();
             player.Server_SpawnEntity(gameManager);
         }
-
-        if (IsKeyJustPressed(Keys.G) && NetworkManager.ServerManager.IsRunning)
-        {
-            new GameManager().Spawn();
-        }
     }
 
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
@@ -198,5 +194,10 @@ public sealed class Application : Game
             Color = color
         };
         player.Spawn();
+    }
+
+    private void Server_OnStarted()
+    {
+        new GameManager().Spawn();
     }
 }

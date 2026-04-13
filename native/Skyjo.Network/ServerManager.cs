@@ -12,6 +12,7 @@ public sealed class ServerManager : ManagerBase
     private int _nextId = FirstEntityId;
 
     public event Action<NetPeer, NetDataReader>? OnPlayerConnected;
+    public event Action? OnServerStarted;
 
     public override bool Start()
     {
@@ -20,7 +21,11 @@ public sealed class ServerManager : ManagerBase
 
         var state = NetManager.Start(Port);
         if (state)
+        {
             Console.WriteLine($"[{Role}] Server listening on port {Port}");
+            OnServerStarted?.Invoke();
+        }
+
         return state;
     }
 
