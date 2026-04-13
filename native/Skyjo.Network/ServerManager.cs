@@ -14,6 +14,9 @@ public sealed class ServerManager : ManagerBase
     public event Action<NetPeer, NetDataReader>? OnPlayerConnected;
     public event Action? OnServerStarted;
 
+    private readonly Dictionary<int, NetPeer> _peers = [];
+    private NetDataReader _lastReader = null!;
+
     public override bool Start()
     {
         if (!base.Start() || ClientManager.IsRunning)
@@ -35,6 +38,7 @@ public sealed class ServerManager : ManagerBase
             return false;
 
         _nextId = FirstEntityId;
+        _peers.Clear();
         return true;
     }
 
@@ -49,34 +53,48 @@ public sealed class ServerManager : ManagerBase
 
         var peer = request.Accept();
         Console.WriteLine($"[{Role}] Connection accepted");
+        _peers.Add(peer.Id, peer);
 
-        OnPlayerConnected?.Invoke(peer, request.Data);
+        _lastReader = request.Data;
     }
 
     public override void OnPeerConnected(NetPeer peer)
     {
         base.OnPeerConnected(peer);
 
-        Writer.Reset();
-        foreach (var entity in Entities.Values)
+        if (peer.Id != ClientManager.NullablePeer?.Id)
         {
-            var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-            new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(Writer);
+            NetworkManager.Writer.Reset();
+            foreach (var entity in NetworkManager.Entities.Values)
+            {
+                var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
+                new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
+            }
+
+            peer.Send(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
         }
 
-        peer.Send(Writer, DeliveryMethod.ReliableOrdered);
+        OnPlayerConnected?.Invoke(peer, _lastReader);
     }
 
     internal void Spawn(Entity entity)
     {
         entity.Id = _nextId++;
         entity.OwnerId = entity.Owner?.Id ?? -1;
-        Entities[entity.Id] = entity;
+        NetworkManager.Entities[entity.Id] = entity;
+
+        switch (NetManager.ConnectedPeersCount)
+        {
+            case 0:
+            case 1 when ClientManager.IsRunning:
+                return;
+        }
+
+        _peers.TryGetValue(ClientManager.NullablePeer?.Id ?? -1, out var excludePeer);
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-
-        Writer.Reset();
-        new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(Writer);
-        NetManager.SendToAll(Writer, DeliveryMethod.ReliableOrdered);
+        NetworkManager.Writer.Reset();
+        new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
+        NetManager.SendToAll(NetworkManager.Writer, DeliveryMethod.ReliableOrdered, excludePeer: excludePeer);
     }
 }

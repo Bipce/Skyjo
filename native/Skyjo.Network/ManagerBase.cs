@@ -12,12 +12,9 @@ public abstract class ManagerBase : INetEventListener
     private NetManager? _netManager;
     protected const string Key = "dd3722c44d3ac0b3919ba75bdd738654";
 
-    internal Dictionary<int, Entity> Entities { get; } = [];
-    protected NetDataWriter Writer { get; private set; } = new();
-
     private readonly Dictionary<Type, Action<Packet>> _packetHandlers = [];
 
-    public ManagerBase()
+    protected ManagerBase()
     {
         AddPacketHandler<RpcPacket>(OnRpcPacket);
     }
@@ -62,7 +59,7 @@ public abstract class ManagerBase : INetEventListener
 
         NetManager.Stop();
         _netManager = null;
-        Entities.Clear();
+        NetworkManager.Entities.Clear();
 
         Console.WriteLine($"[{Role}] Stopped");
         return true;
@@ -115,16 +112,16 @@ public abstract class ManagerBase : INetEventListener
 
     private void OnRpcPacket(RpcPacket packet)
     {
-        var entity = Entities[packet.EntityId];
+        var entity = NetworkManager.Entities[packet.EntityId];
         entity.InternalCallMethod(packet.MethodId, packet.Reader);
     }
 
     [NetworkInternal]
     public NetDataWriter GetRpcPacketData(int entityId, int methodId)
     {
-        Writer.Reset();
-        new RpcPacket(entityId, methodId).Serialize(Writer);
-        return Writer;
+        NetworkManager.Writer.Reset();
+        new RpcPacket(entityId, methodId).Serialize(NetworkManager.Writer);
+        return NetworkManager.Writer;
     }
 
     [NetworkInternal]

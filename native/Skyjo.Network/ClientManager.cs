@@ -1,6 +1,5 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
-using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
@@ -16,6 +15,7 @@ public sealed class ClientManager : ManagerBase
     }
 
     public NetPeer Peer => NetManager.FirstPeer;
+    public NetPeer? NullablePeer => IsRunning ? Peer : null;
 
     public override bool Start()
     {
@@ -44,6 +44,6 @@ public sealed class ClientManager : ManagerBase
         var entity = NetworkManager.CreateEntity(packet.TypeId);
         entity.Id = packet.Id;
         entity.OwnerId = packet.OwnerId;
-        Entities[entity.Id] = entity;
+        NetworkManager.Entities[entity.Id] = entity;
     }
 }

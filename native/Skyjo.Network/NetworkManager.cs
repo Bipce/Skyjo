@@ -1,4 +1,5 @@
-﻿using Skyjo.Network.Enums;
+﻿using LiteNetLib.Utils;
+using Skyjo.Network.Enums;
 using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
@@ -15,8 +16,8 @@ public sealed class NetworkManager
     private readonly Dictionary<Type, byte> _entityTypeIds = [];
     private readonly Dictionary<byte, Func<Entity>> _entityFactories = [];
 
-    private Dictionary<int, Entity> Entities =>
-        ServerManager.IsRunning ? ServerManager.Entities : ClientManager.Entities;
+    internal Dictionary<int, Entity> Entities { get; } = [];
+    internal NetDataWriter Writer { get; private set; } = new();
 
     public NetworkManager()
     {
