@@ -27,8 +27,9 @@ public sealed class NetworkManager
         ServerManager = new ServerManager();
         ClientManager = new ClientManager();
 
-        _packetFactories.Add((byte)PacketType.Entity, () => new EntityPacket());
+        _packetFactories.Add((byte)PacketType.CreateEntity, () => new CreateEntityPacket());
         _packetFactories.Add((byte)PacketType.Rpc, () => new RpcPacket());
+        _packetFactories.Add((byte)PacketType.DestroyEntity, () => new DestroyEntityPacket());
     }
 
     public void Update()

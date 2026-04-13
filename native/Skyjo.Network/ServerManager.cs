@@ -69,13 +69,31 @@ public sealed class ServerManager : ManagerBase
             foreach (var entity in NetworkManager.Entities.Values)
             {
                 var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-                new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
+                new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
             }
 
             peer.Send(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
         }
 
         OnPlayerConnected?.Invoke(peer, _lastReader);
+    }
+
+    public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
+    {
+        base.OnPeerDisconnected(peer, disconnectInfo);
+
+        NetworkManager.Writer.Reset();
+        foreach (var entity in NetworkManager.Entities.Values)
+        {
+            if (entity.Owner?.Id != peer.Id)
+                continue;
+            new DestroyEntityPacket(entity.Id).Serialize(NetworkManager.Writer);
+            NetworkManager.Entities.Remove(entity.Id);
+        }
+
+        _peers.Remove(peer.Id);
+
+        Send(NetworkManager.Writer);
     }
 
     internal void Spawn(Entity entity)
@@ -89,7 +107,7 @@ public sealed class ServerManager : ManagerBase
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset();
-        new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
+        new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
         NetManager.SendToAll(NetworkManager.Writer, DeliveryMethod.ReliableOrdered, excludePeer: excludePeer);
     }
 

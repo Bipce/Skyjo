@@ -3,20 +3,20 @@ using Skyjo.Network.Enums;
 
 namespace Skyjo.Network.Packets;
 
-internal sealed class EntityPacket : Packet
+internal sealed class CreateEntityPacket : Packet
 {
-    public EntityPacket()
+    public CreateEntityPacket()
     {
     }
 
-    public EntityPacket(byte typeId, int id, int ownerId)
+    public CreateEntityPacket(byte typeId, int id, int ownerId)
     {
         TypeId = typeId;
         Id = id;
         OwnerId = ownerId;
     }
 
-    public override PacketType Type => PacketType.Entity;
+    public override PacketType Type => PacketType.CreateEntity;
 
     public byte TypeId { get; private set; }
     public int Id { get; private set; }
