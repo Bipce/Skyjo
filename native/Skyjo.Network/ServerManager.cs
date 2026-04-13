@@ -1,5 +1,6 @@
 ﻿using LiteNetLib;
 using LiteNetLib.Utils;
+using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
 
 namespace Skyjo.Network;
@@ -83,18 +84,28 @@ public sealed class ServerManager : ManagerBase
         entity.OwnerId = entity.Owner?.Id ?? -1;
         NetworkManager.Entities[entity.Id] = entity;
 
-        switch (NetManager.ConnectedPeersCount)
-        {
-            case 0:
-            case 1 when ClientManager.IsRunning:
-                return;
-        }
-
-        _peers.TryGetValue(ClientManager.NullablePeer?.Id ?? -1, out var excludePeer);
+        if (!HasRemotePeers(out var excludePeer))
+            return;
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset();
         new EntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
         NetManager.SendToAll(NetworkManager.Writer, DeliveryMethod.ReliableOrdered, excludePeer: excludePeer);
+    }
+
+    [NetworkInternal]
+    public bool HasRemotePeers(out NetPeer? peer)
+    {
+        switch (NetManager.ConnectedPeersCount)
+        {
+            case 0:
+            case 1 when ClientManager.IsRunning:
+                peer = null;
+                return false;
+        }
+
+        peer = _peers.GetValueOrDefault(ClientManager.NullablePeer?.Id ?? -1);
+
+        return true;
     }
 }
