@@ -1,3 +1,4 @@
+using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Eligibility;
@@ -20,5 +21,14 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
         builder.Outbound
             .Select(m => m.DeclaringType)
             .RequireAspect<RpcDispatcherAspect>();
+    }
+
+    [Template]
+    protected static void WriteParams(NetDataWriter writer)
+    {
+        foreach (var param in meta.Target.Method.Parameters)
+        {
+            writer.Put(param.Value);
+        }
     }
 }
