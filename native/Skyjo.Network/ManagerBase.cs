@@ -126,4 +126,10 @@ public abstract class ManagerBase : INetEventListener
         new RpcPacket(entityId, methodId).Serialize(Writer);
         return Writer;
     }
+
+    [NetworkInternal]
+    public void Send(NetDataWriter writer)
+    {
+        NetManager.SendToAll(writer, DeliveryMethod.ReliableOrdered);
+    }
 }

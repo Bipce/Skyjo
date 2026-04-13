@@ -46,10 +46,4 @@ public sealed class ClientManager : ManagerBase
         entity.OwnerId = packet.OwnerId;
         Entities[entity.Id] = entity;
     }
-
-    [NetworkInternal]
-    public void Send(NetDataWriter writer)
-    {
-        NetManager.SendToAll(writer, DeliveryMethod.ReliableOrdered);
-    }
 }

@@ -176,9 +176,8 @@ public sealed class Application : Game
 
         if (IsKeyJustPressed(Keys.Enter) && NetworkManager.IsRunning)
         {
-            var player = NetworkManager.GetEntities<Player>().First(x => x.IsOwner);
             var gameManager = NetworkManager.GetEntities<GameManager>().First();
-            player.Server_SpawnEntity(gameManager);
+            gameManager.Server_SpawnEntity();
         }
     }
 
