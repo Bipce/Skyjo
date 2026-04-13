@@ -3,7 +3,7 @@ using Skyjo.Network.Attributes;
 
 namespace Skyjo;
 
-public sealed class GameManager : Entity
+public sealed partial class GameManager : Entity
 {
     public string Message => "Hello World!";
     
