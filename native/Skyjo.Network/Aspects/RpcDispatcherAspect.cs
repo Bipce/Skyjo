@@ -15,8 +15,8 @@ internal sealed class RpcDispatcherAspect : TypeAspect
             .Select(m => (
                 Id: NetworkHelper.ComputeMethodId(m),
                 Method: m,
-                ReaderMethodNames: m.Parameters
-                    .Select(p => NetworkHelper.GetReaderGetMethod(p.Type))
+                ReaderExpressions: m.Parameters
+                    .Select(p => NetworkHelper.GetReaderExpression(p.Type))
                     .ToList()
             ))
             .ToList();
@@ -37,16 +37,16 @@ internal sealed class RpcDispatcherAspect : TypeAspect
     internal void InternalCallMethodTemplate(
         int id,
         NetDataReader reader,
-        [CompileTime] List<(int Id, IMethod Method, List<string> ReaderMethodNames)> cases)
+        [CompileTime] List<(int Id, IMethod Method, List<string> ReaderExpressions)> cases)
     {
         foreach (var c in meta.CompileTime(cases))
         {
             if (id == c.Id)
             {
                 var args = new List<IExpression>();
-                foreach (var methodName in meta.CompileTime(c.ReaderMethodNames))
+                foreach (var expr in meta.CompileTime(c.ReaderExpressions))
                 {
-                    args.Add(ExpressionFactory.Parse($"reader.{methodName}()"));
+                    args.Add(ExpressionFactory.Parse(expr));
                 }
                 c.Method.WithObject((IExpression)meta.This).Invoke(args);
                 return;

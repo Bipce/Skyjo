@@ -23,16 +23,22 @@ internal static class NetworkHelper
         }
     }
 
-    public static string GetReaderGetMethod(IType type) => type.ToString() switch
+    public static string GetReaderExpression(IType type)
     {
-        "int" => "GetInt",
-        "bool" => "GetBool",
-        "string" => "GetString",
-        "float" => "GetFloat",
-        "double" => "GetDouble",
-        "byte" => "GetByte",
-        "short" => "GetShort",
-        "long" => "GetLong",
-        _ => throw new InvalidOperationException($"Unsupported RPC parameter type: {type}")
-    };
+        if (type is INamedType namedType && namedType.IsConvertibleTo(typeof(Entity)))
+            return $"NetworkManager.GetEntity<{namedType.FullName}>(reader.GetInt())";
+
+        return type.ToString() switch
+        {
+            "int" => "reader.GetInt()",
+            "bool" => "reader.GetBool()",
+            "string" => "reader.GetString()",
+            "float" => "reader.GetFloat()",
+            "double" => "reader.GetDouble()",
+            "byte" => "reader.GetByte()",
+            "short" => "reader.GetShort()",
+            "long" => "reader.GetLong()",
+            _ => throw new InvalidOperationException($"Unsupported RPC parameter type: {type}")
+        };
+    }
 }

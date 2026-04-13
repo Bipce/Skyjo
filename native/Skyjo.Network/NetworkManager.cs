@@ -15,6 +15,9 @@ public sealed class NetworkManager
     private readonly Dictionary<Type, byte> _entityTypeIds = [];
     private readonly Dictionary<byte, Func<Entity>> _entityFactories = [];
 
+    private Dictionary<int, Entity> Entities =>
+        ServerManager.IsRunning ? ServerManager.Entities : ClientManager.Entities;
+
     public NetworkManager()
     {
         Instance = this;
@@ -40,8 +43,17 @@ public sealed class NetworkManager
 
     public IEnumerable<T> GetEntities<T>() where T : Entity
     {
-        var data = ServerManager.IsRunning ? ServerManager.Entities : ClientManager.Entities;
-        return data.Values.OfType<T>().OrderBy(e => e.Id);
+        return Entities.Values.OfType<T>().OrderBy(e => e.Id);
+    }
+
+    public Entity GetEntity(int id)
+    {
+        return Entities[id];
+    }
+
+    public T GetEntity<T>(int id) where T : Entity
+    {
+        return (T)Entities[id];
     }
 
     internal Packet CreatePacket(byte id)

@@ -28,7 +28,10 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
     {
         foreach (var param in meta.Target.Method.Parameters)
         {
-            writer.Put(param.Value);
+            if (param.Type.IsConvertibleTo(typeof(Entity)))
+                writer.Put(((Entity)param.Value!).Id);
+            else
+                writer.Put(param.Value);
         }
     }
 }

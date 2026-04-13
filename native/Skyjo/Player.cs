@@ -9,8 +9,9 @@ public sealed class Player : Entity
     public Color Color { get; init; } // todo: Replicated
 
     [Server]
-    public void Server_SpawnEntity()
+    public void Server_SpawnEntity(GameManager gameManager)
     {
         new TestEntity().Spawn();
+        Console.WriteLine(gameManager.Message);
     }
 }

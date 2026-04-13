@@ -40,6 +40,7 @@ public sealed class Application : Game
 
         NetworkManager.RegisterEntity<TestEntity>();
         NetworkManager.RegisterEntity<Player>();
+        NetworkManager.RegisterEntity<GameManager>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
 
@@ -175,7 +176,13 @@ public sealed class Application : Game
         if (IsKeyJustPressed(Keys.Enter) && NetworkManager.IsRunning)
         {
             var player = NetworkManager.GetEntities<Player>().First(x => x.IsOwner);
-            player.Server_SpawnEntity();
+            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            player.Server_SpawnEntity(gameManager);
+        }
+
+        if (IsKeyJustPressed(Keys.G) && NetworkManager.ServerManager.IsRunning)
+        {
+            new GameManager().Spawn();
         }
     }
 
