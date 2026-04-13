@@ -179,6 +179,12 @@ public sealed class Application : Game
             var gameManager = NetworkManager.GetEntities<GameManager>().First();
             gameManager.Server_SpawnEntity();
         }
+
+        if (IsKeyJustPressed(Keys.P) && NetworkManager.IsRunning)
+        {
+            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            gameManager.Server_SendMessageToPlayer();
+        }
     }
 
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);

@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using Skyjo.Network.Attributes;
 using Skyjo.Network.Enums;
 using Skyjo.Network.Packets;
 
@@ -78,5 +79,13 @@ public sealed class NetworkManager
     internal Entity CreateEntity(byte typeId)
     {
         return _entityFactories[typeId].Invoke();
+    }
+
+    [NetworkInternal]
+    public NetDataWriter GetRpcPacketData(int entityId, int methodId)
+    {
+        Writer.Reset();
+        new RpcPacket(entityId, methodId).Serialize(Writer);
+        return Writer;
     }
 }

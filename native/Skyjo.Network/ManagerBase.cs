@@ -117,14 +117,6 @@ public abstract class ManagerBase : INetEventListener
     }
 
     [NetworkInternal]
-    public NetDataWriter GetRpcPacketData(int entityId, int methodId)
-    {
-        NetworkManager.Writer.Reset();
-        new RpcPacket(entityId, methodId).Serialize(NetworkManager.Writer);
-        return NetworkManager.Writer;
-    }
-
-    [NetworkInternal]
     public void Send(NetDataWriter writer, NetPeer? excludePeer = null)
     {
         NetManager.SendToAll(writer, DeliveryMethod.ReliableOrdered, excludePeer: excludePeer);

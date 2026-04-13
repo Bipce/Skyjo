@@ -15,7 +15,7 @@ public sealed class MulticastAttribute : RpcMethodAspect
         if (networkManager.ServerManager.IsRunning && networkManager.ServerManager.HasRemotePeers(out var excludePeer))
         {
             var entity = (Entity)meta.This;
-            var writer = networkManager.ServerManager.GetRpcPacketData(entity.Id, methodId);
+            var writer = networkManager.GetRpcPacketData(entity.Id, methodId);
             WriteParams(writer);
             networkManager.ServerManager.Send(writer, excludePeer: excludePeer);
         }

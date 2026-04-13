@@ -9,12 +9,12 @@ public sealed partial class GameManager : Entity
     public void Server_SpawnEntity()
     {
         new TestEntity().Spawn();
-        Multicast_SayHello();
     }
 
-    [Multicast]
-    private void Multicast_SayHello()
+    [Server]
+    public void Server_SendMessageToPlayer()
     {
-        Console.WriteLine($"Hello: {Random.Shared.Next()}");
+        var players = NetworkManager.GetEntities<Player>().ToArray();
+        players[^1].Client_SayHello();
     }
 }
