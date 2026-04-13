@@ -11,7 +11,7 @@ internal sealed class RpcDispatcherAspect : TypeAspect
     public override void BuildAspect(IAspectBuilder<INamedType> builder)
     {
         var cases = builder.Target.Methods
-            .Where(m => m.Attributes.Any(a => a.Type.Name == "ServerAttribute"))
+            .Where(m => m.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(RpcMethodAspect))))
             .Select(m => (
                 Id: NetworkHelper.ComputeMethodId(m),
                 Method: m,
