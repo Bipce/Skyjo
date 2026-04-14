@@ -1,8 +1,10 @@
 using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
+using Metalama.Framework.Code.Types;
 using Metalama.Framework.Eligibility;
 using Skyjo.Network.Enums;
+using Skyjo.Network.Extensions;
 
 namespace Skyjo.Network.Aspects;
 
@@ -33,9 +35,19 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
         foreach (var param in meta.Target.Method.Parameters)
         {
             if (param.Type.IsConvertibleTo(typeof(Entity)))
-                writer.Put(((Entity)param.Value!).Id);
+                NetDataExtensions.PutEntity(writer, param.Value);
+            else if (param.Type is IArrayType { ElementType: INamedType elemType } &&
+                     elemType.IsConvertibleTo(typeof(Entity)))
+                NetDataExtensions.PutEntityArray(writer, param.Value);
+            else if (param.Type.ToString() == "byte[]")
+                NetDataExtensions.PutBytesWithIntLength(writer, param.Value);
             else
-                writer.Put(param.Value);
+            {
+                if (param.Type.TypeKind == TypeKind.Array)
+                    writer.PutArray(param.Value);
+                else
+                    writer.Put(param.Value);
+            }
         }
     }
 
