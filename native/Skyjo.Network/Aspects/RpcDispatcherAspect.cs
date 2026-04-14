@@ -7,27 +7,23 @@ namespace Skyjo.Network.Aspects;
 
 internal sealed class RpcDispatcherAspect : TypeAspect
 {
-    [Introduce] private static Dictionary<int, Action<NetDataReader>>? _rpcHandlers;
-
     [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
     private void InternalCallMethod(int id, NetDataReader reader)
     {
         var methods = meta.Target.Type.Methods
-            .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(RpcMethodAspect)))).ToArray();
+            .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(RpcMethodAspect))));
 
-        if (_rpcHandlers == null)
+        var sb = meta.CompileTime(new System.Text.StringBuilder("switch(id){"));
+        var i = meta.CompileTime(0);
+        foreach (var method in methods)
         {
-            _rpcHandlers = new Dictionary<int, Action<NetDataReader>>(methods.Length);
-            foreach (var method in methods)
-            {
-                var methodId = NetworkHelper.ComputeMethodId(method);
-                var parameters = method.Parameters.Select(x => NetworkHelper.GetReaderExpression(x.Type));
-                var args = string.Join(", ", parameters);
-                var body = $"this.{method.Name}({args});";
-                meta.InsertStatement($"_rpcHandlers[{methodId}] = (reader) => {{{body}}};");
-            }
+            var parameters = method.Parameters.Select(x => NetworkHelper.GetReaderExpression(x.Type));
+            var args = string.Join(", ", parameters);
+            sb.Append($"case {i}: this.{method.Name}({args}); return;");
+            i++;
         }
 
-        _rpcHandlers[id](reader);
+        sb.Append('}');
+        meta.InsertStatement(sb.ToString());
     }
 }

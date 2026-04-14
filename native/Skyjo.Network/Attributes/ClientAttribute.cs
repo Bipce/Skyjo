@@ -1,7 +1,6 @@
 ﻿using LiteNetLib;
 using Metalama.Framework.Aspects;
 using Skyjo.Network.Aspects;
-using Skyjo.Network.Utils;
 
 namespace Skyjo.Network.Attributes;
 
@@ -10,7 +9,6 @@ public sealed class ClientAttribute : RpcMethodAspect
     public override dynamic? OverrideMethod()
     {
         var networkManager = NetworkManager.Instance;
-        var methodId = NetworkHelper.ComputeMethodId(meta.Target.Method);
 
         if (networkManager.ServerManager.IsRunning)
         {
@@ -20,7 +18,7 @@ public sealed class ClientAttribute : RpcMethodAspect
 
             if (networkManager.ServerManager.HasRemotePeers(out _))
             {
-                var writer = networkManager.GetRpcPacketData(entity.Id, methodId);
+                var writer = networkManager.GetRpcPacketData(entity.Id, GetMethodId());
                 WriteParams(writer);
                 entity.Owner.Send(writer, Channel, (DeliveryMethod)meta.RunTime((int)Reliability));
                 return null;

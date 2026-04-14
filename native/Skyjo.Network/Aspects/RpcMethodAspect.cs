@@ -10,7 +10,7 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
 {
     public Reliability Reliability { get; init; } = Reliability.ReliableOrdered;
     public byte Channel { get; init; }
-    
+
     public override void BuildEligibility(IEligibilityBuilder<IMethod> builder)
     {
         base.BuildEligibility(builder);
@@ -37,5 +37,22 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
             else
                 writer.Put(param.Value);
         }
+    }
+
+    [CompileTime]
+    protected static int GetMethodId()
+    {
+        var methods = meta.Target.Type.Methods
+            .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(RpcMethodAspect))));
+
+        var i = 0;
+        foreach (var method in methods)
+        {
+            if (method == meta.Target.Method)
+                return i;
+            i++;
+        }
+
+        throw new Exception($"Method {meta.Target.Method} not found");
     }
 }
