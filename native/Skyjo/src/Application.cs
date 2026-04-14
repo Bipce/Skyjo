@@ -37,6 +37,8 @@ public sealed class Application : Game
         IsMouseVisible = true;
         Window.AllowUserResizing = true;
         Window.ClientSizeChanged += OnResize;
+        graphics.SynchronizeWithVerticalRetrace = false;
+        IsFixedTimeStep = true;
 
         NetworkManager.RegisterEntity<TestEntity>();
         NetworkManager.RegisterEntity<Player>();
