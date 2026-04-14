@@ -1,4 +1,5 @@
-﻿using Metalama.Framework.Aspects;
+﻿using LiteNetLib;
+using Metalama.Framework.Aspects;
 using Skyjo.Network.Aspects;
 using Skyjo.Network.Utils;
 
@@ -17,7 +18,8 @@ public sealed class MulticastAttribute : RpcMethodAspect
             var entity = (Entity)meta.This;
             var writer = networkManager.GetRpcPacketData(entity.Id, methodId);
             WriteParams(writer);
-            networkManager.ServerManager.Send(writer, excludePeer: excludePeer);
+            networkManager.ServerManager.Send(writer, Channel, (DeliveryMethod)meta.RunTime((int)Reliability),
+                excludePeer: excludePeer);
         }
 
         return meta.Proceed();

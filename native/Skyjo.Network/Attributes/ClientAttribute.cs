@@ -22,7 +22,7 @@ public sealed class ClientAttribute : RpcMethodAspect
             {
                 var writer = networkManager.GetRpcPacketData(entity.Id, methodId);
                 WriteParams(writer);
-                entity.Owner.Send(writer, DeliveryMethod.ReliableOrdered);
+                entity.Owner.Send(writer, Channel, (DeliveryMethod)meta.RunTime((int)Reliability));
                 return null;
             }
         }

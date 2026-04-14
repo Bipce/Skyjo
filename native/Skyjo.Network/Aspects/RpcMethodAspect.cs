@@ -2,11 +2,15 @@ using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Eligibility;
+using Skyjo.Network.Enums;
 
 namespace Skyjo.Network.Aspects;
 
 public abstract class RpcMethodAspect : OverrideMethodAspect
 {
+    public Reliability Reliability { get; init; } = Reliability.ReliableOrdered;
+    public byte Channel { get; init; }
+    
     public override void BuildEligibility(IEligibilityBuilder<IMethod> builder)
     {
         base.BuildEligibility(builder);

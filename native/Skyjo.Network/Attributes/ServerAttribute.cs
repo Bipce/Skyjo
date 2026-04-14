@@ -1,3 +1,4 @@
+using LiteNetLib;
 using Metalama.Framework.Aspects;
 using Skyjo.Network.Aspects;
 using Skyjo.Network.Utils;
@@ -17,7 +18,7 @@ public sealed class ServerAttribute : RpcMethodAspect
             var entity = (Entity)meta.This;
             var writer = networkManager.GetRpcPacketData(entity.Id, methodId);
             WriteParams(writer);
-            networkManager.ClientManager.Send(writer);
+            networkManager.ClientManager.Send(writer, Channel, (DeliveryMethod)meta.RunTime((int)Reliability));
             return null;
         }
 

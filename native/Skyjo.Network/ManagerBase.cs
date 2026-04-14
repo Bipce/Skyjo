@@ -117,8 +117,10 @@ public abstract class ManagerBase : INetEventListener
     }
 
     [NetworkInternal]
-    public void Send(NetDataWriter writer, NetPeer? excludePeer = null)
+    public void Send(NetDataWriter writer, byte channel = 0,
+        DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
+        NetPeer? excludePeer = null)
     {
-        NetManager.SendToAll(writer, DeliveryMethod.ReliableOrdered, excludePeer: excludePeer);
+        NetManager.SendToAll(writer, channel, deliveryMethod, excludePeer);
     }
 }
