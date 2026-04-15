@@ -90,7 +90,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
         var i = 0;
         foreach (var replicatedVar in replicatedVars)
         {
-            if (replicatedVar == meta.Target.FieldOrProperty)
+            if (replicatedVar.Name == meta.Target.FieldOrProperty.Name)
                 return i;
             i++;
         }
