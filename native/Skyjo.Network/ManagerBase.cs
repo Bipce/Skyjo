@@ -44,7 +44,7 @@ public abstract class ManagerBase : INetEventListener
         return true;
     }
 
-    public void Update()
+    public virtual void Update()
     {
         if (!IsRunning)
             return;

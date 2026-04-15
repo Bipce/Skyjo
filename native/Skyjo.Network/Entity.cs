@@ -13,6 +13,7 @@ public abstract class Entity
     public int Id { get; internal set; }
     public NetPeer? Owner { get; init; }
     internal int OwnerId { get; set; }
+    public float NetUpdateFrequency { get; set; } = 1000; // temp value
 
     public bool IsOwner
     {

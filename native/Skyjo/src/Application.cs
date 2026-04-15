@@ -87,7 +87,7 @@ public sealed class Application : Game
     {
         base.Update(gameTime);
 
-        NetworkManager.Update();
+        NetworkManager.Update(gameTime.ElapsedGameTime.TotalMilliseconds, gameTime.TotalGameTime.TotalMilliseconds);
 
         UpdateInput();
 
@@ -185,7 +185,13 @@ public sealed class Application : Game
         if (IsKeyJustPressed(Keys.P) && NetworkManager.IsRunning)
         {
             var gameManager = NetworkManager.GetEntities<GameManager>().First();
-            gameManager.Server_SendMessageToPlayer();
+            gameManager.Server_IncrementHealth();
+        }
+
+        if (IsKeyJustPressed(Keys.O) && NetworkManager.IsRunning)
+        {
+            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            gameManager.Server_DecrementHealth();
         }
     }
 

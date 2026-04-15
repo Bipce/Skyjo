@@ -18,6 +18,8 @@ public sealed class ServerManager : ManagerBase
     private readonly Dictionary<int, NetPeer> _peers = [];
     private NetDataReader _lastReader = null!;
 
+    private readonly Dictionary<double, ReplicatedFrequencyData> _frequencyData = [];
+
     public override bool Start()
     {
         if (!base.Start() || ClientManager.IsRunning)
@@ -125,5 +127,69 @@ public sealed class ServerManager : ManagerBase
         peer = _peers.GetValueOrDefault(ClientManager.NullablePeer?.Id ?? -1);
 
         return true;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (!IsRunning)
+            return;
+
+        UpdateReplication();
+    }
+
+    private void UpdateReplication()
+    {
+        foreach (var (frequency, frequencyData) in _frequencyData)
+        {
+            frequencyData.Time += NetworkManager.DeltaTimeMs;
+            if (frequencyData.Time >= frequency)
+            {
+                frequencyData.Time -= frequency;
+
+                while (frequencyData.ReplicatedData.TryDequeue(out var data))
+                {
+                    if (!data.IsUnchanged)
+                    {
+                        new ReplicatedPacket(data.Entity.Id, data.Index).Serialize(NetworkManager.Writer);
+                        data.Serialize(NetworkManager.Writer);
+                    }
+
+                    data.Done();
+                }
+
+                _frequencyData.Remove(frequency);
+            }
+        }
+
+        if (NetworkManager.Writer.Length > 0)
+        {
+            NetManager.SendToAll(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
+            NetworkManager.Writer.Reset();
+        }
+    }
+
+    // [NetworkInternal]
+    public ReplicatedData<T> AddReplicatedData<T>(double frequency, Entity entity, int index, T lastValue, T value)
+        where T : IEquatable<T>
+    {
+        var data = new ReplicatedData<T>
+        {
+            Entity = entity,
+            Index = index,
+            LastValue = lastValue,
+            Value = value
+        };
+
+        if (!_frequencyData.TryGetValue(frequency, out var frequencyData))
+        {
+            frequencyData = new ReplicatedFrequencyData(frequency);
+            _frequencyData[frequency] = frequencyData;
+        }
+
+        frequencyData.ReplicatedData.Enqueue(data);
+
+        return data;
     }
 }

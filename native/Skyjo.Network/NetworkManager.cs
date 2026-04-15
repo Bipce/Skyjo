@@ -20,6 +20,9 @@ public sealed class NetworkManager
     internal Dictionary<int, Entity> Entities { get; } = [];
     internal NetDataWriter Writer { get; private set; } = new();
 
+    public double DeltaTimeMs { get; private set; }
+    public double TotalTimeMs { get; private set; }
+
     public NetworkManager()
     {
         Instance = this;
@@ -30,10 +33,14 @@ public sealed class NetworkManager
         _packetFactories.Add((byte)PacketType.CreateEntity, () => new CreateEntityPacket());
         _packetFactories.Add((byte)PacketType.Rpc, () => new RpcPacket());
         _packetFactories.Add((byte)PacketType.DestroyEntity, () => new DestroyEntityPacket());
+        _packetFactories.Add((byte)PacketType.Replicated, () => new ReplicatedPacket());
     }
 
-    public void Update()
+    public void Update(double deltaTimeMs, double totalTimeMs)
     {
+        DeltaTimeMs = deltaTimeMs;
+        TotalTimeMs = totalTimeMs;
+
         ServerManager.Update();
         ClientManager.Update();
     }

@@ -5,6 +5,8 @@ namespace Skyjo;
 
 public sealed partial class GameManager : Entity
 {
+    [Replicated] private int Health { get; set; } = 100;
+    
     [Server]
     public void Server_SpawnEntity()
     {
@@ -12,9 +14,16 @@ public sealed partial class GameManager : Entity
     }
 
     [Server]
-    public void Server_SendMessageToPlayer()
+    public void Server_DecrementHealth()
     {
-        var players = NetworkManager.GetEntities<Player>().ToArray();
-        players[^1].Client_SayHello();
+        Console.WriteLine("Health -= 10");
+        Health -= 10;
+    }
+
+    [Server]
+    public void Server_IncrementHealth()
+    {
+        Console.WriteLine("Health += 10");
+        Health += 10;
     }
 }
