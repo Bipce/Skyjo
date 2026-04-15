@@ -23,7 +23,8 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
         base.BuildAspect(builder);
 
         var fieldType = ((INamedType)TypeFactory.GetType(typeof(ReplicatedData<>)))
-            .WithTypeArguments(builder.Target.Type);
+            .WithTypeArguments(builder.Target.Type)
+            .ToNullable();
 
         var result = builder.With(builder.Target.DeclaringType).IntroduceField($"{builder.Target.Name}ReplicatedData",
             fieldType, IntroductionScope.Instance, OverrideStrategy.Ignore);
@@ -40,8 +41,15 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
         get => meta.Proceed();
         set
         {
-            var index = GetPropertyIndex();
             var networkManager = NetworkManager.Instance;
+            if (!networkManager.ServerManager.IsRunning ||
+                !networkManager.ServerManager.HasRemotePeers(out _))
+            {
+                meta.Proceed();
+                return;
+            }
+
+            var index = GetPropertyIndex();
             var entity = (Entity)meta.This;
 
             if (_replicatedDataField!.Value == null)

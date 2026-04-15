@@ -21,6 +21,7 @@ public sealed class ClientAttribute : RpcMethodAspect
                 var writer = networkManager.GetRpcPacketData(entity.Id, GetMethodId());
                 WriteParams();
                 entity.Owner.Send(writer, Channel, (DeliveryMethod)meta.RunTime((int)Reliability));
+                writer.Reset();
                 return null;
             }
         }

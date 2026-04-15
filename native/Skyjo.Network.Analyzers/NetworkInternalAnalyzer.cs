@@ -84,8 +84,13 @@ public sealed class NetworkInternalAnalyzer : DiagnosticAnalyzer
     private static IMethodSymbol? GetContainingMethod(SyntaxNode node, SemanticModel model)
     {
         var methodDecl = node.FirstAncestorOrSelf<MethodDeclarationSyntax>();
-        if (methodDecl is null)
-            return null;
-        return model.GetDeclaredSymbol(methodDecl);
+        if (methodDecl is not null)
+            return model.GetDeclaredSymbol(methodDecl);
+
+        var accessorDecl = node.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
+        if (accessorDecl is not null)
+            return model.GetDeclaredSymbol(accessorDecl);
+
+        return null;
     }
 }

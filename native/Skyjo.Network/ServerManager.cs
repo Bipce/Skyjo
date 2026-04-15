@@ -94,7 +94,7 @@ public sealed class ServerManager : ManagerBase
 
         _peers.Remove(peer.Id);
 
-        Send(NetworkManager.Writer);
+        Send();
     }
 
     internal void Spawn(Entity entity)
@@ -109,7 +109,7 @@ public sealed class ServerManager : ManagerBase
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset();
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
-        Send(NetworkManager.Writer, excludePeer: excludePeer);
+        Send(excludePeer: excludePeer);
     }
 
     [NetworkInternal]
@@ -162,13 +162,13 @@ public sealed class ServerManager : ManagerBase
             }
         }
 
-        if (NetworkManager.Writer.Length > 0)
+        if (NetworkManager.Writer.Length > 0 && HasRemotePeers(out var excludePeer))
         {
-            Send(NetworkManager.Writer);
+            Send(excludePeer: excludePeer);
         }
     }
 
-    // [NetworkInternal]
+    [NetworkInternal]
     public ReplicatedData<T> AddReplicatedData<T>(double frequency, Entity entity, int index, T lastValue, T value)
         where T : IEquatable<T>
     {

@@ -93,6 +93,11 @@ public sealed class Application : Game
 
         _renderer.Update();
         _view.Update();
+        
+        foreach (var gameManager in NetworkManager.GetEntities<GameManager>())
+        {
+            gameManager.Update();
+        }
     }
 
     protected override void Draw(GameTime gameTime)

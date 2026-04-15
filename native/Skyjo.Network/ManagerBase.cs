@@ -117,11 +117,11 @@ public abstract class ManagerBase : INetEventListener
     }
 
     [NetworkInternal]
-    public void Send(NetDataWriter writer, byte channel = 0,
+    public void Send(byte channel = 0,
         DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
         NetPeer? excludePeer = null)
     {
-        NetManager.SendToAll(writer, channel, deliveryMethod, excludePeer);
+        NetManager.SendToAll(NetworkManager.Writer, channel, deliveryMethod, excludePeer);
         NetworkManager.Writer.Reset();
     }
 }

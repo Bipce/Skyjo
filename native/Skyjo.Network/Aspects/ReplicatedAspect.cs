@@ -9,6 +9,7 @@ namespace Skyjo.Network.Aspects;
 public sealed class ReplicatedAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
+    [NetworkInternal]
     private void InternalUpdateReplicatedVar(int id, NetDataReader reader)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties
