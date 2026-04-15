@@ -122,5 +122,6 @@ public abstract class ManagerBase : INetEventListener
         NetPeer? excludePeer = null)
     {
         NetManager.SendToAll(writer, channel, deliveryMethod, excludePeer);
+        NetworkManager.Writer.Reset();
     }
 }

@@ -1,3 +1,4 @@
+using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Code.Types;
@@ -53,5 +54,26 @@ internal static class NetworkHelper
             "long[]" => "reader.GetLongArray()",
             _ => throw new InvalidOperationException($"Unsupported RPC parameter type: {type}")
         };
+    }
+
+    public static string GetWriterExpression(IType type, string valueName)
+    {
+        if (type is INamedType namedType && namedType.IsConvertibleTo(typeof(Entity)))
+            return $"{typeof(NetDataExtensions).FullName}.PutEntity(writer, {valueName})";
+
+        if (type is IArrayType { ElementType: INamedType elemType } && elemType.IsConvertibleTo(typeof(Entity)))
+            return $"{typeof(NetDataExtensions).FullName}.PutEntityArray(writer, {valueName})";
+
+        switch (type.ToString())
+        {
+            case "byte[]":
+                return $"{typeof(NetDataExtensions).FullName}.PutBytesWithIntLength(writer, {valueName})";
+            case "int[]" or "bool[]" or "string[]" or "float[]" or "double[]" or "short[]" or "long[]":
+                return $"writer.PutArray({valueName})";
+            case "int" or "bool" or "string" or "float" or "double" or "byte" or "short" or "long":
+                return $"writer.Put({valueName})";
+            default:
+                throw new InvalidOperationException($"Unsupported replicated property type: {type}");
+        }
     }
 }

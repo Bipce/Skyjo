@@ -6,7 +6,7 @@ namespace Skyjo;
 public sealed partial class GameManager : Entity
 {
     [Replicated] private int Health { get; set; } = 100;
-    
+
     [Server]
     public void Server_SpawnEntity()
     {

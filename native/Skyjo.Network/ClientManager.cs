@@ -56,8 +56,7 @@ public sealed class ClientManager : ManagerBase
 
     private void OnReplicatedPacket(ReplicatedPacket packet)
     {
-        Console.WriteLine($"OnReplicatedPacket: {packet.EntityId}");
-        var value = packet.Reader.GetInt(); // todo: tmp
-        Console.WriteLine(value);
+        var entity = NetworkManager.Entities[packet.EntityId];
+        entity.InternalUpdateReplicatedVar(packet.Index, packet.Reader);
     }
 }

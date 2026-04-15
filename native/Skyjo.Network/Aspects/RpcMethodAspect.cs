@@ -1,10 +1,8 @@
-using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
-using Metalama.Framework.Code.Types;
 using Metalama.Framework.Eligibility;
 using Skyjo.Network.Enums;
-using Skyjo.Network.Extensions;
+using Skyjo.Network.Utils;
 
 namespace Skyjo.Network.Aspects;
 
@@ -30,24 +28,12 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
     }
 
     [Template]
-    protected static void WriteParams(NetDataWriter writer)
+    protected static void WriteParams()
     {
         foreach (var param in meta.Target.Method.Parameters)
         {
-            if (param.Type.IsConvertibleTo(typeof(Entity)))
-                NetDataExtensions.PutEntity(writer, param.Value);
-            else if (param.Type is IArrayType { ElementType: INamedType elemType } &&
-                     elemType.IsConvertibleTo(typeof(Entity)))
-                NetDataExtensions.PutEntityArray(writer, param.Value);
-            else if (param.Type.ToString() == "byte[]")
-                NetDataExtensions.PutBytesWithIntLength(writer, param.Value);
-            else
-            {
-                if (param.Type.TypeKind == TypeKind.Array)
-                    writer.PutArray(param.Value);
-                else
-                    writer.Put(param.Value);
-            }
+            var expr = NetworkHelper.GetWriterExpression(param.Type, param.Name);
+            meta.InsertStatement($"{expr};");
         }
     }
 
@@ -65,6 +51,6 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
             i++;
         }
 
-        throw new Exception($"Method {meta.Target.Method} not found");
+        throw new InvalidOperationException($"Method {meta.Target.Method} not found");
     }
 }

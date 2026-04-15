@@ -67,7 +67,6 @@ public sealed class ServerManager : ManagerBase
 
         if (peer.Id != ClientManager.NullablePeer?.Id)
         {
-            NetworkManager.Writer.Reset();
             foreach (var entity in NetworkManager.Entities.Values)
             {
                 var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
@@ -75,6 +74,7 @@ public sealed class ServerManager : ManagerBase
             }
 
             peer.Send(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
+            NetworkManager.Writer.Reset();
         }
 
         OnPlayerConnected?.Invoke(peer, _lastReader);
@@ -84,7 +84,6 @@ public sealed class ServerManager : ManagerBase
     {
         base.OnPeerDisconnected(peer, disconnectInfo);
 
-        NetworkManager.Writer.Reset();
         foreach (var entity in NetworkManager.Entities.Values)
         {
             if (entity.Owner?.Id != peer.Id)
@@ -110,7 +109,7 @@ public sealed class ServerManager : ManagerBase
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset();
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
-        NetManager.SendToAll(NetworkManager.Writer, DeliveryMethod.ReliableOrdered, excludePeer: excludePeer);
+        Send(NetworkManager.Writer, excludePeer: excludePeer);
     }
 
     [NetworkInternal]
@@ -165,8 +164,7 @@ public sealed class ServerManager : ManagerBase
 
         if (NetworkManager.Writer.Length > 0)
         {
-            NetManager.SendToAll(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
-            NetworkManager.Writer.Reset();
+            Send(NetworkManager.Writer);
         }
     }
 

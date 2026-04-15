@@ -4,7 +4,7 @@ using Skyjo.Network.Attributes;
 
 namespace Skyjo.Network;
 
-public abstract class Entity
+public abstract class Entity : IEquatable<Entity>
 {
     protected NetworkManager NetworkManager => NetworkManager.Instance;
     protected ServerManager ServerManager => NetworkManager.ServerManager;
@@ -34,8 +34,15 @@ public abstract class Entity
         ServerManager.Spawn(this);
     }
 
+    public bool Equals(Entity? other) => other is not null && Id == other.Id;
+
     [NetworkInternal]
     protected internal virtual void InternalCallMethod(int id, NetDataReader reader)
+    {
+    }
+    
+    [NetworkInternal]
+    protected internal virtual void InternalUpdateReplicatedVar(int id, NetDataReader reader)
     {
     }
 }

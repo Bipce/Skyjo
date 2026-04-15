@@ -15,7 +15,7 @@ public sealed class ServerAttribute : RpcMethodAspect
         {
             var entity = (Entity)meta.This;
             var writer = networkManager.GetRpcPacketData(entity.Id, GetMethodId());
-            WriteParams(writer);
+            WriteParams();
             networkManager.ClientManager.Send(writer, Channel, (DeliveryMethod)meta.RunTime((int)Reliability));
             return null;
         }
