@@ -1,7 +1,6 @@
 using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
-using Skyjo.Network.Attributes;
 using Skyjo.Network.Utils;
 
 namespace Skyjo.Network.Aspects;
@@ -9,8 +8,7 @@ namespace Skyjo.Network.Aspects;
 internal sealed class RpcDispatcherAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
-    [NetworkInternal]
-    private void InternalCallMethod(int id, NetDataReader reader)
+    private void __CallMethod(int id, NetDataReader reader)
     {
         var methods = meta.Target.Type.Methods
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(RpcMethodAspect))));

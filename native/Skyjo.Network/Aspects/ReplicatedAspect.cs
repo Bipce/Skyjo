@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
@@ -9,7 +10,8 @@ namespace Skyjo.Network.Aspects;
 public sealed class ReplicatedAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Private, WhenExists = OverrideStrategy.Ignore)]
-    private static int GetReplicatedVarIndex(string name)
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    private static int __GetReplicatedVarIndex(string name)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
@@ -24,12 +26,11 @@ public sealed class ReplicatedAspect : TypeAspect
 
         sb.Append("_ => throw new global::System.InvalidOperationException(name) };");
         meta.InsertStatement(sb.ToString());
-        return default;
+        return 0;
     }
 
     [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
-    [NetworkInternal]
-    private void InternalUpdateReplicatedVar(int id, NetDataReader reader)
+    private void __UpdateReplicatedVar(int id, NetDataReader reader)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));

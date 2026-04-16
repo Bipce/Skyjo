@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
+using Metalama.Framework.Code.DeclarationBuilders;
 using Metalama.Framework.Eligibility;
 using Skyjo.Network.Aspects;
 using Skyjo.Network.Utils;
@@ -27,14 +29,23 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
             .WithTypeArguments(builder.Target.Type)
             .ToNullable();
 
-        var result = builder.With(builder.Target.DeclaringType).IntroduceField($"{builder.Target.Name}ReplicatedData",
-            fieldType, IntroductionScope.Instance, OverrideStrategy.Ignore);
+        var result = builder.With(builder.Target.DeclaringType).IntroduceField(
+            $"__{builder.Target.Name}ReplicatedData",
+            fieldType,
+            IntroductionScope.Instance,
+            OverrideStrategy.Ignore,
+            fb =>
+            {
+                fb.Accessibility = Accessibility.Private;
+                fb.AddAttribute(AttributeConstruction.Create(typeof(EditorBrowsableAttribute),
+                    [EditorBrowsableState.Never]));
+                fb.AddAttribute(
+                    AttributeConstruction.Create(typeof(ObsoleteAttribute), [NetworkHelper.InternalMessage]));
+            });
 
         _replicatedDataField = result.Declaration;
 
-        builder.Outbound
-            .Select(m => m.DeclaringType)
-            .RequireAspect<ReplicatedAspect>();
+        builder.Outbound.Select(m => m.DeclaringType).RequireAspect<ReplicatedAspect>();
     }
 
     public override dynamic? OverrideProperty
@@ -50,7 +61,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 return;
             }
 
-            var index = (int)meta.ThisType.GetReplicatedVarIndex(meta.Target.FieldOrProperty.Name);
+            var index = (int)meta.ThisType.__GetReplicatedVarIndex(meta.Target.FieldOrProperty.Name);
             var entity = (Entity)meta.This;
 
             if (_replicatedDataField!.Value == null)
@@ -61,7 +72,8 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 _replicatedDataField.Value.Serialize =
                     meta.RunTime<Action<NetDataWriter>>(writer =>
                     {
-                        NetworkTemplates.WriteType(meta.Target.FieldOrProperty.Type, writer, _replicatedDataField!.Value.Value);
+                        NetworkTemplates.WriteType(meta.Target.FieldOrProperty.Type, writer,
+                            _replicatedDataField!.Value.Value);
                     });
 
                 _replicatedDataField.Value.Done = meta.RunTime(() => { _replicatedDataField.Value = null; });

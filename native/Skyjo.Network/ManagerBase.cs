@@ -113,7 +113,9 @@ public abstract class ManagerBase : INetEventListener
     private void OnRpcPacket(RpcPacket packet)
     {
         var entity = NetworkManager.Entities[packet.EntityId];
-        entity.InternalCallMethod(packet.MethodId, packet.Reader);
+#pragma warning disable CS0618
+        entity.__CallMethod(packet.MethodId, packet.Reader);
+#pragma warning restore CS0618
     }
 
     [NetworkInternal]

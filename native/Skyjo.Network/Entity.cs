@@ -1,6 +1,8 @@
-﻿using LiteNetLib;
+﻿using System.ComponentModel;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using Skyjo.Network.Attributes;
+using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
 
@@ -36,13 +38,15 @@ public abstract class Entity : IEquatable<Entity>
 
     public bool Equals(Entity? other) => other is not null && Id == other.Id;
 
-    [NetworkInternal]
-    protected internal virtual void InternalCallMethod(int id, NetDataReader reader)
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(NetworkHelper.InternalMessage)]
+    protected internal virtual void __CallMethod(int id, NetDataReader reader)
     {
     }
-    
-    [NetworkInternal]
-    protected internal virtual void InternalUpdateReplicatedVar(int id, NetDataReader reader)
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(NetworkHelper.InternalMessage)]
+    protected internal virtual void __UpdateReplicatedVar(int id, NetDataReader reader)
     {
     }
 }
