@@ -49,7 +49,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 return;
             }
 
-            var index = GetPropertyIndex();
+            var index = (int)meta.ThisType.GetReplicatedVarIndex(meta.Target.FieldOrProperty.Name);
             var entity = (Entity)meta.This;
 
             if (_replicatedDataField!.Value == null)
@@ -68,7 +68,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
 
                 meta.InsertStatement($$"""
                                        {{_replicatedDataField.Name}}.Done = () => {
-                                         {{_replicatedDataField.Name}} = null; 
+                                         {{_replicatedDataField.Name}} = null;
                                        };
                                        """);
             }
@@ -79,22 +79,5 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
 
             meta.Proceed();
         }
-    }
-
-    [CompileTime]
-    private static int GetPropertyIndex()
-    {
-        var replicatedVars = meta.Target.FieldOrProperty.DeclaringType.FieldsAndProperties
-            .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
-
-        var i = 0;
-        foreach (var replicatedVar in replicatedVars)
-        {
-            if (replicatedVar.Name == meta.Target.FieldOrProperty.Name)
-                return i;
-            i++;
-        }
-
-        throw new InvalidOperationException($"Property {meta.Target.FieldOrProperty.Name} not found");
     }
 }

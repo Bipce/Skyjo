@@ -170,7 +170,6 @@ public sealed class ServerManager : ManagerBase
 
     [NetworkInternal]
     public ReplicatedData<T> AddReplicatedData<T>(double frequency, Entity entity, int index, T lastValue, T value)
-        where T : IEquatable<T>
     {
         var data = new ReplicatedData<T>
         {

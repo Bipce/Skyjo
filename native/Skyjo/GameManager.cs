@@ -7,6 +7,7 @@ public sealed partial class GameManager : Entity
 {
     [Replicated] private int _health = 100;
     private int _lastHealth;
+    [Replicated] private TestEntity _entity = null!;
 
     public GameManager()
     {
@@ -31,6 +32,9 @@ public sealed partial class GameManager : Entity
     {
         // Console.WriteLine("Health += 10");
         _health += 10;
+
+        _entity = new TestEntity();
+        _entity.Spawn();
     }
 
     public void Update()
@@ -40,5 +44,8 @@ public sealed partial class GameManager : Entity
             _lastHealth = _health;
             Console.WriteLine(_health);
         }
+
+        if (_entity != null)
+            Console.WriteLine(_entity.Id);
     }
 }
