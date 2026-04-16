@@ -14,7 +14,7 @@ public abstract class Entity : IEquatable<Entity>
     public int Id { get; internal set; }
     public NetPeer? Owner { get; init; }
     internal int OwnerId { get; set; }
-    public float NetUpdateFrequency { get; set; } = 100;
+    public int NetUpdateFrequency { get; set; } = 100;
 
     public bool IsOwner
     {

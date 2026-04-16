@@ -19,7 +19,7 @@ public sealed class ServerManager : ManagerBase
     private readonly Dictionary<int, NetPeer> _peers = [];
     private NetDataReader _lastReader = null!;
 
-    private readonly List<ReplicatedFrequencyData> _frequencyData = [];
+    private readonly Dictionary<int, ReplicatedFrequencyData> _frequencyData = [];
 
     public override bool Start()
     {
@@ -141,7 +141,7 @@ public sealed class ServerManager : ManagerBase
 
     private void UpdateReplication()
     {
-        foreach (var frequencyData in _frequencyData)
+        foreach (var (_, frequencyData) in _frequencyData)
         {
             frequencyData.Time += NetworkManager.DeltaTime;
             if (frequencyData.Time >= frequencyData.Frequency)
@@ -169,7 +169,8 @@ public sealed class ServerManager : ManagerBase
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete(NetworkHelper.InternalMessage)]
-    public ReplicatedData<T> AddReplicatedData<T>(double frequency, Entity entity, int index, T lastValue, T value)
+    public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, Entity entity, int index, T lastValue,
+        T value)
     {
         var data = new ReplicatedData<T>
         {
@@ -179,10 +180,13 @@ public sealed class ServerManager : ManagerBase
             Value = value
         };
 
-        frequency = 1 / frequency;
+        var frequency = 1.0 / netUpdateFrequency;
 
-        var frequencyData = new ReplicatedFrequencyData(frequency);
-        _frequencyData.Add(frequencyData);
+        if (!_frequencyData.TryGetValue(netUpdateFrequency, out var frequencyData))
+        {
+            frequencyData = new ReplicatedFrequencyData(frequency);
+            _frequencyData[netUpdateFrequency] = frequencyData;
+        }
 
         frequencyData.ReplicatedData.Enqueue(data);
 
