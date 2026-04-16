@@ -1,3 +1,4 @@
+using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Eligibility;
@@ -28,12 +29,11 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
     }
 
     [Template]
-    protected static void WriteParams()
+    protected static void WriteParams(NetDataWriter writer)
     {
         foreach (var param in meta.Target.Method.Parameters)
         {
-            var expr = NetworkHelper.GetWriterExpression(param.Type, param.Name);
-            meta.InsertStatement($"{expr};");
+            NetworkTemplates.WriteType(param.Type, writer, param.Value);
         }
     }
 

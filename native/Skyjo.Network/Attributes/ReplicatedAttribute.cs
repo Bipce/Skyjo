@@ -1,3 +1,4 @@
+using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Eligibility;
@@ -57,20 +58,13 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 _replicatedDataField.Value = networkManager.ServerManager.AddReplicatedData(entity.NetUpdateFrequency,
                     entity, index, meta.Target.FieldOrProperty.Value, value);
 
-                var writerExpr = NetworkHelper.GetWriterExpression(meta.Target.FieldOrProperty.Type,
-                    $"{_replicatedDataField!.Name}.Value");
+                _replicatedDataField.Value.Serialize =
+                    meta.RunTime<Action<NetDataWriter>>(writer =>
+                    {
+                        NetworkTemplates.WriteType(meta.Target.FieldOrProperty.Type, writer, _replicatedDataField!.Value.Value);
+                    });
 
-                meta.InsertStatement($$"""
-                                       {{_replicatedDataField.Name}}.Serialize = (writer) => {
-                                           {{writerExpr}};
-                                       };
-                                       """);
-
-                meta.InsertStatement($$"""
-                                       {{_replicatedDataField.Name}}.Done = () => {
-                                         {{_replicatedDataField.Name}} = null;
-                                       };
-                                       """);
+                _replicatedDataField.Value.Done = meta.RunTime(() => { _replicatedDataField.Value = null; });
             }
             else
             {
