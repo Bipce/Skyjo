@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
 using LiteNetLib.Utils;
-using Skyjo.Network.Attributes;
+using Microsoft.Xna.Framework;
 using Skyjo.Network.Enums;
 using Skyjo.Network.Packets;
-using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
 
@@ -20,10 +19,11 @@ public sealed class NetworkManager
     private readonly Dictionary<byte, Func<Entity>> _entityFactories = [];
 
     internal Dictionary<int, Entity> Entities { get; } = [];
-    internal NetDataWriter Writer { get; private set; } = new();
+    internal NetDataWriter Writer { get; } = new();
 
-    public double DeltaTimeMs { get; private set; }
-    public double TotalTimeMs { get; private set; }
+    private GameTime _gameTime = null!;
+    public double DeltaTime => _gameTime.ElapsedGameTime.TotalSeconds;
+    public double TotalTime => _gameTime.TotalGameTime.TotalSeconds;
 
     public NetworkManager()
     {
@@ -38,11 +38,9 @@ public sealed class NetworkManager
         _packetFactories.Add((byte)PacketType.Replicated, () => new ReplicatedPacket());
     }
 
-    public void Update(double deltaTimeMs, double totalTimeMs)
+    public void Update(GameTime gameTime)
     {
-        DeltaTimeMs = deltaTimeMs;
-        TotalTimeMs = totalTimeMs;
-
+        _gameTime = gameTime;
         ServerManager.Update();
         ClientManager.Update();
     }

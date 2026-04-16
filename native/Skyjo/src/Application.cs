@@ -92,7 +92,7 @@ public sealed class Application : Game
     {
         base.Update(gameTime);
 
-        NetworkManager.Update(gameTime.ElapsedGameTime.TotalMilliseconds, gameTime.TotalGameTime.TotalMilliseconds);
+        NetworkManager.Update(gameTime);
 
         UpdateInput();
 

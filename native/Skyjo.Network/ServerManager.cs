@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
 using Skyjo.Network.Utils;
 
@@ -20,7 +19,7 @@ public sealed class ServerManager : ManagerBase
     private readonly Dictionary<int, NetPeer> _peers = [];
     private NetDataReader _lastReader = null!;
 
-    private readonly Dictionary<double, ReplicatedFrequencyData> _frequencyData = [];
+    private readonly List<ReplicatedFrequencyData> _frequencyData = [];
 
     public override bool Start()
     {
@@ -142,12 +141,12 @@ public sealed class ServerManager : ManagerBase
 
     private void UpdateReplication()
     {
-        foreach (var (frequency, frequencyData) in _frequencyData)
+        foreach (var frequencyData in _frequencyData)
         {
-            frequencyData.Time += NetworkManager.DeltaTimeMs;
-            if (frequencyData.Time >= frequency)
+            frequencyData.Time += NetworkManager.DeltaTime;
+            if (frequencyData.Time >= frequencyData.Frequency)
             {
-                frequencyData.Time -= frequency;
+                frequencyData.Time -= frequencyData.Frequency;
 
                 while (frequencyData.ReplicatedData.TryDequeue(out var data))
                 {
@@ -159,8 +158,6 @@ public sealed class ServerManager : ManagerBase
 
                     data.Done();
                 }
-
-                _frequencyData.Remove(frequency);
             }
         }
 
@@ -182,11 +179,10 @@ public sealed class ServerManager : ManagerBase
             Value = value
         };
 
-        if (!_frequencyData.TryGetValue(frequency, out var frequencyData))
-        {
-            frequencyData = new ReplicatedFrequencyData(frequency);
-            _frequencyData[frequency] = frequencyData;
-        }
+        frequency = 1 / frequency;
+
+        var frequencyData = new ReplicatedFrequencyData(frequency);
+        _frequencyData.Add(frequencyData);
 
         frequencyData.ReplicatedData.Enqueue(data);
 

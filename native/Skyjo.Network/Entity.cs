@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Skyjo.Network.Attributes;
 using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
