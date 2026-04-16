@@ -112,26 +112,28 @@ public sealed class Application : Game
         _view.Render();
 
         _spriteBatch.Begin();
-        _spriteBatch.Draw(_view.Texture, Vector2.Zero, Color.White);
-        _spriteBatch.End();
-
-        _spriteBatch.Begin();
 
         var i = 0;
         foreach (var _ in NetworkManager.GetEntities<TestEntity>())
         {
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 0, 50, 50), Color.White);
+            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 0, 50, 50), Color.Gray);
             i++;
         }
 
         i = 0;
         foreach (var player in NetworkManager.GetEntities<Player>())
         {
-            // var color = player.IsOwner ? Color.Blue : Color.Red;
             _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), player.Color);
+            if (player.IsOwner)
+                _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50 + (50 - 10) / 2, 50 + (50 - 10) / 2, 10, 10),
+                    Color.DarkRed);
             i++;
         }
 
+        _spriteBatch.End();
+
+        _spriteBatch.Begin();
+        _spriteBatch.Draw(_view.Texture, Vector2.Zero, Color.White);
         _spriteBatch.End();
 
         base.Draw(gameTime);
