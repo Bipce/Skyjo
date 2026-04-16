@@ -4,8 +4,7 @@ public sealed class ReplicatedFrequencyData
 {
     public ReplicatedFrequencyData(double frequency)
     {
-        // Time = NetworkManager.Instance.TotalTimeMs % frequency;
-        Time = 0;
+        Time = NetworkManager.Instance.TotalTimeMs % frequency;
     }
 
     public double Time { get; set; }

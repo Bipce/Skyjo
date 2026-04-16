@@ -53,6 +53,7 @@ internal static class NetworkHelper
             "short[]" => "reader.GetShortArray()",
             "long" => "reader.GetLong()",
             "long[]" => "reader.GetLongArray()",
+            "Color" => $"{typeof(NetDataExtensions).FullName}.GetColor(reader)",
             _ => throw new InvalidOperationException($"Unsupported RPC parameter type: {type}")
         };
     }

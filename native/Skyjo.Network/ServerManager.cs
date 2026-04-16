@@ -1,7 +1,9 @@
-﻿using LiteNetLib;
+﻿using System.ComponentModel;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
+using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
 
@@ -112,7 +114,7 @@ public sealed class ServerManager : ManagerBase
         Send(excludePeer: excludePeer);
     }
 
-    [NetworkInternal]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public bool HasRemotePeers(out NetPeer? peer)
     {
         switch (NetManager.ConnectedPeersCount)
@@ -168,7 +170,8 @@ public sealed class ServerManager : ManagerBase
         }
     }
 
-    [NetworkInternal]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [Obsolete(NetworkHelper.InternalMessage)]
     public ReplicatedData<T> AddReplicatedData<T>(double frequency, Entity entity, int index, T lastValue, T value)
     {
         var data = new ReplicatedData<T>

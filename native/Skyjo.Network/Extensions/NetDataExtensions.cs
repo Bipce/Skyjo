@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using Microsoft.Xna.Framework;
 
 namespace Skyjo.Network.Extensions;
 
@@ -43,5 +44,18 @@ public static class NetDataExtensions
         }
 
         return entities;
+    }
+
+    public static void PutColor(this NetDataWriter writer, Color color)
+    {
+        writer.Put(color.R);
+        writer.Put(color.G);
+        writer.Put(color.B);
+        writer.Put(color.A);
+    }
+
+    public static Color GetColor(this NetDataReader reader)
+    {
+        return new Color(reader.GetByte(), reader.GetByte(), reader.GetByte(), reader.GetByte());
     }
 }

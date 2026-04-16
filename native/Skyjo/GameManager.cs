@@ -7,11 +7,11 @@ public sealed partial class GameManager : Entity
 {
     [Replicated] private int _health = 100;
     private int _lastHealth;
-    [Replicated] private TestEntity _entity = null!;
 
     public GameManager()
     {
         _lastHealth = _health;
+        View_SetHealth(_health);
     }
 
     [Server]
@@ -32,9 +32,6 @@ public sealed partial class GameManager : Entity
     {
         // Console.WriteLine("Health += 10");
         _health += 10;
-
-        _entity = new TestEntity();
-        _entity.Spawn();
     }
 
     public void Update()
@@ -42,10 +39,12 @@ public sealed partial class GameManager : Entity
         if (_lastHealth != _health)
         {
             _lastHealth = _health;
-            Console.WriteLine(_health);
+            View_SetHealth(_health);
         }
+    }
 
-        if (_entity != null)
-            Console.WriteLine(_entity.Id);
+    private void View_SetHealth(int health)
+    {
+        Application.View.EvaluateScript($"window.SetHealth(\"{health}\")");
     }
 }

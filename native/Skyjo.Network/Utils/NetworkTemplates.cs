@@ -18,6 +18,8 @@ internal sealed class NetworkTemplates : ITemplateProvider
             NetDataExtensions.PutEntityArray(writer, value);
         else if (type.ToString() == "byte[]")
             NetDataExtensions.PutBytesWithIntLength(writer, value);
+        else if (type.ToString() == "Color")
+            NetDataExtensions.PutColor(writer, value);
         else
         {
             if (type.TypeKind == TypeKind.Array)

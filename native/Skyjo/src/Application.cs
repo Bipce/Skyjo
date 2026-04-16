@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Skyjo.Network;
+using Skyjo.Network.Extensions;
 using Ultralight.FNA;
 
 #if !DEBUG
@@ -14,6 +15,8 @@ namespace Skyjo;
 
 public sealed class Application : Game
 {
+    private static Application _instance = null!;
+
     private UltralightRenderer _renderer = null!;
     private UltralightView _view = null!;
 
@@ -29,8 +32,12 @@ public sealed class Application : Game
 
     private Texture2D _pixelTexture = null!;
 
+    public static UltralightView View => _instance._view;
+
     public Application()
     {
+        _instance = this;
+
         var graphics = new GraphicsDeviceManager(this);
         graphics.PreferredBackBufferWidth = 1280;
         graphics.PreferredBackBufferHeight = 720;
@@ -51,9 +58,7 @@ public sealed class Application : Game
         {
             var color = new Color(Random.Shared.NextSingle(), Random.Shared.NextSingle(),
                 Random.Shared.NextSingle());
-            writer.Put(color.R);
-            writer.Put(color.G);
-            writer.Put(color.B);
+            writer.PutColor(color);
         };
     }
 
@@ -93,7 +98,6 @@ public sealed class Application : Game
 
         _renderer.Update();
         _view.Update();
-        
         foreach (var gameManager in NetworkManager.GetEntities<GameManager>())
         {
             gameManager.Update();
@@ -123,8 +127,8 @@ public sealed class Application : Game
         i = 0;
         foreach (var player in NetworkManager.GetEntities<Player>())
         {
-            var color = player.IsOwner ? Color.Blue : Color.Red;
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), color);
+            // var color = player.IsOwner ? Color.Blue : Color.Red;
+            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), player.Color);
             i++;
         }
 
@@ -204,7 +208,7 @@ public sealed class Application : Game
 
     private void Server_OnPlayerConnected(NetPeer peer, NetDataReader reader)
     {
-        var color = new Color(reader.GetByte(), reader.GetByte(), reader.GetByte());
+        var color = reader.GetColor();
 
         var player = new Player
         {

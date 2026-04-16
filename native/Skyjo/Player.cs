@@ -1,9 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Skyjo.Network;
+using Skyjo.Network.Attributes;
 
 namespace Skyjo;
 
 public sealed class Player : Entity
 {
-    public Color Color { get; init; } // todo: Replicated
+    [Replicated] public Color Color { get; set; }
 }

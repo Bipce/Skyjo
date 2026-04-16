@@ -1,9 +1,11 @@
-﻿using System.Net;
+﻿using System.ComponentModel;
+using System.Net;
 using System.Net.Sockets;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Skyjo.Network.Attributes;
 using Skyjo.Network.Packets;
+using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
 
@@ -118,7 +120,7 @@ public abstract class ManagerBase : INetEventListener
 #pragma warning restore CS0618
     }
 
-    [NetworkInternal]
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public void Send(byte channel = 0,
         DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
         NetPeer? excludePeer = null)
