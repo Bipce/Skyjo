@@ -1,4 +1,4 @@
-import Cart from "./shared/Cart.tsx";
+import Cart from "./Cart.tsx";
 
 const CartDeck = () => {
   return (

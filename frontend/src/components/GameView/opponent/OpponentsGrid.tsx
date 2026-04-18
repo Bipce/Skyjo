@@ -1,17 +1,17 @@
 import React, { type ReactNode } from "react";
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 const OpponentsGrid = ({ children }: Props) => {
-  const count = React.Children.count(children);
+  const opponent = React.Children.count(children);
 
   return (
-    <section className="w-full">
+    <section className="flex w-full items-center">
       <div
         className={`mx-auto grid w-full gap-4 ${
-          count === 1 ? "max-w-2xl grid-cols-1" : count === 2 ? "max-w-4xl grid-cols-2" : "grid-cols-3"
+          opponent === 1 ? "max-w-2xl grid-cols-1" : opponent === 2 ? "max-w-4xl grid-cols-2" : "grid-cols-3"
         }`}
       >
         {children}

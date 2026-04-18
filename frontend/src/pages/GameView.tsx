@@ -1,15 +1,16 @@
 import OpponentsGrid from "../components/GameView/opponent/OpponentsGrid.tsx";
 import OpponentPanel from "../components/GameView/opponent/OpponentPanel.tsx";
-import CartDeck from "../components/GameView/CartDeck.tsx";
 import PlayerPanel from "../components/GameView/player/PlayerPanel.tsx";
+import CartDeck from "../components/GameView/shared/CartDeck.tsx";
 
 const GameView = () => {
   return (
-    <main className="grid h-screen place-items-center px-6">
-      <div className="grid w-full max-w-5xl gap-6">
+    <main className="grid min-h-screen place-items-center py-10">
+      <div className="grid w-full max-w-6xl gap-8">
         <OpponentsGrid>
           <OpponentPanel />
-          <OpponentPanel />
+          {/*<OpponentPanel />*/}
+          {/*<OpponentPanel />*/}
         </OpponentsGrid>
 
         <CartDeck />
