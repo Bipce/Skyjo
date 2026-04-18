@@ -1,14 +1,14 @@
 import { Route, Routes } from "react-router";
-import Game from "./pages/Game.tsx";
+import GameView from "./pages/GameView.tsx";
 
-function App() {
+const App = () => {
   return (
     <>
       <Routes>
-        <Route path="/" element={<Game />} />
+        <Route path="/" element={<GameView />} />
       </Routes>
     </>
   );
-}
+};
 
 export default App;
