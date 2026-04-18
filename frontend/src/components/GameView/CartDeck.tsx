@@ -1,8 +1,10 @@
+import Cart from "./shared/Cart.tsx";
+
 const CartDeck = () => {
   return (
     <section className="flex items-center justify-center gap-10">
-      <div className="border-round center h-28 w-20 text-2xl font-bold">9</div>
-      <div className="border-round center h-28 w-20 text-2xl font-bold">?</div>
+      <Cart>9</Cart>
+      <Cart>?</Cart>
     </section>
   );
 };

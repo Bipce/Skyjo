@@ -5,7 +5,19 @@ interface Props {
 }
 
 const OpponentsGrid = ({ children }: Props) => {
-  return <section className="flex items-center gap-10 overflow-hidden p-4">{children}</section>;
+  const count = React.Children.count(children);
+
+  return (
+    <section className="w-full">
+      <div
+        className={`mx-auto grid w-full gap-4 ${
+          count === 1 ? "max-w-2xl grid-cols-1" : count === 2 ? "max-w-4xl grid-cols-2" : "grid-cols-3"
+        }`}
+      >
+        {children}
+      </div>
+    </section>
+  );
 };
 
 export default OpponentsGrid;

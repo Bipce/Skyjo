@@ -5,15 +5,17 @@ import PlayerPanel from "../components/GameView/player/PlayerPanel.tsx";
 
 const GameView = () => {
   return (
-    <main className="grid h-screen grid-rows-[1fr_auto_1.5fr]">
-      <OpponentsGrid>
-        <OpponentPanel />
-        <OpponentPanel />
-      </OpponentsGrid>
+    <main className="grid h-screen place-items-center px-6">
+      <div className="grid w-full max-w-5xl gap-6">
+        <OpponentsGrid>
+          <OpponentPanel />
+          <OpponentPanel />
+        </OpponentsGrid>
 
-      <CartDeck />
+        <CartDeck />
 
-      <PlayerPanel />
+        <PlayerPanel />
+      </div>
     </main>
   );
 };
