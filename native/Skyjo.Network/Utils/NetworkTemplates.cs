@@ -21,37 +21,30 @@ internal sealed class NetworkTemplates : ITemplateProvider
     }
 
     [Template]
-    private static void PutData(IType type, NetDataWriter writer, dynamic value, bool isNullable)
-    {
-        if (type is IArrayType { ElementType: INamedType elementType })
-        {
-            writer.Put(value.Length);
-            for (var i = 0; i < value.Length; i++)
-                WriteType(elementType, writer, value[i]);
-        }
-        else if (IsBasicType(type.ToNonNullable()))
-            writer.Put(isNullable ? value.Value : value);
-        else
-            NetDataExtensions.Put(writer, isNullable ? value.Value : value);
-    }
-
-    [Template]
     public static void WriteType(IType type, NetDataWriter writer, dynamic value)
     {
         var isEntity = type.IsConvertibleTo(typeof(Entity));
-        var isNullable = type.IsNullable == true && !isEntity;
+        var isValid = true;
 
-        if (isNullable)
-            writer.Put(value != null);
-
-        if (isNullable)
+        if (type.IsNullable == true && !isEntity)
         {
-            if (value != null)
-                PutData(type, writer, value, type.IsReferenceType == false);
+            isValid = value != null;
+            writer.Put(isValid);
         }
-        else
+
+        var isNullable = type is { IsNullable: true, IsReferenceType: false };
+        if (isValid)
         {
-            PutData(type, writer, value, false);
+            if (type is IArrayType { ElementType: INamedType elementType })
+            {
+                writer.Put(value!.Length);
+                for (var i = 0; i < value.Length; i++)
+                    WriteType(elementType, writer, value[i]);
+            }
+            else if (IsBasicType(type.ToNonNullable()))
+                writer.Put(isNullable ? value!.Value : value);
+            else
+                NetDataExtensions.Put(writer, isNullable ? value!.Value : value);
         }
     }
 
