@@ -5,48 +5,18 @@ namespace Skyjo.Network.Extensions;
 
 public static class NetDataExtensions
 {
-    public static void PutBytesWithIntLength(this NetDataWriter writer, byte[] data)
+    public static void Put(this NetDataWriter writer, Entity? entity)
     {
-        writer.Put(data.Length);
-        writer.Put(data);
+        writer.Put(entity?.Id ?? 0);
     }
 
-    public static byte[] GetBytesWithIntLength(this NetDataReader reader)
+    public static Entity? GetEntity(this NetDataReader reader)
     {
-        var data = new byte[reader.GetInt()];
-        reader.GetBytes(data, data.Length);
-        return data;
+        var id = reader.GetInt();
+        return id == 0 ? null : NetworkManager.Instance.GetEntity(id);
     }
 
-    public static void PutEntity(this NetDataWriter writer, Entity entity)
-    {
-        writer.Put(entity.Id);
-    }
-
-    public static T GetEntity<T>(this NetDataReader reader) where T : Entity
-    {
-        return NetworkManager.Instance.GetEntity<T>(reader.GetInt());
-    }
-
-    public static void PutEntityArray<T>(this NetDataWriter writer, T[] entities) where T : Entity
-    {
-        writer.Put(entities.Length);
-        foreach (var entity in entities)
-            writer.Put(entity.Id);
-    }
-
-    public static T[] GetEntityArray<T>(this NetDataReader reader) where T : Entity
-    {
-        var entities = new T[reader.GetInt()];
-        for (var i = 0; i < entities.Length; i++)
-        {
-            entities[i] = NetworkManager.Instance.GetEntity<T>(reader.GetInt());
-        }
-
-        return entities;
-    }
-
-    public static void PutColor(this NetDataWriter writer, Color color)
+    public static void Put(this NetDataWriter writer, Color color)
     {
         writer.Put(color.R);
         writer.Put(color.G);

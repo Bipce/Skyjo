@@ -66,8 +66,10 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
 
             if (_replicatedDataField!.Value == null)
             {
+                var lastValue = meta.Target.FieldOrProperty.Value;
+                meta.Proceed();
                 _replicatedDataField.Value = networkManager.ServerManager.AddReplicatedData(entity.NetUpdateFrequency,
-                    entity, index, meta.Target.FieldOrProperty.Value, value);
+                    entity, index, lastValue, value);
 
                 _replicatedDataField.Value.Serialize =
                     meta.RunTime<Action<NetDataWriter>>(writer =>
@@ -80,10 +82,9 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
             }
             else
             {
+                meta.Proceed();
                 _replicatedDataField.Value.Value = value;
             }
-
-            meta.Proceed();
         }
     }
 }

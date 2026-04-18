@@ -2,6 +2,7 @@ using System.ComponentModel;
 using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
+using Metalama.Framework.Code.SyntaxBuilders;
 using Skyjo.Network.Attributes;
 using Skyjo.Network.Utils;
 
@@ -17,17 +18,26 @@ public sealed class ReplicatedAspect : TypeAspect
         var replicatedVars = meta.Target.Type.FieldsAndProperties
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
 
-        var sb = meta.CompileTime(new System.Text.StringBuilder("return name switch { "));
+        var switchBuilder = new SwitchStatementBuilder(ExpressionFactory.Capture(name));
         var i = meta.CompileTime(0);
         foreach (var replicatedVar in replicatedVars)
         {
-            sb.Append($"\"{replicatedVar.Name}\" => {i}, ");
+            var label = SwitchStatementLabel.CreateLiteral(replicatedVar.Name);
+            switchBuilder.AddCase(label,
+                StatementFactory.Parse($"return {i};").UnwrapBlock());
             i++;
         }
 
-        sb.Append("_ => throw new global::System.InvalidOperationException(name) };");
-        meta.InsertStatement(sb.ToString());
+        switchBuilder.AddDefault(StatementFactory.Parse("throw new global::System.InvalidOperationException(name);"));
+
+        meta.InsertStatement(switchBuilder.ToStatement());
         return 0;
+    }
+
+    [Template]
+    private static void ReadType(IFieldOrProperty field, NetDataReader reader)
+    {
+        NetworkTemplates.ReadType(field.Type, reader, field);
     }
 
     [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
@@ -36,16 +46,17 @@ public sealed class ReplicatedAspect : TypeAspect
         var replicatedVars = meta.Target.Type.FieldsAndProperties
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
 
-        var sb = meta.CompileTime(new System.Text.StringBuilder("switch(id){"));
+        var switchBuilder = new SwitchStatementBuilder(ExpressionFactory.Capture(id));
         var i = meta.CompileTime(0);
         foreach (var replicatedVar in replicatedVars)
         {
-            var expr = NetworkHelper.GetReaderExpression(replicatedVar.Type);
-            sb.Append($"case {i}: this.{replicatedVar.Name} = {expr}; return;");
+            var label = SwitchStatementLabel.CreateLiteral(i);
+            switchBuilder.AddCase(label,
+                StatementFactory.FromTemplate(nameof(ReadType),
+                    new { field = replicatedVar, reader = ExpressionFactory.Capture(reader) }).UnwrapBlock());
             i++;
         }
 
-        sb.Append('}');
-        meta.InsertStatement(sb.ToString());
+        meta.InsertStatement(switchBuilder.ToStatement());
     }
 }

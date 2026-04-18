@@ -4,7 +4,7 @@ using Skyjo.Network.Attributes;
 
 namespace Skyjo;
 
-public sealed class Player : Entity
+public sealed partial class Player : Entity
 {
     [Replicated] public Color Color { get; set; }
 }

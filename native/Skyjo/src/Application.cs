@@ -58,7 +58,7 @@ public sealed class Application : Game
         {
             var color = new Color(Random.Shared.NextSingle(), Random.Shared.NextSingle(),
                 Random.Shared.NextSingle());
-            writer.PutColor(color);
+            writer.Put(color);
         };
     }
 
