@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/cards.css";
 
 body {
   @apply h-screen overflow-hidden bg-zinc-900 text-zinc-100;
@@ -13,5 +14,5 @@ body {
 }
 
 .shadow {
-  @apply shadow-sm shadow-zinc-600;
+  @apply shadow-sm shadow-zinc-500;
 }

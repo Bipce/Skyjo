@@ -1,7 +1,7 @@
 import OpponentsGrid from "../components/GameView/opponent/OpponentsGrid.tsx";
 import OpponentPanel from "../components/GameView/opponent/OpponentPanel.tsx";
 import PlayerPanel from "../components/GameView/player/PlayerPanel.tsx";
-import CartDeck from "../components/GameView/shared/CartDeck.tsx";
+import CardDeck from "../components/GameView/shared/CardDeck.tsx";
 
 const GameView = () => {
   return (
@@ -9,11 +9,11 @@ const GameView = () => {
       <div className="grid w-full max-w-6xl gap-8">
         <OpponentsGrid>
           <OpponentPanel />
-          {/*<OpponentPanel />*/}
+          <OpponentPanel />
           {/*<OpponentPanel />*/}
         </OpponentsGrid>
 
-        <CartDeck />
+        <CardDeck />
 
         <PlayerPanel />
       </div>
