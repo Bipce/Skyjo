@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Skyjo.Network.Enums;
 using Skyjo.Network.Packets;
 using Skyjo.Network.Utils;
 
@@ -17,7 +16,7 @@ public sealed class ServerManager : ManagerBase
     public event Action<NetPeer, NetDataReader>? OnPlayerConnected;
     public event Action? OnServerStarted;
 
-    private readonly Dictionary<int, NetPeer> _peers = [];
+    private readonly IndexedCollection<int, NetPeer> _peers = new(x => x.Id);
     private NetDataReader _lastReader = null!;
 
     private readonly IndexedCollection<int, ReplicatedFrequencyData> _frequencyData = new(x => x.NetUpdateFrequency);
@@ -58,7 +57,7 @@ public sealed class ServerManager : ManagerBase
 
         var peer = request.Accept();
         Console.WriteLine($"[{Role}] Connection accepted");
-        _peers.Add(peer.Id, peer);
+        _peers.Add(peer);
 
         _lastReader = request.Data;
     }
@@ -220,13 +219,13 @@ public sealed class ServerManager : ManagerBase
         return data;
     }
 
-    public void SendToAll(byte channel = 0, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
+    private void SendToAll(byte channel = 0, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
         NetPeer? excludePeer = null)
     {
         if (!HasRemotePeers(out var ownPeer))
             return;
 
-        foreach (var peer in _peers.Values) // todo: make it IndexedCollection ?
+        foreach (var peer in _peers)
         {
             if (excludePeer != null && peer.Id == excludePeer.Id)
                 continue;

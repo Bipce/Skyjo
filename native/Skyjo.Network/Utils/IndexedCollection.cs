@@ -26,6 +26,12 @@ public sealed class IndexedCollection<TKey, T> : IEnumerable<T>
 
     public bool Contains(TKey key) => _indices.ContainsKey(key);
 
+    public void Clear()
+    {
+        _items.Clear();
+        _indices.Clear();
+    }
+
     public T this[TKey key]
     {
         get => _items[_indices[key]];
@@ -44,8 +50,14 @@ public sealed class IndexedCollection<TKey, T> : IEnumerable<T>
             value = _items[index];
             return true;
         }
+
         value = default;
         return false;
+    }
+
+    public T? GetValueOrDefault(TKey key)
+    {
+        return TryGetValue(key, out var value) ? value : default;
     }
 
     public bool Remove(TKey key)
