@@ -55,9 +55,8 @@ public sealed class ServerManager : ManagerBase
             return;
         }
 
-        var peer = request.Accept();
+        request.Accept();
         Console.WriteLine($"[{Role}] Connection accepted");
-        _peers.Add(peer);
 
         _lastReader = request.Data;
     }
@@ -68,6 +67,8 @@ public sealed class ServerManager : ManagerBase
 
         if (peer.Id != ClientManager.NullablePeer?.Id)
         {
+            _peers.Add(peer);
+
             foreach (var entity in NetworkManager.Entities.Values)
             {
                 var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
@@ -89,13 +90,16 @@ public sealed class ServerManager : ManagerBase
         {
             if (entity.Owner?.Id != peer.Id)
                 continue;
-            new DestroyEntityPacket(entity.Id).Serialize(NetworkManager.Writer);
             NetworkManager.Entities.Remove(entity.Id);
+            if (!HasRemotePeers)
+                continue;
+            new DestroyEntityPacket(entity.Id).Serialize(NetworkManager.Writer);
         }
 
         _peers.Remove(peer.Id);
 
-        Send();
+        if (HasRemotePeers)
+            SendToAll();
     }
 
     internal void Spawn(Entity entity)
@@ -104,31 +108,17 @@ public sealed class ServerManager : ManagerBase
         entity.OwnerId = entity.Owner?.Id ?? -1;
         NetworkManager.Entities[entity.Id] = entity;
 
-        if (!HasRemotePeers(out var excludePeer))
+        if (!HasRemotePeers)
             return;
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset();
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
-        Send(excludePeer: excludePeer);
+        SendToAll();
     }
 
-    // todo: maybe not include the own peer to _peers
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public bool HasRemotePeers(out NetPeer? peer)
-    {
-        switch (NetManager.ConnectedPeersCount)
-        {
-            case 0:
-            case 1 when ClientManager.IsRunning:
-                peer = null;
-                return false;
-        }
-
-        peer = _peers.GetValueOrDefault(ClientManager.NullablePeer?.Id ?? -1);
-
-        return true;
-    }
+    public bool HasRemotePeers => _peers.Count > 0;
 
     public override void Update()
     {
@@ -219,17 +209,12 @@ public sealed class ServerManager : ManagerBase
         return data;
     }
 
-    private void SendToAll(byte channel = 0, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
+    public void SendToAll(byte channel = 0, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
         NetPeer? excludePeer = null)
     {
-        if (!HasRemotePeers(out var ownPeer))
-            return;
-
         foreach (var peer in _peers)
         {
             if (excludePeer != null && peer.Id == excludePeer.Id)
-                continue;
-            if (ownPeer != null && peer.Id == ownPeer.Id)
                 continue;
 
             peer.Send(NetworkManager.Writer, channel, deliveryMethod);

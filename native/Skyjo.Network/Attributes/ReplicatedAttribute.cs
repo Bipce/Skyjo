@@ -62,7 +62,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
         {
             var networkManager = NetworkManager.Instance;
             if (!networkManager.ServerManager.IsRunning ||
-                !networkManager.ServerManager.HasRemotePeers(out _))
+                !networkManager.ServerManager.HasRemotePeers)
             {
                 meta.Proceed();
                 return;
