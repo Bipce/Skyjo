@@ -48,4 +48,14 @@ public abstract class Entity : IEquatable<Entity>
     protected internal virtual void __UpdateReplicatedVar(int id, NetDataReader reader)
     {
     }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected internal virtual void __SerializeReplicatedVars(NetDataWriter writer)
+    {
+    }
+    
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected internal virtual void __DeserializeReplicatedVars(NetDataReader reader)
+    {
+    }
 }

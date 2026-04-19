@@ -14,6 +14,7 @@ public sealed class ClientManager : ManagerBase
         AddPacketHandler<CreateEntityPacket>(OnCreateEntityPacket);
         AddPacketHandler<DestroyEntityPacket>(OnDestroyEntityPacket);
         AddPacketHandler<ReplicatedPacket>(OnReplicatedPacket);
+        AddPacketHandler<ReplicatedAllPacket>(_ => {});
     }
 
     public NetPeer Peer => NetManager.FirstPeer;
