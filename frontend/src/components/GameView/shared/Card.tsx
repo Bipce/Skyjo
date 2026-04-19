@@ -1,18 +1,22 @@
+import type { ICard } from "../../interfaces/ICard.ts";
+
 interface Props {
-  isRevealed: boolean;
-  card: number | string;
+  card: ICard;
   className?: string;
   cardClassName?: string;
 }
 
-const Card = ({ isRevealed, card, className, cardClassName }: Props) => {
-  const getCardColor = (cart: number | string) => {
-    const value = Number(cart);
-    if (value < 0) return "custom-card-dark-blue";
-    if (value === 0) return "custom-card-blue";
-    if (value <= 4) return "custom-card-green";
-    if (value <= 8) return "custom-card-yellow";
-    return "custom-card-red";
+const Card = ({ card, className, cardClassName }: Props) => {
+  const getCardColor = (card: ICard) => {
+    const { number } = card;
+
+    if (number < 0) return "custom-card-dark-blue";
+    if (number === 0) return "custom-card-blue";
+    if (number <= 4) return "custom-card-green";
+    if (number <= 8) return "custom-card-yellow";
+    if (number > 8) return "custom-card-red";
+
+    return "custom-card-no-reveal";
   };
 
   const cardColor = getCardColor(card);
@@ -20,10 +24,10 @@ const Card = ({ isRevealed, card, className, cardClassName }: Props) => {
   return (
     <button
       className={`center border-round t aspect-2/3 max-h-28 w-full max-w-20 bg-size-[100%_100%] bg-no-repeat font-bold ${
-        isRevealed ? `${cardColor}` : `custom-card-no-reveal ${cardClassName}`
-      } ${className} card-number card-pattern text-zinc-950`}
+        card.isRevealed && cardColor
+      } ${cardClassName} ${className} card-number card-pattern text-zinc-950`}
     >
-      {isRevealed ? card : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
+      {card.isRevealed ? card.number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
     </button>
   );
 };

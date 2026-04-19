@@ -1,7 +1,7 @@
-import OpponentsGrid from "../components/GameView/opponent/OpponentsGrid.tsx";
-import OpponentPanel from "../components/GameView/opponent/OpponentPanel.tsx";
-import PlayerPanel from "../components/GameView/player/PlayerPanel.tsx";
-import CardDeck from "../components/GameView/shared/CardDeck.tsx";
+import OpponentsGrid from "../components/gameView/opponent/OpponentsGrid.tsx";
+import OpponentPanel from "../components/gameView/opponent/OpponentPanel.tsx";
+import CardDeck from "../components/gameView/shared/CardDeck.tsx";
+import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
 
 const GameView = () => {
   return (
