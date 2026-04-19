@@ -121,8 +121,7 @@ public abstract class ManagerBase : INetEventListener
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public void Send(byte channel = 0,
-        DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
+    public void Send(byte channel = 0, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
         NetPeer? excludePeer = null)
     {
         NetManager.SendToAll(NetworkManager.Writer, channel, deliveryMethod, excludePeer);

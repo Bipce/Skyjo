@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using LiteNetLib;
 using LiteNetLib.Utils;
+using Skyjo.Network.Enums;
 using Skyjo.Network.Packets;
 using Skyjo.Network.Utils;
 
@@ -19,7 +20,7 @@ public sealed class ServerManager : ManagerBase
     private readonly Dictionary<int, NetPeer> _peers = [];
     private NetDataReader _lastReader = null!;
 
-    private readonly Dictionary<int, ReplicatedFrequencyData> _frequencyData = [];
+    private readonly IndexedCollection<int, ReplicatedFrequencyData> _frequencyData = new(x => x.NetUpdateFrequency);
 
     public override bool Start()
     {
@@ -113,6 +114,7 @@ public sealed class ServerManager : ManagerBase
         Send(excludePeer: excludePeer);
     }
 
+    // todo: maybe not include the own peer to _peers
     [EditorBrowsable(EditorBrowsableState.Never)]
     public bool HasRemotePeers(out NetPeer? peer)
     {
@@ -141,36 +143,50 @@ public sealed class ServerManager : ManagerBase
 
     private void UpdateReplication()
     {
-        foreach (var (_, frequencyData) in _frequencyData)
+        foreach (var frequencyData in _frequencyData)
         {
             frequencyData.Time += NetworkManager.DeltaTime;
             if (frequencyData.Time >= frequencyData.Frequency)
             {
                 frequencyData.Time -= frequencyData.Frequency;
 
-                while (frequencyData.ReplicatedData.TryDequeue(out var data))
+                foreach (var replicatedDataQueue in frequencyData.ReplicatedData)
                 {
-                    if (!data.IsUnchanged)
+                    while (replicatedDataQueue.Data.TryDequeue(out var data))
                     {
-                        new ReplicatedPacket(data.Entity.Id, data.Index).Serialize(NetworkManager.Writer);
-                        data.Serialize(NetworkManager.Writer);
+                        if (!data.IsUnchanged)
+                        {
+                            new ReplicatedPacket(data.Entity.Id, data.Index).Serialize(NetworkManager.Writer);
+                            data.Serialize(NetworkManager.Writer);
+                        }
+
+                        data.Done();
                     }
 
-                    data.Done();
+                    if (NetworkManager.Writer.Length > 0)
+                    {
+                        if (replicatedDataQueue.Peer != null)
+                        {
+                            replicatedDataQueue.Peer.Send(NetworkManager.Writer, replicatedDataQueue.Channel,
+                                replicatedDataQueue.DeliveryMethod);
+                        }
+                        else
+                        {
+                            SendToAll(replicatedDataQueue.Channel, replicatedDataQueue.DeliveryMethod,
+                                replicatedDataQueue.ExcludePeer);
+                        }
+
+                        NetworkManager.Writer.Reset();
+                    }
                 }
             }
-        }
-
-        if (NetworkManager.Writer.Length > 0 && HasRemotePeers(out var excludePeer))
-        {
-            Send(excludePeer: excludePeer);
         }
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     [Obsolete(NetworkHelper.InternalMessage)]
-    public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, Entity entity, int index, T lastValue,
-        T value)
+    public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, byte channel, DeliveryMethod deliveryMethod,
+        NetPeer? excludePeer, NetPeer? peer, Entity entity, int index, T lastValue, T value)
     {
         var data = new ReplicatedData<T>
         {
@@ -180,16 +196,46 @@ public sealed class ServerManager : ManagerBase
             Value = value
         };
 
-        var frequency = 1.0 / netUpdateFrequency;
-
         if (!_frequencyData.TryGetValue(netUpdateFrequency, out var frequencyData))
         {
-            frequencyData = new ReplicatedFrequencyData(frequency);
-            _frequencyData[netUpdateFrequency] = frequencyData;
+            frequencyData = new ReplicatedFrequencyData(netUpdateFrequency);
+            _frequencyData.Add(frequencyData);
         }
 
-        frequencyData.ReplicatedData.Enqueue(data);
+        var key = ReplicatedDataQueue.GetKey(channel, deliveryMethod, excludePeer, peer);
+        if (!frequencyData.ReplicatedData.TryGetValue(key, out var replicatedDataQueue))
+        {
+            replicatedDataQueue = new ReplicatedDataQueue(key)
+            {
+                Channel = channel,
+                DeliveryMethod = deliveryMethod,
+                ExcludePeer = excludePeer,
+                Peer = peer
+            };
+            frequencyData.ReplicatedData.Add(replicatedDataQueue);
+        }
+
+        replicatedDataQueue.Data.Enqueue(data);
 
         return data;
+    }
+
+    public void SendToAll(byte channel = 0, DeliveryMethod deliveryMethod = DeliveryMethod.ReliableOrdered,
+        NetPeer? excludePeer = null)
+    {
+        if (!HasRemotePeers(out var ownPeer))
+            return;
+
+        foreach (var peer in _peers.Values) // todo: make it IndexedCollection ?
+        {
+            if (excludePeer != null && peer.Id == excludePeer.Id)
+                continue;
+            if (ownPeer != null && peer.Id == ownPeer.Id)
+                continue;
+
+            peer.Send(NetworkManager.Writer, channel, deliveryMethod);
+        }
+
+        NetworkManager.Writer.Reset();
     }
 }
