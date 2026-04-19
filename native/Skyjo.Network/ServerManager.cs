@@ -75,6 +75,11 @@ public sealed class ServerManager : ManagerBase
                 new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
             }
 
+            foreach (var entity in NetworkManager.Entities.Values)
+            {
+                new ReplicatedAllPacket(entity).Serialize(NetworkManager.Writer);
+            }
+
             peer.Send(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
             NetworkManager.Writer.Reset();
         }
@@ -114,6 +119,7 @@ public sealed class ServerManager : ManagerBase
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset();
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
+        new ReplicatedAllPacket(entity).Serialize(NetworkManager.Writer);
         SendToAll();
     }
 
@@ -173,7 +179,6 @@ public sealed class ServerManager : ManagerBase
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(NetworkHelper.InternalMessage)]
     public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, byte channel, DeliveryMethod deliveryMethod,
         NetPeer? excludePeer, NetPeer? peer, Entity entity, int index, T lastValue, T value)
     {

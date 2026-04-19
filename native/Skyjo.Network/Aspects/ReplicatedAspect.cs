@@ -12,7 +12,6 @@ public sealed class ReplicatedAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Private, WhenExists = OverrideStrategy.Ignore)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(NetworkHelper.InternalMessage)]
     private static int __GetReplicatedVarIndex(string name)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties
@@ -58,5 +57,29 @@ public sealed class ReplicatedAspect : TypeAspect
         }
 
         meta.InsertStatement(switchBuilder.ToStatement());
+    }
+
+    [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
+    private void __SerializeReplicatedVars(NetDataWriter writer)
+    {
+        var replicatedVars = meta.Target.Type.FieldsAndProperties
+            .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
+
+        foreach (var replicatedVar in replicatedVars)
+        {
+            NetworkTemplates.WriteType(replicatedVar.Type, writer, replicatedVar.Value);
+        }
+    }
+
+    [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]
+    private void __DeserializeReplicatedVars(NetDataReader reader)
+    {
+        var replicatedVars = meta.Target.Type.FieldsAndProperties
+            .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
+
+        foreach (var replicatedVar in replicatedVars)
+        {
+            NetworkTemplates.ReadType(replicatedVar.Type, reader, replicatedVar);
+        }
     }
 }

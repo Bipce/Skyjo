@@ -18,7 +18,7 @@ public sealed class NetworkManager
     private readonly Dictionary<Type, byte> _entityTypeIds = [];
     private readonly Dictionary<byte, Func<Entity>> _entityFactories = [];
 
-    internal Dictionary<int, Entity> Entities { get; } = [];
+    internal Dictionary<int, Entity> Entities { get; } = []; // todo: make it IndexedCollection
     internal NetDataWriter Writer { get; } = new();
 
     private GameTime _gameTime = null!;
@@ -36,6 +36,7 @@ public sealed class NetworkManager
         _packetFactories.Add((byte)PacketType.Rpc, () => new RpcPacket());
         _packetFactories.Add((byte)PacketType.DestroyEntity, () => new DestroyEntityPacket());
         _packetFactories.Add((byte)PacketType.Replicated, () => new ReplicatedPacket());
+        _packetFactories.Add((byte)PacketType.ReplicatedAll, () => new ReplicatedAllPacket());
     }
 
     public void Update(GameTime gameTime)

@@ -45,8 +45,6 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 fb.Accessibility = Accessibility.Private;
                 fb.AddAttribute(AttributeConstruction.Create(typeof(EditorBrowsableAttribute),
                     [EditorBrowsableState.Never]));
-                fb.AddAttribute(
-                    AttributeConstruction.Create(typeof(ObsoleteAttribute), [NetworkHelper.InternalMessage]));
             });
 
         _replicatedDataField = result.Declaration;

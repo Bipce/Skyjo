@@ -38,14 +38,22 @@ public abstract class Entity : IEquatable<Entity>
     public bool Equals(Entity? other) => other is not null && Id == other.Id;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(NetworkHelper.InternalMessage)]
     protected internal virtual void __CallMethod(int id, NetDataReader reader)
     {
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(NetworkHelper.InternalMessage)]
     protected internal virtual void __UpdateReplicatedVar(int id, NetDataReader reader)
+    {
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected internal virtual void __SerializeReplicatedVars(NetDataWriter writer)
+    {
+    }
+    
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    protected internal virtual void __DeserializeReplicatedVars(NetDataReader reader)
     {
     }
 }

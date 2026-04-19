@@ -5,5 +5,6 @@ public enum PacketType : byte
     CreateEntity,
     Rpc,
     DestroyEntity,
-    Replicated
+    Replicated,
+    ReplicatedAll
 }
