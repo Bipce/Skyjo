@@ -39,7 +39,11 @@ public sealed class IndexedCollection<TKey, T> : IEnumerable<T>
         {
             if (!EqualityComparer<TKey>.Default.Equals(_keySelector(value), key))
                 throw new ArgumentException("The key extracted from the value does not match the indexer key.");
-            _items[_indices[key]] = value;
+
+            if (_indices.TryGetValue(key, out var index))
+                _items[index] = value;
+            else
+                Add(value);
         }
     }
 
