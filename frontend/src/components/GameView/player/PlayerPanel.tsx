@@ -1,8 +1,22 @@
 import ScorePanel from "../shared/ScorePanel.tsx";
 import CardGridWrapper from "../shared/CardGridWrapper.tsx";
+import type { ICard } from "../../interfaces/ICard.ts";
 
 const PlayerPanel = () => {
-  const cards = [5, 1, 2, "?", 0, "?", 12, -1, 2, 3, 1, 1];
+  const cards: ICard[] = [
+    { number: 0, isRevealed: true },
+    { number: 1, isRevealed: false },
+    { number: 2, isRevealed: false },
+    { number: 5, isRevealed: true },
+    { number: 5, isRevealed: false },
+    { number: 9, isRevealed: true },
+    { number: 12, isRevealed: false },
+    { number: -2, isRevealed: true },
+    { number: 4, isRevealed: true },
+    { number: 5, isRevealed: false },
+    { number: 5, isRevealed: true },
+    { number: 5, isRevealed: true },
+  ];
 
   return (
     <section className="flex h-full w-full justify-center">
