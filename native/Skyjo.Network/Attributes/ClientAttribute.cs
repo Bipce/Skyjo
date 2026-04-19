@@ -16,7 +16,7 @@ public sealed class ClientAttribute : RpcMethodAspect
             if (entity.Owner == null)
                 return null;
 
-            if (networkManager.ServerManager.HasRemotePeers(out _))
+            if (networkManager.ServerManager.HasRemotePeers)
             {
                 var writer = networkManager.GetRpcPacketData(entity.Id, GetMethodId());
                 WriteParams(writer);

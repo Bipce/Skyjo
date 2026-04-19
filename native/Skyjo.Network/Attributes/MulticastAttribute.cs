@@ -11,13 +11,12 @@ public sealed class MulticastAttribute : RpcMethodAspect
     {
         var networkManager = NetworkManager.Instance;
 
-        if (networkManager.ServerManager.IsRunning && networkManager.ServerManager.HasRemotePeers(out var excludePeer))
+        if (networkManager.ServerManager is { IsRunning: true, HasRemotePeers: true })
         {
             var entity = (Entity)meta.This;
             var writer = networkManager.GetRpcPacketData(entity.Id, GetMethodId());
             WriteParams(writer);
-            networkManager.ServerManager.Send(Channel, (DeliveryMethod)meta.RunTime((int)Reliability),
-                excludePeer: excludePeer);
+            networkManager.ServerManager.SendToAll(Channel, (DeliveryMethod)meta.RunTime((int)Reliability));
         }
 
         return meta.Proceed();

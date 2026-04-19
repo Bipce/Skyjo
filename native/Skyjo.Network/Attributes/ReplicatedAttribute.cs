@@ -1,10 +1,12 @@
 using System.ComponentModel;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using Metalama.Framework.Aspects;
 using Metalama.Framework.Code;
 using Metalama.Framework.Code.DeclarationBuilders;
 using Metalama.Framework.Eligibility;
 using Skyjo.Network.Aspects;
+using Skyjo.Network.Enums;
 using Skyjo.Network.Utils;
 
 namespace Skyjo.Network.Attributes;
@@ -12,6 +14,10 @@ namespace Skyjo.Network.Attributes;
 public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
 {
     private IField? _replicatedDataField;
+
+    public Reliability Reliability { get; init; } = Reliability.ReliableSequenced;
+    public byte Channel { get; init; }
+    public Condition Condition { get; init; }
 
     public override void BuildEligibility(IEligibilityBuilder<IFieldOrProperty> builder)
     {
@@ -48,6 +54,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
         builder.Outbound.Select(m => m.DeclaringType).RequireAspect<ReplicatedAspect>();
     }
 
+    [EditorBrowsable(EditorBrowsableState.Never)]
     public override dynamic? OverrideProperty
     {
         get => meta.Proceed();
@@ -55,7 +62,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
         {
             var networkManager = NetworkManager.Instance;
             if (!networkManager.ServerManager.IsRunning ||
-                !networkManager.ServerManager.HasRemotePeers(out _))
+                !networkManager.ServerManager.HasRemotePeers)
             {
                 meta.Proceed();
                 return;
@@ -68,8 +75,17 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
             {
                 var lastValue = meta.Target.FieldOrProperty.Value;
                 meta.Proceed();
+
+                NetPeer? excludePeer = null;
+                if (Condition == Condition.SkipOwner)
+                    excludePeer = entity.Owner;
+                NetPeer? peer = null;
+                if (Condition == Condition.OwnerOnly)
+                    peer = entity.Owner;
+
                 _replicatedDataField.Value = networkManager.ServerManager.AddReplicatedData(entity.NetUpdateFrequency,
-                    entity, index, lastValue, value);
+                    Channel, (DeliveryMethod)meta.RunTime((int)Reliability), excludePeer, peer, entity, index,
+                    lastValue, value);
 
                 _replicatedDataField.Value.Serialize =
                     meta.RunTime<Action<NetDataWriter>>(writer =>
