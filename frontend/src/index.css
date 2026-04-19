@@ -2,7 +2,7 @@
 @import "./styles/cards.css";
 
 body {
-  @apply h-screen overflow-hidden bg-zinc-900 text-zinc-100;
+  @apply h-screen overflow-hidden bg-zinc-900 text-zinc-100 select-none;
 }
 
 .center {
@@ -15,4 +15,8 @@ body {
 
 .shadow {
   @apply shadow-sm shadow-zinc-500;
+}
+
+.card-number {
+  font-family: "Luckiest Guy", cursive;
 }

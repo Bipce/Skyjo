@@ -6,42 +6,22 @@
     radial-gradient(circle at bottom right, rgba(255, 255, 0, 0.6), transparent 60%), #111;
 }
 
-.custom-card-purple {
-  background:
-    radial-gradient(circle at top left, rgba(168, 85, 247, 0.6), transparent 50%),
-    radial-gradient(circle at top right, rgba(139, 92, 246, 0.6), transparent 50%),
-    radial-gradient(circle at bottom left, rgba(192, 132, 252, 0.6), transparent 50%),
-    radial-gradient(circle at bottom right, rgba(124, 58, 237, 0.6), transparent 50%), #2e1065;
+.custom-card-dark-blue {
+  background: radial-gradient(circle, white 10%, transparent 60%), linear-gradient(145deg, #4a6fa5, #082864, #021541);
 }
 
 .custom-card-blue {
-  background:
-    radial-gradient(circle at top left, rgba(96, 165, 250, 0.6), transparent 50%),
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.6), transparent 50%),
-    radial-gradient(circle at bottom left, rgba(147, 197, 253, 0.6), transparent 50%),
-    radial-gradient(circle at bottom right, rgba(29, 78, 216, 0.6), transparent 50%), #1e3a8a;
+  background: radial-gradient(circle, white 20%, transparent 60%), linear-gradient(145deg, #a8d8f0, #5bb8e8, #2196c8);
 }
 
 .custom-card-green {
-  background:
-    radial-gradient(circle at top left, rgba(74, 222, 128, 0.6), transparent 50%),
-    radial-gradient(circle at top right, rgba(34, 197, 94, 0.6), transparent 50%),
-    radial-gradient(circle at bottom left, rgba(134, 239, 172, 0.6), transparent 50%),
-    radial-gradient(circle at bottom right, rgba(21, 128, 61, 0.6), transparent 50%), #064e3b;
+  background: radial-gradient(circle, white 20%, transparent 60%), linear-gradient(145deg, #6abf69, #3a9e3a, #1f7a1f);
 }
 
 .custom-card-yellow {
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 0, 0.6), transparent 50%),
-    radial-gradient(circle at top right, rgba(255, 255, 0, 0.6), transparent 50%),
-    radial-gradient(circle at bottom left, rgba(255, 255, 0, 0.6), transparent 50%),
-    radial-gradient(circle at bottom right, rgba(255, 255, 0, 0.6), transparent 50%), #78350f;
+  background: radial-gradient(circle, white 20%, transparent 60%), linear-gradient(145deg, #f5d76e, #e8a020, #c87010);
 }
 
 .custom-card-red {
-  background:
-    radial-gradient(circle at top left, rgba(248, 113, 113, 0.6), transparent 50%),
-    radial-gradient(circle at top right, rgba(239, 68, 68, 0.6), transparent 50%),
-    radial-gradient(circle at bottom left, rgba(252, 165, 165, 0.6), transparent 50%),
-    radial-gradient(circle at bottom right, rgba(185, 28, 28, 0.6), transparent 50%), #7f1d1d;
+  background: radial-gradient(circle, white 20%, transparent 60%), linear-gradient(145deg, #e57373, #c0392b, #8e1a1a);
 }
