@@ -6,8 +6,6 @@ namespace Skyjo.Network.Utils;
 [CompileTime]
 internal static class NetworkHelper
 {
-    public const string InternalMessage = "This member is managed by an aspect. Do not use it directly.";
-
     public static int ComputeMethodId(IMethod method)
     {
         var parameters = string.Join(",", method.Parameters.Select(x => x.Type.ToString()));

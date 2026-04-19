@@ -179,7 +179,6 @@ public sealed class ServerManager : ManagerBase
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(NetworkHelper.InternalMessage)]
     public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, byte channel, DeliveryMethod deliveryMethod,
         NetPeer? excludePeer, NetPeer? peer, Entity entity, int index, T lastValue, T value)
     {

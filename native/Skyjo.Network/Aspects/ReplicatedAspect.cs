@@ -12,7 +12,6 @@ public sealed class ReplicatedAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Private, WhenExists = OverrideStrategy.Ignore)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    [Obsolete(NetworkHelper.InternalMessage)]
     private static int __GetReplicatedVarIndex(string name)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties

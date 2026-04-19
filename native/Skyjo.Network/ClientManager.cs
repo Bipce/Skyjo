@@ -58,8 +58,6 @@ public sealed class ClientManager : ManagerBase
     private void OnReplicatedPacket(ReplicatedPacket packet)
     {
         var entity = NetworkManager.Entities[packet.EntityId];
-#pragma warning disable CS0618
         entity.__UpdateReplicatedVar(packet.Index, packet.Reader);
-#pragma warning restore CS0618
     }
 }
