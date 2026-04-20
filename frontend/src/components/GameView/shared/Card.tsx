@@ -34,7 +34,7 @@ const Card = ({ card, className }: Props) => {
 
   return (
     <button
-      className={`center border-round t } aspect-2/3 max-h-28 w-full max-w-20 bg-size-[100%_100%] bg-no-repeat font-bold ${
+      className={`center border-round aspect-2/3 max-h-28 w-full max-w-20 bg-size-[100%_100%] bg-no-repeat font-bold ${
         className
       } ${cardColor} ${cardSize} card-number card-pattern text-zinc-950`}
     >
