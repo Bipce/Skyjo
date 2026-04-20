@@ -1,4 +1,4 @@
-export interface ICard {
+export interface CardData {
   number: number;
   isRevealed: boolean;
   belongTo: CardBelongToType;

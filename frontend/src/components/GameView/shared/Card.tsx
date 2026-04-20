@@ -1,13 +1,13 @@
-import type { ICard } from "../../interfaces/ICard.ts";
+import type { CardData } from "../../interfaces/CardData.ts";
 
 interface Props {
-  card: ICard;
+  card: CardData;
   className?: string;
 }
 
 const Card = ({ card, className }: Props) => {
+  const { number, isRevealed, belongTo } = card;
   const getCardColor = (): string => {
-    const { number, isRevealed } = card;
     if (isRevealed) {
       if (number < 0) return "custom-card-dark-blue";
       if (number === 0) return "custom-card-blue";
@@ -20,15 +20,15 @@ const Card = ({ card, className }: Props) => {
   const cardColor = getCardColor();
 
   const getCardSize = (): string => {
-    const { isRevealed, belongTo } = card;
-    if (belongTo === "opponent") {
-      if (isRevealed) return "text-3xl";
-      if (!isRevealed) return "text-[9px]";
-    } else if (belongTo === "player" || belongTo === "deck") {
-      if (isRevealed) return "text-5xl";
-      if (!isRevealed) return "text-xl";
+    switch (belongTo) {
+      case "opponent":
+        return isRevealed ? "text-3xl" : "text-[9px]";
+      case "player":
+      case "deck":
+        return isRevealed ? "text-5xl" : "text-xl";
+      default:
+        return "";
     }
-    return "";
   };
   const cardSize = getCardSize();
 
