@@ -36,7 +36,21 @@ public sealed class ReplicatedAspect : TypeAspect
     [Template]
     private static void ReadType(IFieldOrProperty field, NetDataReader reader)
     {
+        var attribute = field.Attributes.First(x => x.Type.IsConvertibleTo(typeof(ReplicatedAttribute)));
+
+        var lastValue = field.Value;
         NetworkTemplates.ReadType(field.Type, reader, field);
+
+        var onRepArg = attribute.NamedArguments.FirstOrDefault(x => x.Key == "OnRep");
+        if (onRepArg.Key != null)
+        {
+            var onRepName = (string)onRepArg.Value.Value!;
+            var onRepMethod = field.DeclaringType.Methods.OfName(onRepName).Single();
+            if (onRepMethod.Parameters.Count == 1)
+                onRepMethod.WithObject((IExpression)meta.This).Invoke(lastValue);
+            else
+                onRepMethod.WithObject((IExpression)meta.This).Invoke();
+        }
     }
 
     [Introduce(Accessibility = Accessibility.Protected, WhenExists = OverrideStrategy.Override)]

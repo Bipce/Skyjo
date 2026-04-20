@@ -19,6 +19,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
     public byte Channel { get; init; }
     public Condition Condition { get; init; }
     public int NetUpdateFrequency { get; init; }
+    public string? OnRep { get; init; }
 
     public override void BuildEligibility(IEligibilityBuilder<IFieldOrProperty> builder)
     {

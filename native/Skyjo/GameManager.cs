@@ -5,15 +5,14 @@ namespace Skyjo;
 
 public sealed partial class GameManager : Entity
 {
-    [Replicated] private int _health = 100;
-    [Replicated] private TestEntity? _entity;
+    [Replicated(OnRep = nameof(OnRep_Health))]
+    private int _health = 100;
 
-    private int _lastHealth;
-    private bool _exist;
+    [Replicated(OnRep = nameof(OnRep_TestEntity))]
+    private TestEntity? _entity;
 
     public GameManager()
     {
-        _lastHealth = _health;
         View_SetHealth(_health);
     }
 
@@ -35,37 +34,35 @@ public sealed partial class GameManager : Entity
     public void Server_DecrementHealth()
     {
         _health -= 10;
+        OnRep_Health();
     }
 
     [Server]
     public void Server_IncrementHealth()
     {
         _health += 10;
+        OnRep_Health();
     }
 
     public void Update()
     {
-        if (_lastHealth != _health)
-        {
-            _lastHealth = _health;
-            View_SetHealth(_health);
-        }
-
-        // todo: to be removed when OnRep will be implemented
-        if (!_entity && _exist)
-        {
-            Console.WriteLine("Entity is null");
-            _exist = false;
-        }
-        else if (_entity && !_exist)
-        {
-            Console.WriteLine($"Entity is not null: {_entity.Id}");
-            _exist = true;
-        }
     }
 
     private void View_SetHealth(int health)
     {
         Application.View.EvaluateScript($"window.SetHealth(\"{health}\")");
+    }
+
+    private void OnRep_Health()
+    {
+        View_SetHealth(_health);
+    }
+
+    private void OnRep_TestEntity()
+    {
+        if (!_entity)
+            Console.WriteLine("Entity is null or not valid");
+        else if (_entity)
+            Console.WriteLine($"Entity is not valid: {_entity.Id}");
     }
 }
