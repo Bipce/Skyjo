@@ -165,7 +165,7 @@ public sealed class ServerManager : ManagerBase
 
                         if (!data.IsUnchanged)
                         {
-                            new ReplicatedPacket(data.Entity.Id, data.Index).Serialize(NetworkManager.Writer);
+                            new ReplicatedPacket(data.Entity.Id, data.Id).Serialize(NetworkManager.Writer);
                             data.Serialize(NetworkManager.Writer);
                         }
 
@@ -194,12 +194,12 @@ public sealed class ServerManager : ManagerBase
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, byte channel, DeliveryMethod deliveryMethod,
-        NetPeer? excludePeer, NetPeer? peer, Entity entity, int index, T lastValue, T value)
+        NetPeer? excludePeer, NetPeer? peer, Entity entity, int id, T lastValue, T value)
     {
         var data = new ReplicatedData<T>
         {
             Entity = entity,
-            Index = index,
+            Id = id,
             LastValue = lastValue,
             Value = value
         };

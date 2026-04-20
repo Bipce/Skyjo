@@ -5,7 +5,7 @@ namespace Skyjo.Network;
 public sealed class ReplicatedData<T> : IReplicatedData
 {
     public required Entity Entity { get; init; }
-    public required int Index { get; init; }
+    public required int Id { get; init; }
     public required T LastValue { get; init; }
     public required T Value { get; set; }
     public bool IsUnchanged => EqualityComparer<T>.Default.Equals(Value, LastValue);

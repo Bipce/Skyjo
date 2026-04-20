@@ -61,6 +61,6 @@ public sealed class ClientManager : ManagerBase
     private void OnReplicatedPacket(ReplicatedPacket packet)
     {
         var entity = NetworkManager.Entities[packet.EntityId];
-        entity.__UpdateReplicatedVar(packet.Index, packet.Reader);
+        entity.__UpdateReplicatedVar(packet.Id, packet.Reader);
     }
 }

@@ -12,7 +12,7 @@ public sealed class ReplicatedAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Private, WhenExists = OverrideStrategy.Ignore)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    private static int __GetReplicatedVarIndex(string name)
+    private static int __GetReplicatedVarId(string name)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));

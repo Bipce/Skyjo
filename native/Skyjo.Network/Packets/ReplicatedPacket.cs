@@ -11,29 +11,29 @@ public sealed class ReplicatedPacket : Packet
     {
     }
 
-    public ReplicatedPacket(int entityId, int index)
+    public ReplicatedPacket(int entityId, int id)
     {
         EntityId = entityId;
-        Index = index;
+        Id = id;
     }
 
     public override PacketType Type => PacketType.Replicated;
 
     public int EntityId { get; private set; }
-    public int Index { get; private set; }
+    public int Id { get; private set; }
 
     public override void Serialize(NetDataWriter writer)
     {
         base.Serialize(writer);
 
         writer.Put(EntityId);
-        writer.Put(Index);
+        writer.Put(Id);
     }
 
     public override void Deserialize(NetDataReader reader)
     {
         EntityId = reader.GetInt();
-        Index = reader.GetInt();
+        Id = reader.GetInt();
 
         Reader = reader;
     }

@@ -67,7 +67,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 return;
             }
 
-            var index = (int)meta.ThisType.__GetReplicatedVarIndex(meta.Target.FieldOrProperty.Name);
+            var id = (int)meta.ThisType.__GetReplicatedVarId(meta.Target.FieldOrProperty.Name);
             var entity = (Entity)meta.This;
 
             if (_replicatedDataField!.Value == null)
@@ -86,7 +86,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 if (NetUpdateFrequency != 0)
                     netUpdateFrequency = NetUpdateFrequency;
                 _replicatedDataField.Value = networkManager.ServerManager.AddReplicatedData(netUpdateFrequency,
-                    Channel, (DeliveryMethod)meta.RunTime((int)Reliability), excludePeer, peer, entity, index,
+                    Channel, (DeliveryMethod)meta.RunTime((int)Reliability), excludePeer, peer, entity, id,
                     lastValue, value);
 
                 _replicatedDataField.Value.Serialize =
