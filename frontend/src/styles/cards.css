@@ -25,3 +25,7 @@
 .custom-card-red {
   background: radial-gradient(circle, white 20%, transparent 60%), linear-gradient(145deg, #e57373, #c0392b, #8e1a1a);
 }
+
+.card-number {
+  font-family: "Luckiest Guy", cursive;
+}

@@ -17,6 +17,6 @@ body {
   @apply shadow-sm shadow-zinc-500;
 }
 
-.card-number {
-  font-family: "Luckiest Guy", cursive;
+.panel-base {
+  @apply flex items-center rounded-xl bg-zinc-950 shadow;
 }

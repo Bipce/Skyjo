@@ -1,9 +1,10 @@
 import ScorePanel from "../shared/ScorePanel.tsx";
 import CardGridWrapper from "../shared/CardGridWrapper.tsx";
-import type { ICard } from "../../interfaces/ICard.ts";
+import type { CardData } from "../../interfaces/CardData.ts";
+import Separation from "../shared/Separation.tsx";
 
 const PlayerPanel = () => {
-  const cards: ICard[] = [
+  const cards: CardData[] = [
     { number: 0, isRevealed: true, belongTo: "player" },
     { number: 1, isRevealed: false, belongTo: "player" },
     { number: 2, isRevealed: false, belongTo: "player" },
@@ -19,8 +20,9 @@ const PlayerPanel = () => {
   ];
 
   return (
-    <section className="flex h-full w-full justify-center">
-      <div className="flex h-full w-2/3 items-center justify-around gap-10 overflow-hidden rounded-xl bg-zinc-950 p-8 shadow">
+    <section className="relative flex h-full w-full justify-center">
+      <Separation className="right-1/3" />
+      <div className="panel-base h-full w-2/3 justify-around gap-10 p-8">
         <CardGridWrapper cards={cards} className="w-full gap-10" />
         <ScorePanel />
       </div>
