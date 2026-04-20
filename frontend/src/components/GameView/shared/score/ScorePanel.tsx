@@ -1,5 +1,5 @@
 import { Trophy, Hourglass } from "lucide-react";
-import IconWrapper from "./IconWrapper.tsx";
+import IconWrapper from "../../../ui/IconWrapper.tsx";
 
 const ScorePanel = () => {
   return (

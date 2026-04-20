@@ -1,4 +1,4 @@
-import type { CardData } from "../../interfaces/CardData.ts";
+import type { CardData } from "../../../../interfaces/CardData.ts";
 
 interface Props {
   card: CardData;

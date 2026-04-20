@@ -1,7 +1,7 @@
-import ScorePanel from "../shared/ScorePanel.tsx";
-import CardGridWrapper from "../shared/CardGridWrapper.tsx";
-import type { CardData } from "../../interfaces/CardData.ts";
-import Separation from "../shared/Separation.tsx";
+import ScorePanel from "../shared/score/ScorePanel.tsx";
+import CardGridWrapper from "../shared/card/CardGridWrapper.tsx";
+import type { CardData } from "../../../interfaces/CardData.ts";
+import Separation from "../../ui/Separation.tsx";
 
 const PlayerPanel = () => {
   const cards: CardData[] = [

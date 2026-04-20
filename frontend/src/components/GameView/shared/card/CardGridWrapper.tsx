@@ -1,9 +1,9 @@
-import type { ICard } from "../../interfaces/ICard.ts";
-import Card from "./Card";
+import type { CardData } from "../../../../interfaces/CardData.ts";
+import Card from "./Card.tsx";
 
 interface Props {
   className?: string;
-  cards: ICard[];
+  cards: CardData[];
 }
 
 const CardGridWrapper = ({ cards, className }: Props) => {

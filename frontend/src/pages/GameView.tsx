@@ -1,6 +1,6 @@
 import OpponentsGrid from "../components/gameView/opponent/OpponentsGrid.tsx";
 import OpponentPanel from "../components/gameView/opponent/OpponentPanel.tsx";
-import CardDeck from "../components/gameView/shared/CardDeck.tsx";
+import CardDeck from "../components/gameView/shared/card/CardDeck.tsx";
 import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
 
 const GameView = () => {
