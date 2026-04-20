@@ -70,17 +70,7 @@ public sealed class ServerManager : ManagerBase
         {
             _peers.Add(peer);
 
-            foreach (var entity in NetworkManager.Entities)
-            {
-                var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-                new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
-            }
-
-            foreach (var entity in NetworkManager.Entities)
-            {
-                new ReplicatedAllPacket(entity).Serialize(NetworkManager.Writer);
-            }
-
+            new SendWorldPacket().Serialize(NetworkManager.Writer);
             peer.Send(NetworkManager.Writer, DeliveryMethod.ReliableOrdered);
             NetworkManager.Writer.Reset();
         }
@@ -121,7 +111,7 @@ public sealed class ServerManager : ManagerBase
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
         NetworkManager.Writer.Reset(); // todo: is it really necessary ?
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
-        new ReplicatedAllPacket(entity).Serialize(NetworkManager.Writer);
+        entity.__SerializeReplicatedVars(NetworkManager.Writer);
         SendToAll();
     }
 

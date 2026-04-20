@@ -6,5 +6,5 @@ public enum PacketType : byte
     Rpc,
     DestroyEntity,
     Replicated,
-    ReplicatedAll
+    SendWorld
 }

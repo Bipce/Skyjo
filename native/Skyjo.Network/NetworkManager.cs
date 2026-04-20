@@ -40,7 +40,7 @@ public sealed class NetworkManager
         _packetFactories.Add((byte)PacketType.Rpc, () => new RpcPacket());
         _packetFactories.Add((byte)PacketType.DestroyEntity, () => new DestroyEntityPacket());
         _packetFactories.Add((byte)PacketType.Replicated, () => new ReplicatedPacket());
-        _packetFactories.Add((byte)PacketType.ReplicatedAll, () => new ReplicatedAllPacket());
+        _packetFactories.Add((byte)PacketType.SendWorld, () => new SendWorldPacket());
     }
 
     public void Update(GameTime gameTime)
@@ -59,6 +59,7 @@ public sealed class NetworkManager
         while (SpawnQueue.TryDequeue(out var entity))
         {
             Entities.Add(entity);
+            entity.OnSpawned();
         }
     }
 
@@ -66,7 +67,9 @@ public sealed class NetworkManager
     {
         while (DestroyQueue.TryDequeue(out var id))
         {
+            var entity = Entities[id];
             Entities.Remove(id);
+            entity.OnDestroyed();
         }
     }
 
@@ -78,7 +81,7 @@ public sealed class NetworkManager
 
     public IEnumerable<T> GetEntities<T>() where T : Entity
     {
-        return Entities.OfType<T>().OrderBy(e => e.Id);
+        return Entities.OfType<T>().OrderBy(e => e.Id); // todo: Remove OrderBy
     }
 
     public Entity GetEntity(int id)

@@ -69,4 +69,12 @@ public abstract class Entity : IEquatable<Entity>
     protected internal virtual void __DeserializeReplicatedVars(NetDataReader reader)
     {
     }
+
+    protected internal virtual void OnSpawned()
+    {
+    }
+
+    protected internal virtual void OnDestroyed()
+    {
+    }
 }

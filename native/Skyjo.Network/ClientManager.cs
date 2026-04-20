@@ -14,7 +14,6 @@ public sealed class ClientManager : ManagerBase
         AddPacketHandler<CreateEntityPacket>(OnCreateEntityPacket);
         AddPacketHandler<DestroyEntityPacket>(OnDestroyEntityPacket);
         AddPacketHandler<ReplicatedPacket>(OnReplicatedPacket);
-        AddPacketHandler<ReplicatedAllPacket>(_ => { });
     }
 
     public NetPeer Peer => NetManager.FirstPeer;
@@ -48,11 +47,15 @@ public sealed class ClientManager : ManagerBase
         entity.Id = packet.Id;
         entity.OwnerId = packet.OwnerId;
         NetworkManager.Entities.Add(entity);
+        entity.__DeserializeReplicatedVars(packet.Reader);
+        entity.OnSpawned();
     }
 
     private void OnDestroyEntityPacket(DestroyEntityPacket packet)
     {
+        var entity = NetworkManager.Entities[packet.Id];
         NetworkManager.Entities.Remove(packet.Id);
+        entity.OnDestroyed();
     }
 
     private void OnReplicatedPacket(ReplicatedPacket packet)

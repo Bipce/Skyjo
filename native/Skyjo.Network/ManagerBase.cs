@@ -85,7 +85,8 @@ public abstract class ManagerBase : INetEventListener
         {
             var packet = NetworkManager.CreatePacket(reader.GetByte());
             packet.Deserialize(reader);
-            _packetHandlers[packet.GetType()].Invoke(packet);
+            if (_packetHandlers.TryGetValue(packet.GetType(), out var handler))
+                handler(packet);
         }
 
         reader.Recycle();

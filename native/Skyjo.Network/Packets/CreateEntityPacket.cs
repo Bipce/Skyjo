@@ -5,6 +5,8 @@ namespace Skyjo.Network.Packets;
 
 internal sealed class CreateEntityPacket : Packet
 {
+    public NetDataReader Reader { get; set; } = null!;
+
     public CreateEntityPacket()
     {
     }
@@ -33,6 +35,8 @@ internal sealed class CreateEntityPacket : Packet
 
     public override void Deserialize(NetDataReader reader)
     {
+        Reader = reader;
+
         TypeId = reader.GetByte();
         Id = reader.GetInt();
         OwnerId = reader.GetInt();
