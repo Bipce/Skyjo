@@ -46,10 +46,13 @@ public sealed class ReplicatedAspect : TypeAspect
         {
             var onRepName = (string)onRepArg.Value.Value!;
             var onRepMethod = field.DeclaringType.Methods.OfName(onRepName).Single();
-            if (onRepMethod.Parameters.Count == 1)
-                onRepMethod.WithObject((IExpression)meta.This).Invoke(lastValue);
-            else
-                onRepMethod.WithObject((IExpression)meta.This).Invoke();
+            if (lastValue != field.Value)
+            {
+                if (onRepMethod.Parameters.Count == 1)
+                    onRepMethod.WithObject((IExpression)meta.This).Invoke(lastValue);
+                else
+                    onRepMethod.WithObject((IExpression)meta.This).Invoke();
+            }
         }
     }
 
@@ -93,7 +96,7 @@ public sealed class ReplicatedAspect : TypeAspect
 
         foreach (var replicatedVar in replicatedVars)
         {
-            NetworkTemplates.ReadType(replicatedVar.Type, reader, replicatedVar);
+            ReadType(replicatedVar, reader);
         }
     }
 }
