@@ -9,4 +9,5 @@ public interface IReplicatedData
     bool IsUnchanged { get; }
     Action<NetDataWriter> Serialize { get; }
     Action Done { get; }
+    bool IsValid { get; }
 }

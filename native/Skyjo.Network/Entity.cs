@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Skyjo.Network.Utils;
@@ -15,6 +16,7 @@ public abstract class Entity : IEquatable<Entity>
     public NetPeer? Owner { get; init; }
     internal int OwnerId { get; set; }
     public int NetUpdateFrequency { get; set; } = 100;
+    public bool IsPendingDestroy { get; internal set; }
 
     public bool IsOwner
     {
@@ -35,7 +37,18 @@ public abstract class Entity : IEquatable<Entity>
         ServerManager.Spawn(this);
     }
 
+    public void Destroy()
+    {
+        if (!ServerManager.IsRunning)
+            throw new InvalidOperationException("Only the server can destroy entities");
+
+        ServerManager.Destroy(this);
+    }
+
     public bool Equals(Entity? other) => other is not null && Id == other.Id;
+    public bool IsValid => NetworkManager.Entities.Contains(this);
+
+    public static implicit operator bool([NotNullWhen(true)] Entity? entity) => entity is not null && entity.IsValid;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected internal virtual void __CallMethod(int id, NetDataReader reader)
@@ -51,7 +64,7 @@ public abstract class Entity : IEquatable<Entity>
     protected internal virtual void __SerializeReplicatedVars(NetDataWriter writer)
     {
     }
-    
+
     [EditorBrowsable(EditorBrowsableState.Never)]
     protected internal virtual void __DeserializeReplicatedVars(NetDataReader reader)
     {

@@ -3,6 +3,7 @@ using LiteNetLib.Utils;
 using Microsoft.Xna.Framework;
 using Skyjo.Network.Enums;
 using Skyjo.Network.Packets;
+using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
 
@@ -18,12 +19,15 @@ public sealed class NetworkManager
     private readonly Dictionary<Type, byte> _entityTypeIds = [];
     private readonly Dictionary<byte, Func<Entity>> _entityFactories = [];
 
-    internal Dictionary<int, Entity> Entities { get; } = []; // todo: make it IndexedCollection
+    internal IndexedCollection<int, Entity> Entities { get; } = new(x => x.Id);
     internal NetDataWriter Writer { get; } = new();
 
     private GameTime _gameTime = null!;
     public double DeltaTime => _gameTime.ElapsedGameTime.TotalSeconds;
     public double TotalTime => _gameTime.TotalGameTime.TotalSeconds;
+
+    internal Queue<Entity> SpawnQueue { get; } = [];
+    internal Queue<int> DestroyQueue { get; } = [];
 
     public NetworkManager()
     {
@@ -42,8 +46,28 @@ public sealed class NetworkManager
     public void Update(GameTime gameTime)
     {
         _gameTime = gameTime;
+
+        FlushSpawnQueue();
+        FlushDestroyQueue();
+
         ServerManager.Update();
         ClientManager.Update();
+    }
+
+    private void FlushSpawnQueue()
+    {
+        while (SpawnQueue.TryDequeue(out var entity))
+        {
+            Entities.Add(entity);
+        }
+    }
+
+    private void FlushDestroyQueue()
+    {
+        while (DestroyQueue.TryDequeue(out var id))
+        {
+            Entities.Remove(id);
+        }
     }
 
     public void Stop()
@@ -54,7 +78,7 @@ public sealed class NetworkManager
 
     public IEnumerable<T> GetEntities<T>() where T : Entity
     {
-        return Entities.Values.OfType<T>().OrderBy(e => e.Id);
+        return Entities.OfType<T>().OrderBy(e => e.Id);
     }
 
     public Entity GetEntity(int id)

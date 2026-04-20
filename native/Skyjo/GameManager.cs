@@ -25,6 +25,13 @@ public sealed partial class GameManager : Entity
     }
 
     [Server]
+    public void Server_DestroyEntity()
+    {
+        _entity?.Destroy();
+        _entity = null;
+    }
+
+    [Server]
     public void Server_DecrementHealth()
     {
         _health -= 10;
@@ -44,9 +51,15 @@ public sealed partial class GameManager : Entity
             View_SetHealth(_health);
         }
 
-        if (_entity != null && !_exist)
+        // todo: to be removed when OnRep will be implemented
+        if (!_entity && _exist)
         {
-            Console.WriteLine(_entity);
+            Console.WriteLine("Entity is null");
+            _exist = false;
+        }
+        else if (_entity && !_exist)
+        {
+            Console.WriteLine($"Entity is not null: {_entity.Id}");
             _exist = true;
         }
     }

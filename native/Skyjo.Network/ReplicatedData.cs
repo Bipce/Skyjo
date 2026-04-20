@@ -11,4 +11,15 @@ public sealed class ReplicatedData<T> : IReplicatedData
     public bool IsUnchanged => EqualityComparer<T>.Default.Equals(Value, LastValue);
     public Action<NetDataWriter> Serialize { get; set; } = null!;
     public Action Done { get; set; } = null!;
+
+    public bool IsValid
+    {
+        get
+        {
+            if (Value is Entity entity)
+                return entity.IsValid;
+
+            return true;
+        }
+    }
 }

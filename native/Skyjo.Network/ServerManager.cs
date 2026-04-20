@@ -20,6 +20,7 @@ public sealed class ServerManager : ManagerBase
     private NetDataReader _lastReader = null!;
 
     private readonly IndexedCollection<int, ReplicatedFrequencyData> _frequencyData = new(x => x.NetUpdateFrequency);
+    private readonly List<IReplicatedData> _invalidReplicatedData = [];
 
     public override bool Start()
     {
@@ -69,13 +70,13 @@ public sealed class ServerManager : ManagerBase
         {
             _peers.Add(peer);
 
-            foreach (var entity in NetworkManager.Entities.Values)
+            foreach (var entity in NetworkManager.Entities)
             {
                 var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
                 new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
             }
 
-            foreach (var entity in NetworkManager.Entities.Values)
+            foreach (var entity in NetworkManager.Entities)
             {
                 new ReplicatedAllPacket(entity).Serialize(NetworkManager.Writer);
             }
@@ -91,11 +92,12 @@ public sealed class ServerManager : ManagerBase
     {
         base.OnPeerDisconnected(peer, disconnectInfo);
 
-        foreach (var entity in NetworkManager.Entities.Values)
+        foreach (var entity in NetworkManager.Entities)
         {
             if (entity.Owner?.Id != peer.Id)
                 continue;
-            NetworkManager.Entities.Remove(entity.Id);
+            entity.IsPendingDestroy = true;
+            NetworkManager.DestroyQueue.Enqueue(entity.Id);
             if (!HasRemotePeers)
                 continue;
             new DestroyEntityPacket(entity.Id).Serialize(NetworkManager.Writer);
@@ -111,15 +113,26 @@ public sealed class ServerManager : ManagerBase
     {
         entity.Id = _nextId++;
         entity.OwnerId = entity.Owner?.Id ?? -1;
-        NetworkManager.Entities[entity.Id] = entity;
+        NetworkManager.SpawnQueue.Enqueue(entity);
 
         if (!HasRemotePeers)
             return;
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-        NetworkManager.Writer.Reset();
+        NetworkManager.Writer.Reset(); // todo: is it really necessary ?
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
         new ReplicatedAllPacket(entity).Serialize(NetworkManager.Writer);
+        SendToAll();
+    }
+
+    internal void Destroy(Entity entity)
+    {
+        NetworkManager.DestroyQueue.Enqueue(entity.Id);
+
+        if (!HasRemotePeers)
+            return;
+
+        new DestroyEntityPacket(entity.Id).Serialize(NetworkManager.Writer);
         SendToAll();
     }
 
@@ -147,8 +160,21 @@ public sealed class ServerManager : ManagerBase
 
                 foreach (var replicatedDataQueue in frequencyData.ReplicatedData)
                 {
+                    if (_invalidReplicatedData.Count > 0)
+                    {
+                        foreach (var data in _invalidReplicatedData)
+                            replicatedDataQueue.Data.Enqueue(data);
+                        _invalidReplicatedData.Clear();
+                    }
+
                     while (replicatedDataQueue.Data.TryDequeue(out var data))
                     {
+                        if (!data.IsValid)
+                        {
+                            _invalidReplicatedData.Add(data);
+                            continue;
+                        }
+
                         if (!data.IsUnchanged)
                         {
                             new ReplicatedPacket(data.Entity.Id, data.Index).Serialize(NetworkManager.Writer);

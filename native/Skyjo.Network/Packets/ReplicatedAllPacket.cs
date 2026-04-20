@@ -23,7 +23,7 @@ public sealed class ReplicatedAllPacket : Packet
     {
         base.Serialize(writer);
 
-        writer.Put(_entity);
+        writer.Put(_entity.Id);
         _entity.__SerializeReplicatedVars(writer);
     }
 

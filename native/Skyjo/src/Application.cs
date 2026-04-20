@@ -193,6 +193,12 @@ public sealed class Application : Game
             gameManager.Server_SpawnEntity();
         }
 
+        if (IsKeyJustPressed(Keys.Back) && NetworkManager.IsRunning)
+        {
+            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            gameManager.Server_DestroyEntity();
+        }
+
         if (IsKeyJustPressed(Keys.P) && NetworkManager.IsRunning)
         {
             var gameManager = NetworkManager.GetEntities<GameManager>().First();
