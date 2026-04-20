@@ -189,25 +189,25 @@ public sealed class Application : Game
 
         if (IsKeyJustPressed(Keys.Enter) && NetworkManager.IsRunning)
         {
-            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            var gameManager = NetworkManager.GetEntity<GameManager>();
             gameManager.Server_SpawnEntity();
         }
 
         if (IsKeyJustPressed(Keys.Back) && NetworkManager.IsRunning)
         {
-            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            var gameManager = NetworkManager.GetEntity<GameManager>();
             gameManager.Server_DestroyEntity();
         }
 
         if (IsKeyJustPressed(Keys.P) && NetworkManager.IsRunning)
         {
-            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            var gameManager = NetworkManager.GetEntity<GameManager>();
             gameManager.Server_IncrementHealth();
         }
 
         if (IsKeyJustPressed(Keys.O) && NetworkManager.IsRunning)
         {
-            var gameManager = NetworkManager.GetEntities<GameManager>().First();
+            var gameManager = NetworkManager.GetEntity<GameManager>();
             gameManager.Server_DecrementHealth();
         }
     }

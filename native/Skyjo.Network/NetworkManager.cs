@@ -81,7 +81,12 @@ public sealed class NetworkManager
 
     public IEnumerable<T> GetEntities<T>() where T : Entity
     {
-        return Entities.OfType<T>().OrderBy(e => e.Id); // todo: Remove OrderBy
+        return Entities.OfType<T>();
+    }
+
+    public T GetEntity<T>() where T : Entity
+    {
+        return Entities.OfType<T>().First();
     }
 
     public Entity GetEntity(int id)
