@@ -116,6 +116,7 @@ public sealed class ServerManager : ManagerBase
 
     internal void Destroy(Entity entity)
     {
+        entity.IsPendingDestroy = true;
         NetworkManager.DestroyQueue.Enqueue(entity.Id);
 
         if (!HasRemotePeers)
@@ -155,7 +156,7 @@ public sealed class ServerManager : ManagerBase
                     while (replicatedDataQueue.Data.TryDequeue(out var data))
                     {
                         if (!data.Entity)
-                            break;
+                            continue;
 
                         if (!data.IsValid)
                         {

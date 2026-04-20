@@ -55,6 +55,7 @@ public sealed class ClientManager : ManagerBase
     {
         var entity = NetworkManager.Entities[packet.Id];
         NetworkManager.Entities.Remove(packet.Id);
+        entity.IsPendingDestroy = true;
         entity.OnDestroyed();
     }
 

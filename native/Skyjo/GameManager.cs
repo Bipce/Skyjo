@@ -21,6 +21,7 @@ public sealed partial class GameManager : Entity
     {
         _entity = new TestEntity();
         _entity.Spawn();
+        OnRep_TestEntity();
     }
 
     [Server]
@@ -28,6 +29,7 @@ public sealed partial class GameManager : Entity
     {
         _entity?.Destroy();
         _entity = null;
+        OnRep_TestEntity();
     }
 
     [Server]
@@ -63,6 +65,6 @@ public sealed partial class GameManager : Entity
         if (!_entity)
             Console.WriteLine("Entity is null or not valid");
         else if (_entity)
-            Console.WriteLine($"Entity is not valid: {_entity.Id}");
+            Console.WriteLine($"Entity is valid: {_entity.Id}");
     }
 }

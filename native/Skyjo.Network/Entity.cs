@@ -46,7 +46,7 @@ public abstract class Entity : IEquatable<Entity>
     }
 
     public bool Equals(Entity? other) => other is not null && Id == other.Id;
-    public bool IsValid => NetworkManager.Entities.Contains(this);
+    public bool IsValid => Id > 0 && !IsPendingDestroy;
 
     public static implicit operator bool([NotNullWhen(true)] Entity? entity) => entity is not null && entity.IsValid;
 
