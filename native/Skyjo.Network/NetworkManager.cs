@@ -125,7 +125,6 @@ public sealed class NetworkManager
     [EditorBrowsable(EditorBrowsableState.Never)]
     public NetDataWriter GetRpcPacketData(int entityId, int methodId)
     {
-        Writer.Reset();
         new RpcPacket(entityId, methodId).Serialize(Writer);
         return Writer;
     }

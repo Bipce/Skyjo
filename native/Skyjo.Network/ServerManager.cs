@@ -109,7 +109,6 @@ public sealed class ServerManager : ManagerBase
             return;
 
         var typeId = NetworkManager.GetEntityTypeId(entity.GetType());
-        NetworkManager.Writer.Reset(); // todo: is it really necessary ?
         new CreateEntityPacket(typeId, entity.Id, entity.OwnerId).Serialize(NetworkManager.Writer);
         entity.__SerializeReplicatedVars(NetworkManager.Writer);
         SendToAll();
@@ -159,7 +158,7 @@ public sealed class ServerManager : ManagerBase
 
                     while (replicatedDataQueue.Data.TryDequeue(out var data))
                     {
-                        if (data.Entity)
+                        if (!data.Entity)
                             break;
 
                         if (!data.IsValid)
