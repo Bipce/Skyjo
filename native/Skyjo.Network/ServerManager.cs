@@ -20,7 +20,7 @@ public sealed class ServerManager : ManagerBase
     private NetDataReader _lastReader = null!;
 
     private readonly IndexedCollection<int, ReplicatedFrequencyData> _frequencyData = new(x => x.NetUpdateFrequency);
-    private readonly List<IReplicatedData> _invalidReplicatedData = [];
+    private readonly Queue<IReplicatedData> _invalidReplicatedQueue = [];
 
     public override bool Start()
     {
@@ -149,12 +149,8 @@ public sealed class ServerManager : ManagerBase
 
                 foreach (var replicatedDataQueue in frequencyData.ReplicatedData)
                 {
-                    if (_invalidReplicatedData.Count > 0)
-                    {
-                        foreach (var data in _invalidReplicatedData)
-                            replicatedDataQueue.Data.Enqueue(data);
-                        _invalidReplicatedData.Clear();
-                    }
+                    while (_invalidReplicatedQueue.TryDequeue(out var data))
+                        replicatedDataQueue.Data.Enqueue(data);
 
                     while (replicatedDataQueue.Data.TryDequeue(out var data))
                     {
@@ -163,7 +159,7 @@ public sealed class ServerManager : ManagerBase
 
                         if (!data.IsValid)
                         {
-                            _invalidReplicatedData.Add(data);
+                            _invalidReplicatedQueue.Enqueue(data);
                             continue;
                         }
 
