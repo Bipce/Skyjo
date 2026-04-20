@@ -159,6 +159,9 @@ public sealed class ServerManager : ManagerBase
 
                     while (replicatedDataQueue.Data.TryDequeue(out var data))
                     {
+                        if (data.Entity)
+                            break;
+
                         if (!data.IsValid)
                         {
                             _invalidReplicatedData.Add(data);

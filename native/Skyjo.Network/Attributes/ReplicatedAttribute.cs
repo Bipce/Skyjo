@@ -18,6 +18,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
     public Reliability Reliability { get; init; } = Reliability.ReliableSequenced;
     public byte Channel { get; init; }
     public Condition Condition { get; init; }
+    public int NetUpdateFrequency { get; init; }
 
     public override void BuildEligibility(IEligibilityBuilder<IFieldOrProperty> builder)
     {
@@ -81,7 +82,10 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 if (Condition == Condition.OwnerOnly)
                     peer = entity.Owner;
 
-                _replicatedDataField.Value = networkManager.ServerManager.AddReplicatedData(entity.NetUpdateFrequency,
+                var netUpdateFrequency = entity.NetUpdateFrequency;
+                if (NetUpdateFrequency != 0)
+                    netUpdateFrequency = NetUpdateFrequency;
+                _replicatedDataField.Value = networkManager.ServerManager.AddReplicatedData(netUpdateFrequency,
                     Channel, (DeliveryMethod)meta.RunTime((int)Reliability), excludePeer, peer, entity, index,
                     lastValue, value);
 
