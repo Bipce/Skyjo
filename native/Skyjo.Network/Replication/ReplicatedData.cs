@@ -1,6 +1,6 @@
 ﻿using LiteNetLib.Utils;
 
-namespace Skyjo.Network;
+namespace Skyjo.Network.Replication;
 
 public sealed class ReplicatedData<T> : IReplicatedData
 {

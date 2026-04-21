@@ -1,6 +1,6 @@
 ﻿using Skyjo.Network.Utils;
 
-namespace Skyjo.Network;
+namespace Skyjo.Network.Replication;
 
 public sealed class ReplicatedFrequencyData
 {

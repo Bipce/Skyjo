@@ -1,6 +1,6 @@
 ﻿using LiteNetLib;
 
-namespace Skyjo.Network;
+namespace Skyjo.Network.Replication;
 
 public sealed class ReplicatedDataQueue
 {

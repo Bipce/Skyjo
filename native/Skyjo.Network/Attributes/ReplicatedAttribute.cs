@@ -7,6 +7,7 @@ using Metalama.Framework.Code.DeclarationBuilders;
 using Metalama.Framework.Eligibility;
 using Skyjo.Network.Aspects;
 using Skyjo.Network.Enums;
+using Skyjo.Network.Replication;
 using Skyjo.Network.Utils;
 
 namespace Skyjo.Network.Attributes;

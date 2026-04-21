@@ -2,6 +2,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using Skyjo.Network.Packets;
+using Skyjo.Network.Replication;
 using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
