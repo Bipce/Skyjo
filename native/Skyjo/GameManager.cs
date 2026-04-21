@@ -52,7 +52,7 @@ public sealed partial class GameManager : Entity
 
     private void View_SetHealth(int health)
     {
-        Application.View.EvaluateScript($"window.SetHealth(\"{health}\")");
+        Application.View.EvaluateScript($"window.setHealth(\"{health}\")");
     }
 
     private void OnRep_Health()
