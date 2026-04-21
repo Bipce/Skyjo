@@ -37,7 +37,7 @@ public sealed class GameView
 
     private int CurrentWidth => _graphicsDevice.Viewport.Width;
     private int CurrentHeight => _graphicsDevice.Viewport.Height;
-    
+
 #if !DEBUG
     private static ShaderSources GetShaders()
     {

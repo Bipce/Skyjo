@@ -46,10 +46,6 @@ public sealed partial class GameManager : Entity
         OnRep_Health();
     }
 
-    public void Update()
-    {
-    }
-
     private void View_SetHealth(int health)
     {
         GameView.EvaluateScript($"window.setHealth(\"{health}\")");

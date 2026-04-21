@@ -2,7 +2,6 @@
 using LiteNetLib.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using Skyjo.Network;
 using Skyjo.Network.Extensions;
 
@@ -15,15 +14,11 @@ namespace Skyjo;
 public sealed class Application : Game
 {
     private GameView _gameView = null!;
+    private TestView _testView = null!;
 
     private SpriteBatch _spriteBatch = null!;
 
     private NetworkManager NetworkManager { get; } = new();
-
-    private KeyboardState _keyboard;
-    private KeyboardState _lastKeyboard;
-
-    private Texture2D _pixelTexture = null!;
 
     public Application()
     {
@@ -72,9 +67,7 @@ public sealed class Application : Game
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
         _gameView = new GameView(GraphicsDevice, _spriteBatch);
-
-        _pixelTexture = new Texture2D(GraphicsDevice, 1, 1);
-        _pixelTexture.SetData([Color.White]);
+        _testView = new TestView(GraphicsDevice, _spriteBatch);
     }
 
     protected override void Update(GameTime gameTime)
@@ -83,13 +76,8 @@ public sealed class Application : Game
 
         NetworkManager.Update(gameTime);
 
-        UpdateInput();
-
         _gameView.Update();
-        foreach (var gameManager in NetworkManager.GetEntities<GameManager>())
-        {
-            gameManager.Update();
-        }
+        _testView.Update();
     }
 
     protected override void Draw(GameTime gameTime)
@@ -97,27 +85,7 @@ public sealed class Application : Game
         GraphicsDevice.Clear(Color.Black);
 
         _gameView.Render();
-
-        _spriteBatch.Begin();
-
-        var i = 0;
-        foreach (var _ in NetworkManager.GetEntities<TestEntity>())
-        {
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 0, 50, 50), Color.Gray);
-            i++;
-        }
-
-        i = 0;
-        foreach (var player in NetworkManager.GetEntities<Player>())
-        {
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), player.Color);
-            if (player.IsOwner)
-                _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50 + (50 - 10) / 2, 50 + (50 - 10) / 2, 10, 10),
-                    Color.DarkRed);
-            i++;
-        }
-
-        _spriteBatch.End();
+        _testView.Draw();
 
         _spriteBatch.Begin();
         _gameView.Draw();
@@ -125,54 +93,6 @@ public sealed class Application : Game
 
         base.Draw(gameTime);
     }
-
-    private void UpdateInput()
-    {
-        _lastKeyboard = _keyboard;
-        _keyboard = Keyboard.GetState();
-
-        if (IsKeyJustPressed(Keys.H)) // Host
-        {
-            if (NetworkManager.ServerManager.Start())
-                NetworkManager.ClientManager.Start();
-        }
-
-        if (IsKeyJustPressed(Keys.S)) // Server
-            NetworkManager.ServerManager.Start();
-        if (IsKeyJustPressed(Keys.C)) // Client
-        {
-            NetworkManager.ClientManager.Start();
-        }
-
-        if (IsKeyJustPressed(Keys.D)) // Disconnect
-            NetworkManager.Stop();
-
-        if (IsKeyJustPressed(Keys.Enter) && NetworkManager.IsRunning)
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_SpawnEntity();
-        }
-
-        if (IsKeyJustPressed(Keys.Back) && NetworkManager.IsRunning)
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_DestroyEntity();
-        }
-
-        if (IsKeyJustPressed(Keys.P) && NetworkManager.IsRunning)
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_IncrementHealth();
-        }
-
-        if (IsKeyJustPressed(Keys.O) && NetworkManager.IsRunning)
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_DecrementHealth();
-        }
-    }
-
-    private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
 
     private void Server_OnPlayerConnected(NetPeer peer, NetDataReader reader)
     {
