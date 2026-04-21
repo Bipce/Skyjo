@@ -5,25 +5,18 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Skyjo.Network;
 using Skyjo.Network.Extensions;
-using Ultralight.FNA;
 
 #if !DEBUG
-using SteamDatabase.ValvePak;
+using SDL3;
 #endif
 
 namespace Skyjo;
 
 public sealed class Application : Game
 {
-    private static Application _instance = null!;
-
-    private UltralightRenderer _renderer = null!;
-    private UltralightView _view = null!;
+    private GameView _gameView = null!;
 
     private SpriteBatch _spriteBatch = null!;
-
-    private int CurrentWidth => GraphicsDevice.Viewport.Width;
-    private int CurrentHeight => GraphicsDevice.Viewport.Height;
 
     private NetworkManager NetworkManager { get; } = new();
 
@@ -32,12 +25,8 @@ public sealed class Application : Game
 
     private Texture2D _pixelTexture = null!;
 
-    public static UltralightView View => _instance._view;
-
     public Application()
     {
-        _instance = this;
-
         var graphics = new GraphicsDeviceManager(this);
         graphics.PreferredBackBufferWidth = 1280;
         graphics.PreferredBackBufferHeight = 720;
@@ -64,7 +53,16 @@ public sealed class Application : Game
 
     private void OnResize(object? sender, EventArgs e)
     {
-        _view.Resize(CurrentWidth, CurrentHeight);
+        _gameView.OnResize();
+    }
+
+    protected override void Initialize()
+    {
+        base.Initialize();
+
+#if !DEBUG
+        SDL.SDL_MaximizeWindow(Window.Handle);
+#endif
     }
 
     protected override void LoadContent()
@@ -73,16 +71,7 @@ public sealed class Application : Game
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-#if DEBUG
-        const string url = "http://localhost:5173";
-        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, assetsDir: "data", enableLog: true);
-#else
-        const string url = "file:///index.html";
-        _renderer = new UltralightRendererSDLGPU(GraphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
-            shaders: GetShaders(), enableLog: false);
-#endif
-        _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
-        _view.LoadUrl(url);
+        _gameView = new GameView(GraphicsDevice, _spriteBatch);
 
         _pixelTexture = new Texture2D(GraphicsDevice, 1, 1);
         _pixelTexture.SetData([Color.White]);
@@ -96,8 +85,7 @@ public sealed class Application : Game
 
         UpdateInput();
 
-        _renderer.Update();
-        _view.Update();
+        _gameView.Update();
         foreach (var gameManager in NetworkManager.GetEntities<GameManager>())
         {
             gameManager.Update();
@@ -108,8 +96,7 @@ public sealed class Application : Game
     {
         GraphicsDevice.Clear(Color.Black);
 
-        _renderer.Render();
-        _view.Render();
+        _gameView.Render();
 
         _spriteBatch.Begin();
 
@@ -133,38 +120,11 @@ public sealed class Application : Game
         _spriteBatch.End();
 
         _spriteBatch.Begin();
-        _spriteBatch.Draw(_view.Texture, Vector2.Zero, Color.White);
+        _gameView.Draw();
         _spriteBatch.End();
 
         base.Draw(gameTime);
     }
-
-#if !DEBUG
-    private static ShaderSources GetShaders()
-    {
-        var package = new Package();
-        package.OptimizeEntriesForBinarySearch(StringComparison.OrdinalIgnoreCase);
-        package.Read("data/shaders.vpk");
-
-        return new ShaderSources
-        {
-            FillVert = GetDataInPackage(package, "fill.vert.spv"),
-            FillFrag = GetDataInPackage(package, "fill.frag.spv"),
-            PathVert = GetDataInPackage(package, "fill_path.vert.spv"),
-            PathFrag = GetDataInPackage(package, "fill_path.frag.spv"),
-        };
-    }
-
-    private static byte[] GetDataInPackage(Package package, string path)
-    {
-        var entry = package.FindEntry(path);
-        if (entry == null)
-            throw new FileNotFoundException(path);
-
-        package.ReadEntry(entry, out var data);
-        return data;
-    }
-#endif
 
     private void UpdateInput()
     {
