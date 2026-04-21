@@ -5,7 +5,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Skyjo.Config;
 using Skyjo.Game;
 using Skyjo.Network;
-using Skyjo.Network.Extensions;
 
 #if !DEBUG
 using SDL3;
@@ -15,6 +14,25 @@ namespace Skyjo;
 
 public sealed class Application : Microsoft.Xna.Framework.Game
 {
+#if DEBUG
+    static Application()
+    {
+        for (var i = 1; i <= 3; i++)
+        {
+            var mutex = new Mutex(true, $"Skyjo_Instance_{i}", out var created);
+            if (created)
+            {
+                InstanceNumber = i;
+                break;
+            }
+
+            mutex.Dispose();
+        }
+    }
+
+    private static readonly int InstanceNumber;
+#endif
+
     private GameView _gameView = null!;
     private TestView _testView = null!;
 
@@ -77,6 +95,12 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         if (NetworkManager.IsRunning)
             return;
 
+#if DEBUG
+        if (InstanceNumber == 1)
+            NetworkManager.ServerManager.Start();
+        ConfigManager.Settings.Username = $"Player {InstanceNumber}";
+        NetworkManager.ClientManager.Start();
+#else
         var settings = ConfigManager.Settings;
         switch (ConfigManager.Settings.NetMode)
         {
@@ -95,6 +119,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
             default:
                 throw new ArgumentOutOfRangeException();
         }
+#endif
     }
 
     protected override void Update(GameTime gameTime)
