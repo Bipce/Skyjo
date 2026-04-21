@@ -4,6 +4,7 @@ import CardDeck from "../components/gameView/shared/card/CardDeck.tsx";
 import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
 import { useEffect, useState } from "react";
 import type { PlayerData } from "../interfaces/PlayerData.ts";
+import type { CardData } from "../interfaces/CardData.ts";
 
 const GameView = () => {
   const [players, setPlayers] = useState<PlayerData[]>([]);
@@ -19,6 +20,10 @@ const GameView = () => {
 
     window.removePlayer = (username: string) => {
       setPlayers(prev => prev.filter(p => p.username !== username));
+    };
+
+    window.initGame = (drawCard: CardData, discardCard: CardData) => {
+      // todo
     };
   }, []);
 

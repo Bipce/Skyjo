@@ -1,13 +1,12 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Skyjo.ViewData;
 
-[JsonSerializable(typeof(PlayerData))]
-[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
-internal partial class AppJsonContext : JsonSerializerContext { }
-
-public  sealed class PlayerData
+public sealed class PlayerData : ViewData
 {
+    protected override JsonTypeInfo JsonTypeInfo => AppJsonContext.Default.PlayerData;
+
     public string Username { get; set; } = null!;
     public bool IsOwner { get; set; }
+    public CardData[] Cards { get; set; } = null!;
 }

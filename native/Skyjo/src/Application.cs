@@ -52,9 +52,8 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         graphics.SynchronizeWithVerticalRetrace = false;
         IsFixedTimeStep = true;
 
-        NetworkManager.RegisterEntity<TestEntity>();
-        NetworkManager.RegisterEntity<Player>();
         NetworkManager.RegisterEntity<GameManager>();
+        NetworkManager.RegisterEntity<Player>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
         NetworkManager.ServerManager.OnServerStarted += Server_OnStarted;

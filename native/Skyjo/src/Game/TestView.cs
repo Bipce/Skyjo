@@ -44,33 +44,6 @@ public sealed class TestView
 
         if (IsKeyJustPressed(Keys.D)) // Disconnect
             NetworkManager.Stop();
-
-        if (!NetworkManager.IsRunning)
-            return;
-
-        if (IsKeyJustPressed(Keys.Enter))
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_SpawnEntity();
-        }
-
-        if (IsKeyJustPressed(Keys.Back))
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_DestroyEntity();
-        }
-
-        if (IsKeyJustPressed(Keys.P))
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_IncrementHealth();
-        }
-
-        if (IsKeyJustPressed(Keys.O))
-        {
-            var gameManager = NetworkManager.GetEntity<GameManager>();
-            gameManager.Server_DecrementHealth();
-        }
     }
 
     public void Draw()

@@ -1,66 +1,72 @@
-﻿using Skyjo.Network;
+﻿using System.Text.Json;
+using Skyjo.Network;
 using Skyjo.Network.Attributes;
+using Skyjo.ViewData;
 
 namespace Skyjo.Game;
 
 public sealed partial class GameManager : Entity
 {
-    [Replicated(OnRep = nameof(OnRep_Health))]
-    private int _health = 100;
+    private const int NumberOfCards = 150;
+    private const int NumberOfMinosTwoCards = 5;
+    private const int NumberOfZeroCards = 15;
+    private const int NumberOfOtherCards = 10;
 
-    [Replicated(OnRep = nameof(OnRep_TestEntity))]
-    private TestEntity? _entity;
+    [Replicated(OnRep = nameof(OnRep_RandomCards))]
+    private int[] _randomCards = null!;
+
+    private Stack<CardData> _drawPile = null!;
+    private readonly Stack<CardData> _discardPile = [];
 
     protected override void OnSpawned()
     {
-        View_SetHealth(_health);
+        if (HasAuthority)
+        {
+            InitCards();
+        }
     }
 
-    [Server]
-    public void Server_SpawnEntity()
+    private void InitCards()
     {
-        _entity = new TestEntity();
-        _entity.Spawn();
-        OnRep_TestEntity();
+        var data = new List<int>(NumberOfCards);
+        for (var i = 0; i < NumberOfMinosTwoCards; i++)
+            data.Add(-2);
+        for (var i = 0; i < NumberOfZeroCards; i++)
+            data.Add(0);
+
+        for (var i = -1; i <= 12; i++)
+        {
+            if (i == 0)
+                continue;
+
+            for (var j = 0; j < NumberOfOtherCards; j++)
+                data.Add(i);
+        }
+
+        _randomCards = data.Shuffle().ToArray();
+        OnRep_RandomCards();
     }
 
-    [Server]
-    public void Server_DestroyEntity()
+    private void OnRep_RandomCards()
     {
-        _entity?.Destroy();
-        _entity = null;
-        OnRep_TestEntity();
+        _drawPile = new Stack<CardData>(_randomCards.Select(x => new CardData { Number = x }));
+        _discardPile.Push(_drawPile.Pop());
+        InitGame();
     }
 
-    [Server]
-    public void Server_DecrementHealth()
+    public CardData[] GetPlayerCards()
     {
-        _health -= 10;
-        OnRep_Health();
+        var cards = new CardData[12];
+        for (var i = 0; i < cards.Length; i++)
+            cards[i] = _drawPile.Pop();
+
+        return cards;
     }
 
-    [Server]
-    public void Server_IncrementHealth()
+    private void InitGame()
     {
-        _health += 10;
-        OnRep_Health();
-    }
-
-    private void View_SetHealth(int health)
-    {
-        GameView.EvaluateScript($"window.setHealth(\"{health}\")");
-    }
-
-    private void OnRep_Health()
-    {
-        View_SetHealth(_health);
-    }
-
-    private void OnRep_TestEntity()
-    {
-        if (!_entity)
-            Console.WriteLine("Entity is null or not valid");
-        else if (_entity)
-            Console.WriteLine($"Entity is valid: {_entity.Id}");
+        var drawCard = _drawPile.Peek().Serialize();
+        var discardCard = _discardPile.Peek().Serialize();
+        GameView.EvaluateScript($"window.initGame({drawCard}, {discardCard})");
     }
 }
