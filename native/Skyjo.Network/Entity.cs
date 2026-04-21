@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using LiteNetLib;
 using LiteNetLib.Utils;
-using Skyjo.Network.Utils;
 
 namespace Skyjo.Network;
 
@@ -17,6 +16,8 @@ public abstract class Entity : IEquatable<Entity>
     internal int OwnerId { get; set; }
     public int NetUpdateFrequency { get; set; } = 100;
     public bool IsPendingDestroy { get; internal set; }
+
+    public bool HasAuthority => NetworkManager.IsServer;
 
     public bool IsOwner
     {

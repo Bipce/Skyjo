@@ -43,6 +43,11 @@ public sealed class NetworkManager
         _packetFactories.Add((byte)PacketType.SendWorld, () => new SendWorldPacket());
     }
 
+    public bool IsServer => ServerManager.IsRunning;
+    public bool IsClient => ClientManager.IsRunning;
+    public bool IsServerOnly => IsServer && !IsClient;
+    public bool IsClientOnly => IsClient && !IsServer;
+
     public void Update(GameTime gameTime)
     {
         _gameTime = gameTime;
