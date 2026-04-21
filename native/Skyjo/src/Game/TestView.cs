@@ -84,16 +84,6 @@ public sealed class TestView
             i++;
         }
 
-        i = 0;
-        foreach (var player in NetworkManager.GetEntities<Player>())
-        {
-            _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50, 50, 50, 50), player.Color);
-            if (player.IsOwner)
-                _spriteBatch.Draw(_pixelTexture, new Rectangle(i * 50 + (50 - 10) / 2, 50 + (50 - 10) / 2, 10, 10),
-                    Color.DarkRed);
-            i++;
-        }
-
         _spriteBatch.End();
     }
 }

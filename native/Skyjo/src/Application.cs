@@ -41,12 +41,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
         NetworkManager.ServerManager.OnServerStarted += Server_OnStarted;
 
-        NetworkManager.ClientManager.ConnectionData = writer =>
-        {
-            var color = new Color(Random.Shared.NextSingle(), Random.Shared.NextSingle(),
-                Random.Shared.NextSingle());
-            writer.Put(color);
-        };
+        NetworkManager.ClientManager.ConnectionData = writer => writer.Put(ConfigManager.Settings.Username);
 
         ConfigManager.Load();
     }
@@ -81,7 +76,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
     {
         if (NetworkManager.IsRunning)
             return;
-        
+
         var settings = ConfigManager.Settings;
         switch (ConfigManager.Settings.NetMode)
         {
@@ -128,12 +123,12 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
     private void Server_OnPlayerConnected(NetPeer peer, NetDataReader reader)
     {
-        var color = reader.GetColor();
+        var username = reader.GetString();
 
         var player = new Player
         {
             Owner = peer,
-            Color = color
+            Username = username
         };
         player.Spawn();
     }

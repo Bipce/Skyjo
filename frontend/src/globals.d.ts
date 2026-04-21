@@ -1,6 +1,7 @@
 declare global {
   interface Window {
-    setHealth: (value: number) => void;
+    startNetwork: () => void;
+    setUsername: (value: string) => void;
   }
 }
 

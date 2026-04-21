@@ -3,7 +3,11 @@ import CardGridWrapper from "../shared/card/CardGridWrapper.tsx";
 import type { CardData } from "../../../interfaces/CardData.ts";
 import Separation from "../../ui/Separation.tsx";
 
-const PlayerPanel = () => {
+interface Props {
+  username: string;
+}
+
+const PlayerPanel = ({ username }: Props) => {
   const cards: CardData[] = [
     { number: 0, isRevealed: true, belongTo: "player" },
     { number: 1, isRevealed: false, belongTo: "player" },
@@ -24,7 +28,7 @@ const PlayerPanel = () => {
       <Separation className="right-1/3" />
       <div className="panel-base h-full w-2/3 justify-around gap-10 p-8">
         <CardGridWrapper cards={cards} className="w-full gap-10" />
-        <ScorePanel />
+        <ScorePanel username={username} />
       </div>
     </section>
   );

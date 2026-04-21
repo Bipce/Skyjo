@@ -3,7 +3,11 @@ import CardGridWrapper from "../shared/card/CardGridWrapper.tsx";
 import ScorePanel from "../shared/score/ScorePanel.tsx";
 import Separation from "../../ui/Separation.tsx";
 
-const OpponentPanel = () => {
+interface Props {
+  username: string;
+}
+
+const OpponentPanel = ({ username }: Props) => {
   const cards: CardData[] = [
     { number: 0, isRevealed: true, belongTo: "opponent" },
     { number: 1, isRevealed: false, belongTo: "opponent" },
@@ -23,7 +27,7 @@ const OpponentPanel = () => {
     <div className="panel-base relative mx-auto w-full max-w-md justify-between p-5">
       <Separation className="right-[38%]" />
       <CardGridWrapper cards={cards} className="w-1/2 gap-4" />
-      <ScorePanel />
+      <ScorePanel username={username} />
     </div>
   );
 };
