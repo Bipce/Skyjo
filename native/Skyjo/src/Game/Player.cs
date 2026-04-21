@@ -2,7 +2,7 @@
 using Skyjo.Network;
 using Skyjo.Network.Attributes;
 
-namespace Skyjo;
+namespace Skyjo.Game;
 
 public sealed partial class Player : Entity
 {

@@ -2,6 +2,7 @@
 using LiteNetLib.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Skyjo.Game;
 using Skyjo.Network;
 using Skyjo.Network.Extensions;
 
@@ -11,7 +12,7 @@ using SDL3;
 
 namespace Skyjo;
 
-public sealed class Application : Game
+public sealed class Application : Microsoft.Xna.Framework.Game
 {
     private GameView _gameView = null!;
     private TestView _testView = null!;
@@ -32,8 +33,8 @@ public sealed class Application : Game
         IsFixedTimeStep = true;
 
         NetworkManager.RegisterEntity<TestEntity>();
-        NetworkManager.RegisterEntity<Player>();
-        NetworkManager.RegisterEntity<GameManager>();
+        NetworkManager.RegisterEntity<Game.Player>();
+        NetworkManager.RegisterEntity<Game.GameManager>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
         NetworkManager.ServerManager.OnServerStarted += Server_OnStarted;
@@ -98,7 +99,7 @@ public sealed class Application : Game
     {
         var color = reader.GetColor();
 
-        var player = new Player
+        var player = new Game.Player
         {
             Owner = peer,
             Color = color
@@ -108,6 +109,6 @@ public sealed class Application : Game
 
     private void Server_OnStarted()
     {
-        new GameManager().Spawn();
+        new Game.GameManager().Spawn();
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Skyjo.Network;
 
-namespace Skyjo;
+namespace Skyjo.Game;
 
 public sealed class TestView
 {

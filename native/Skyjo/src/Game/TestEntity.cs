@@ -1,6 +1,6 @@
 ﻿using Skyjo.Network;
 
-namespace Skyjo;
+namespace Skyjo.Game;
 
 public sealed class TestEntity : Entity
 {

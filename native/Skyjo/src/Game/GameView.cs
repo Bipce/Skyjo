@@ -1,12 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Ultralight.FNA;
-
 #if !DEBUG
 using SteamDatabase.ValvePak;
 #endif
 
-namespace Skyjo;
+namespace Skyjo.Game;
 
 public sealed class GameView
 {
