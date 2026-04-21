@@ -11,7 +11,7 @@ public sealed partial class GameManager : Entity
     [Replicated(OnRep = nameof(OnRep_TestEntity))]
     private TestEntity? _entity;
 
-    public GameManager()
+    protected override void OnSpawned()
     {
         View_SetHealth(_health);
     }

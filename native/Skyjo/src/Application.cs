@@ -2,6 +2,7 @@
 using LiteNetLib.Utils;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Skyjo.Config;
 using Skyjo.Game;
 using Skyjo.Network;
 using Skyjo.Network.Extensions;
@@ -20,6 +21,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
     private SpriteBatch _spriteBatch = null!;
 
     private NetworkManager NetworkManager { get; } = new();
+    private ConfigManager ConfigManager { get; } = new();
 
     public Application()
     {
@@ -33,8 +35,8 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         IsFixedTimeStep = true;
 
         NetworkManager.RegisterEntity<TestEntity>();
-        NetworkManager.RegisterEntity<Game.Player>();
-        NetworkManager.RegisterEntity<Game.GameManager>();
+        NetworkManager.RegisterEntity<Player>();
+        NetworkManager.RegisterEntity<GameManager>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
         NetworkManager.ServerManager.OnServerStarted += Server_OnStarted;
@@ -45,6 +47,8 @@ public sealed class Application : Microsoft.Xna.Framework.Game
                 Random.Shared.NextSingle());
             writer.Put(color);
         };
+
+        ConfigManager.Load();
     }
 
     private void OnResize(object? sender, EventArgs e)
@@ -69,6 +73,33 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
         _gameView = new GameView(GraphicsDevice, _spriteBatch);
         _testView = new TestView(GraphicsDevice, _spriteBatch);
+
+        GameView.BindFunction("startNetwork", StartNetwork);
+    }
+
+    private void StartNetwork()
+    {
+        if (NetworkManager.IsRunning)
+            return;
+        
+        var settings = ConfigManager.Settings;
+        switch (ConfigManager.Settings.NetMode)
+        {
+            case NetMode.Host:
+            {
+                NetworkManager.ServerManager.Port = settings.Port;
+                if (NetworkManager.ServerManager.Start())
+                    NetworkManager.ClientManager.Start();
+                break;
+            }
+            case NetMode.Join:
+                NetworkManager.ClientManager.Address = settings.Address;
+                NetworkManager.ClientManager.Port = settings.Port;
+                NetworkManager.ClientManager.Start();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
     protected override void Update(GameTime gameTime)
@@ -99,7 +130,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
     {
         var color = reader.GetColor();
 
-        var player = new Game.Player
+        var player = new Player
         {
             Owner = peer,
             Color = color
@@ -109,6 +140,6 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
     private void Server_OnStarted()
     {
-        new Game.GameManager().Spawn();
+        new GameManager().Spawn();
     }
 }

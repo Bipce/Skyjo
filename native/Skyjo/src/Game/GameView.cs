@@ -22,12 +22,13 @@ public sealed class GameView
 
         _graphicsDevice = graphicsDevice;
         _spriteBatch = spriteBatch;
+
 #if DEBUG
         const string url = "http://localhost:5173";
-        _renderer = new UltralightRendererSDLGPU(graphicsDevice, assetsDir: "data", enableLog: true);
+        _renderer = new UltralightRendererSDLGPU(_graphicsDevice, assetsDir: "data", enableLog: true);
 #else
         const string url = "file:///index.html";
-        _renderer = new UltralightRendererSDLGPU(graphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
+        _renderer = new UltralightRendererSDLGPU(_graphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
             shaders: GetShaders(), enableLog: false);
 #endif
         _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
@@ -89,5 +90,10 @@ public sealed class GameView
     public static void EvaluateScript(string js)
     {
         _instance._view.EvaluateScript(js);
+    }
+
+    public static void BindFunction(string name, Action callback)
+    {
+        _instance._view.BindFunction(name, callback);
     }
 }
