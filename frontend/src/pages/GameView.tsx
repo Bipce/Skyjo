@@ -3,27 +3,39 @@ import OpponentPanel from "../components/gameView/opponent/OpponentPanel.tsx";
 import CardDeck from "../components/gameView/shared/card/CardDeck.tsx";
 import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
 import { useEffect, useState } from "react";
+import type { PlayerData } from "../interfaces/PlayerData.ts";
 
 const GameView = () => {
-  const [username, setUsername] = useState("");
+  const [players, setPlayers] = useState<PlayerData[]>([]);
+  const [player, setPlayer] = useState<PlayerData | null>(null);
 
   useEffect(() => {
     window.startNetwork();
-    window.setUsername = setUsername;
-  }, [])
+
+    window.addPlayer = (player: PlayerData) => {
+      setPlayers(prev => [...prev, player]);
+      if (player.isOwner) setPlayer(player);
+    };
+
+    window.removePlayer = (username: string) => {
+      setPlayers(prev => prev.filter(p => p.username !== username));
+    };
+  }, []);
 
   return (
     <main className="grid min-h-screen place-items-center py-10">
       <div className="grid w-full max-w-6xl gap-8">
         <OpponentsGrid>
-          {/*<OpponentPanel />*/}
-          {/*<OpponentPanel />*/}
-          {/*<OpponentPanel />*/}
+          {players
+            .filter(x => !x.isOwner)
+            .map(player => {
+              return <OpponentPanel key={player.username} player={player} />;
+            })}
         </OpponentsGrid>
 
         <CardDeck />
 
-        <PlayerPanel username={username} />
+        {player && <PlayerPanel player={player} />}
       </div>
     </main>
   );

@@ -1,14 +1,15 @@
 import { Trophy, Hourglass } from "lucide-react";
 import IconWrapper from "../../../ui/IconWrapper.tsx";
+import type { PlayerData } from "../../../../interfaces/PlayerData.ts";
 
 interface Props {
-  username: string;
+  player: PlayerData;
 }
 
-const ScorePanel = ({ username }: Props) => {
+const ScorePanel = ({ player }: Props) => {
   return (
     <aside className="w-32 shrink-0 text-lg">
-      <p className="mb-8 text-2xl font-bold">{username}</p>
+      <p className="mb-8 text-2xl font-bold">{player.username}</p>
 
       <div className="flex flex-col gap-3">
         <IconWrapper>

@@ -1,5 +1,7 @@
-﻿using Skyjo.Network;
+﻿using System.Text.Json;
+using Skyjo.Network;
 using Skyjo.Network.Attributes;
+using Skyjo.ViewData;
 
 namespace Skyjo.Game;
 
@@ -9,9 +11,23 @@ public sealed partial class Player : Entity
 
     protected override void OnSpawned()
     {
-        if (IsOwner)
-        {
-            GameView.EvaluateScript($"window.setUsername(\"{Username}\");");
-        }
+        var player = new PlayerData { Username = Username, IsOwner = IsOwner };
+        AddPlayer(player);
+    }
+
+    protected override void OnDestroyed()
+    {
+        RemovePlayer(Username);
+    }
+
+    private static void AddPlayer(PlayerData data)
+    {
+        var json = JsonSerializer.Serialize(data, AppJsonContext.Default.PlayerData);
+        GameView.EvaluateScript($"window.addPlayer({json});");
+    }
+
+    private static void RemovePlayer(string username)
+    {
+        GameView.EvaluateScript($"window.removePlayer(\"{username}\");");
     }
 }
