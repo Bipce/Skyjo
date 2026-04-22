@@ -1,14 +1,16 @@
+import { useEffect, useState } from "react";
 import OpponentsGrid from "../components/gameView/opponent/OpponentsGrid.tsx";
 import OpponentPanel from "../components/gameView/opponent/OpponentPanel.tsx";
 import CardDeck from "../components/gameView/shared/card/CardDeck.tsx";
 import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
-import { useEffect, useState } from "react";
 import type { PlayerData } from "../interfaces/PlayerData.ts";
 import type { CardData } from "../interfaces/CardData.ts";
 
 const GameView = () => {
   const [players, setPlayers] = useState<PlayerData[]>([]);
   const [player, setPlayer] = useState<PlayerData | null>(null);
+  const [drawnCard, setDrawnCard] = useState<CardData | null>(null);
+  const [discardedCard, setDiscardedCard] = useState<CardData | null>(null);
 
   useEffect(() => {
     window.startNetwork();
@@ -22,8 +24,9 @@ const GameView = () => {
       setPlayers(prev => prev.filter(p => p.username !== username));
     };
 
-    window.initGame = (drawCard: CardData, discardCard: CardData) => {
-      // todo
+    window.initGame = (drawnCard: CardData, discardedCard: CardData) => {
+      setDrawnCard(drawnCard);
+      setDiscardedCard(discardedCard);
     };
   }, []);
 
@@ -38,7 +41,7 @@ const GameView = () => {
             })}
         </OpponentsGrid>
 
-        <CardDeck />
+        {drawnCard && discardedCard && <CardDeck drawnCard={drawnCard} discardedCard={discardedCard} />}
 
         {player && <PlayerPanel player={player} />}
       </div>

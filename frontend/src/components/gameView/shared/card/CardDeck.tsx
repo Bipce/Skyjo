@@ -1,10 +1,16 @@
 import Card from "./Card.tsx";
+import type { CardData } from "../../../../interfaces/CardData.ts";
 
-const CardDeck = () => {
+interface Props {
+  drawnCard: CardData;
+  discardedCard: CardData;
+}
+
+const CardDeck = ({ drawnCard, discardedCard }: Props) => {
   return (
     <section className="flex items-center justify-center gap-10">
-      <Card card={{ number: 9, isRevealed: true }} belongsTo="deck" />
-      <Card card={{ number: 5, isRevealed: false }} belongsTo="deck" />
+      <Card card={drawnCard} belongsTo="deck" />
+      <Card card={discardedCard} belongsTo="deck" />
     </section>
   );
 };
