@@ -11,7 +11,7 @@ internal sealed class CreateEntityPacket : Packet
     {
     }
 
-    public CreateEntityPacket(byte typeId, int id, int ownerId)
+    public CreateEntityPacket(byte typeId, ushort id, int ownerId)
     {
         TypeId = typeId;
         Id = id;
@@ -21,7 +21,7 @@ internal sealed class CreateEntityPacket : Packet
     public override PacketType Type => PacketType.CreateEntity;
 
     public byte TypeId { get; private set; }
-    public int Id { get; private set; }
+    public ushort Id { get; private set; }
     public int OwnerId { get; private set; }
 
     public override void Serialize(NetDataWriter writer)
@@ -38,7 +38,7 @@ internal sealed class CreateEntityPacket : Packet
         Reader = reader;
 
         TypeId = reader.GetByte();
-        Id = reader.GetInt();
+        Id = reader.GetUShort();
         OwnerId = reader.GetInt();
     }
 }

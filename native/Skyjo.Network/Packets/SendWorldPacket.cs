@@ -32,7 +32,7 @@ public sealed class SendWorldPacket : Packet
         for (var i = 0; i < count; i++)
         {
             var entity = NetworkManager.CreateEntity(reader.GetByte());
-            entity.Id = reader.GetInt();
+            entity.Id = reader.GetUShort();
             entity.OwnerId = reader.GetInt();
             NetworkManager.Entities.Add(entity);
         }

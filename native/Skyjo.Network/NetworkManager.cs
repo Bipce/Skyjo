@@ -19,7 +19,7 @@ public sealed class NetworkManager
     private readonly Dictionary<Type, byte> _entityTypeIds = [];
     private readonly Dictionary<byte, Func<Entity>> _entityFactories = [];
 
-    internal IndexedCollection<int, Entity> Entities { get; } = new(x => x.Id);
+    internal IndexedCollection<ushort, Entity> Entities { get; } = new(x => x.Id);
     internal NetDataWriter Writer { get; } = new();
 
     private GameTime _gameTime = null!;
@@ -27,7 +27,7 @@ public sealed class NetworkManager
     public double TotalTime => _gameTime.TotalGameTime.TotalSeconds;
 
     internal Queue<Entity> SpawnQueue { get; } = [];
-    internal Queue<int> DestroyQueue { get; } = [];
+    internal Queue<ushort> DestroyQueue { get; } = [];
 
     public NetworkManager()
     {
@@ -100,12 +100,12 @@ public sealed class NetworkManager
         return Entities.OfType<T>().First();
     }
 
-    public Entity GetEntity(int id)
+    public Entity GetEntity(ushort id)
     {
         return Entities[id];
     }
 
-    public T GetEntity<T>(int id) where T : Entity
+    public T GetEntity<T>(ushort id) where T : Entity
     {
         return (T)Entities[id];
     }
@@ -134,7 +134,7 @@ public sealed class NetworkManager
     }
 
     [EditorBrowsable(EditorBrowsableState.Never)]
-    public NetDataWriter GetRpcPacketData(int entityId, int methodId)
+    public NetDataWriter GetRpcPacketData(ushort entityId, int methodId)
     {
         new RpcPacket(entityId, methodId).Serialize(Writer);
         return Writer;

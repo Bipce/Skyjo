@@ -11,7 +11,7 @@ public sealed class ReplicatedPacket : Packet
     {
     }
 
-    public ReplicatedPacket(int entityId, int id)
+    public ReplicatedPacket(ushort entityId, int id)
     {
         EntityId = entityId;
         Id = id;
@@ -19,7 +19,7 @@ public sealed class ReplicatedPacket : Packet
 
     public override PacketType Type => PacketType.Replicated;
 
-    public int EntityId { get; private set; }
+    public ushort EntityId { get; private set; }
     public int Id { get; private set; }
 
     public override void Serialize(NetDataWriter writer)
@@ -32,7 +32,7 @@ public sealed class ReplicatedPacket : Packet
 
     public override void Deserialize(NetDataReader reader)
     {
-        EntityId = reader.GetInt();
+        EntityId = reader.GetUShort();
         Id = reader.GetInt();
 
         Reader = reader;

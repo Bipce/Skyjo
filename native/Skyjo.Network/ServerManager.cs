@@ -9,10 +9,10 @@ namespace Skyjo.Network;
 
 public sealed class ServerManager : ManagerBase
 {
-    private const int FirstEntityId = 1;
+    private const ushort FirstEntityId = 1;
 
     protected override string Role => "Server";
-    private int _nextId = FirstEntityId;
+    private ushort _nextId = FirstEntityId;
 
     public event Action<NetPeer, NetDataReader>? OnPlayerConnected;
 

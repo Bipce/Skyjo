@@ -12,7 +12,7 @@ public static class NetDataExtensions
 
     public static Entity? GetEntity(this NetDataReader reader)
     {
-        var id = reader.GetInt();
+        var id = reader.GetUShort();
         return id == 0 ? null : NetworkManager.Instance.GetEntity(id);
     }
 

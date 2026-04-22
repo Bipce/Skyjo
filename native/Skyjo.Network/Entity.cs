@@ -11,7 +11,7 @@ public abstract class Entity : IEquatable<Entity>
     protected ServerManager ServerManager => NetworkManager.ServerManager;
     protected ClientManager ClientManager => NetworkManager.ClientManager;
 
-    public int Id { get; internal set; }
+    public ushort Id { get; internal set; }
     public NetPeer? Owner { get; init; }
     internal int OwnerId { get; set; }
     public int NetUpdateFrequency { get; set; } = 100;

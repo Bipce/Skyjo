@@ -11,12 +11,12 @@ public sealed class DestroyEntityPacket : Packet
     {
     }
 
-    public DestroyEntityPacket(int id)
+    public DestroyEntityPacket(ushort id)
     {
         Id = id;
     }
 
-    public int Id { get; private set; }
+    public ushort Id { get; private set; }
 
     public override void Serialize(NetDataWriter writer)
     {
@@ -27,6 +27,6 @@ public sealed class DestroyEntityPacket : Packet
 
     public override void Deserialize(NetDataReader reader)
     {
-        Id = reader.GetInt();
+        Id = reader.GetUShort();
     }
 }
