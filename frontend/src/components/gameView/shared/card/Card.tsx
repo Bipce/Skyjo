@@ -3,10 +3,12 @@ import type { CardBelongToType, CardData } from "../../../../interfaces/CardData
 interface Props {
   card: CardData;
   belongsTo: CardBelongToType;
+  isSelected: boolean;
+  handleOnClick?: () => void;
   className?: string;
 }
 
-const Card = ({ card, belongsTo, className }: Props) => {
+const Card = ({ card, belongsTo, isSelected, handleOnClick, className }: Props) => {
   const { number, isRevealed } = card;
   const getCardColor = (): string => {
     if (isRevealed) {
@@ -35,9 +37,10 @@ const Card = ({ card, belongsTo, className }: Props) => {
 
   return (
     <button
-      className={`center border-round aspect-2/3 max-h-28 w-full max-w-20 bg-size-[100%_100%] bg-no-repeat font-bold ${
-        className
-      } ${cardColor} ${cardSize} card-number card-pattern text-zinc-950`}
+      onClick={handleOnClick}
+      className={`center aspect-2/3 max-h-28 w-full max-w-20 rounded-xl bg-size-[100%_100%] bg-no-repeat font-bold ${
+        isSelected ? "border-2 border-rose-600 shadow-md shadow-rose-600" : "border border-zinc-500"
+      } ${className} ${cardColor} ${cardSize} card-number card-pattern text-zinc-950`}
     >
       {isRevealed ? number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
     </button>
