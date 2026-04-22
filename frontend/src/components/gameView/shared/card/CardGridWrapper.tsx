@@ -5,8 +5,8 @@ interface Props {
   className?: string;
   cards: CardData[];
   belongsTo: CardBelongToType;
-  onSelectedForRevealCard: (index: number) => void;
-  selectedCardsForInitiateGame: number[];
+  onSelectedForRevealCard?: (index: number) => void;
+  selectedCardsForInitiateGame?: number[];
 }
 
 const CardGridWrapper = ({
@@ -23,8 +23,8 @@ const CardGridWrapper = ({
           key={i}
           card={card}
           belongsTo={belongsTo}
-          handleOnClick={() => onSelectedForRevealCard(i)}
-          isSelected={selectedCardsForInitiateGame.includes(i)}
+          handleOnClick={onSelectedForRevealCard ? () => onSelectedForRevealCard(i) : undefined}
+          isSelected={selectedCardsForInitiateGame?.includes(i) ?? false}
         />
       ))}
     </div>
