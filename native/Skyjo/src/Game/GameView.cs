@@ -92,7 +92,22 @@ public sealed partial class GameView
         _instance._view.EvaluateScript(js);
     }
 
+    public static T EvaluateScript<T>(string js)
+    {
+        return _instance._view.EvaluateScript<T>(js);
+    }
+
     public static void BindFunction(string name, Action callback)
+    {
+        _instance._view.BindFunction(name, callback);
+    }
+
+    public static void BindFunction<T, T1>(string name, Action<T, T1> callback)
+    {
+        _instance._view.BindFunction(name, callback);
+    }
+
+    public static void BindFunction<T, T1, T2>(string name, Action<T, T1, T2> callback)
     {
         _instance._view.BindFunction(name, callback);
     }

@@ -22,6 +22,7 @@ public sealed partial class GameManager : Entity
 
     protected override void OnSpawned()
     {
+        GameView.BindFunction<string, int[]>("selectCard", Server_OnPlayerSelectCard_PreMatch);
         GameView.InitGame(CardData.Empty, CardData.Empty);
     }
 
@@ -67,14 +68,39 @@ public sealed partial class GameManager : Entity
         _discardPile.Push(discardedCard);
 
         GameView.InitGame(_drawPile.Peek(), _discardPile.Peek());
+
+        foreach (var player in NetworkManager.GetEntities<Player>())
+        {
+            var newCards = GetPlayerCards();
+
+            for (var i = 0; i < player.Data.Cards.Count; i++)
+            {
+                player.Data.Cards[i].Number = newCards[i].Number;
+                if (player.Data.Cards[i].WillBeRevealed)
+                    player.Data.Cards[i].IsRevealed = true;
+            }
+
+            GameView.UpdatePlayer(player.Username, player.Data);
+        }
     }
 
-    public CardData[] GetPlayerCards()
+    private CardData[] GetPlayerCards()
     {
         var cards = new CardData[12];
         for (var i = 0; i < cards.Length; i++)
             cards[i] = _drawPile.Pop();
 
         return cards;
+    }
+
+    [Server]
+    private void Server_OnPlayerSelectCard_PreMatch(string username, int[] indexes)
+    {
+        if (indexes.Length == 0)
+            return;
+
+        var player = NetworkManager.GetEntities<Player>().First(x => x.Username == username);
+        player.RevealedCardIndexes = indexes;
+        player.OnRep_RevealedCardIndexes();
     }
 }

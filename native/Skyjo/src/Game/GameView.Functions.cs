@@ -16,6 +16,11 @@ partial class GameView
 
     public static void InitGame(CardData drawnCard, CardData discardedCard)
     {
-        EvaluateScript($"window.initGame({drawnCard.Serialize()}, {discardedCard.Serialize()})");
+        EvaluateScript($"window.initGame({drawnCard.Serialize()}, {discardedCard.Serialize()});");
+    }
+
+    public static void UpdatePlayer(string username, PlayerData data)
+    {
+        EvaluateScript($"window.updatePlayer(\"{username}\", {data.Serialize()});");
     }
 }

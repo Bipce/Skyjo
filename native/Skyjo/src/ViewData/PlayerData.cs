@@ -8,5 +8,5 @@ public sealed class PlayerData : ViewData
 
     public string Username { get; set; } = null!;
     public bool IsOwner { get; set; }
-    public CardData[] Cards { get; set; } = null!;
+    public List<CardData> Cards { get; init; } = null!;
 }
