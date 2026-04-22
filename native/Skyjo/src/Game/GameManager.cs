@@ -1,4 +1,5 @@
-﻿using Skyjo.Network;
+﻿using Microsoft.Xna.Framework.Input;
+using Skyjo.Network;
 using Skyjo.Network.Attributes;
 using Skyjo.ViewData;
 
@@ -11,21 +12,31 @@ public sealed partial class GameManager : Entity
     private const int NumberOfZeroCards = 15;
     private const int NumberOfOtherCards = 10;
 
-    [Replicated(OnRep = nameof(OnRep_RandomCards))]
-    private int[] _randomCards = null!;
-
     private Stack<CardData> _drawPile = null!;
     private readonly Stack<CardData> _discardPile = [];
 
+    private KeyboardState _keyboard;
+    private KeyboardState _lastKeyboard;
+
+    private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
+
     protected override void OnSpawned()
     {
-        if (HasAuthority)
+        GameView.InitGame(CardData.Empty, CardData.Empty);
+    }
+
+    public void Update()
+    {
+        _lastKeyboard = _keyboard;
+        _keyboard = Keyboard.GetState();
+
+        if (IsKeyJustPressed(Keys.Enter))
         {
-            InitCards();
+            StartGame();
         }
     }
 
-    private void InitCards()
+    private void StartGame()
     {
         var data = new List<int>(NumberOfCards);
         for (var i = 0; i < NumberOfMinosTwoCards; i++)
@@ -42,15 +53,20 @@ public sealed partial class GameManager : Entity
                 data.Add(i);
         }
 
-        _randomCards = data.Shuffle().ToArray();
-        OnRep_RandomCards();
+        var cards = data.Shuffle().ToArray();
+        Multicast_StartGame(cards);
     }
 
-    private void OnRep_RandomCards()
+    [Multicast]
+    private void Multicast_StartGame(int[] cards)
     {
-        _drawPile = new Stack<CardData>(_randomCards.Select(x => new CardData { Number = x }));
-        _discardPile.Push(_drawPile.Pop());
-        InitGame();
+        _drawPile = new Stack<CardData>(cards.Select(x => new CardData { Number = x }));
+
+        var discardedCard = _drawPile.Pop();
+        discardedCard.IsRevealed = true;
+        _discardPile.Push(discardedCard);
+
+        GameView.InitGame(_drawPile.Peek(), _discardPile.Peek());
     }
 
     public CardData[] GetPlayerCards()
@@ -60,12 +76,5 @@ public sealed partial class GameManager : Entity
             cards[i] = _drawPile.Pop();
 
         return cards;
-    }
-
-    private void InitGame()
-    {
-        var drawCard = _drawPile.Peek().Serialize();
-        var discardCard = _discardPile.Peek().Serialize();
-        GameView.EvaluateScript($"window.initGame({drawCard}, {discardCard})");
     }
 }

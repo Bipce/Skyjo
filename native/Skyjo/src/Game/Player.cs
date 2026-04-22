@@ -17,23 +17,13 @@ public sealed partial class Player : Entity
         {
             Username = Username,
             IsOwner = IsOwner,
-            Cards = _gameManager.GetPlayerCards()
+            Cards = Enumerable.Range(0, 12).Select(_ => CardData.Empty).ToArray()
         };
-        AddPlayer(player);
+        GameView.AddPlayer(player);
     }
 
     protected override void OnDestroyed()
     {
-        RemovePlayer(Username);
-    }
-
-    private static void AddPlayer(PlayerData data)
-    {
-        GameView.EvaluateScript($"window.addPlayer({data.Serialize()});");
-    }
-
-    private static void RemovePlayer(string username)
-    {
-        GameView.EvaluateScript($"window.removePlayer(\"{username}\");");
+        GameView.RemovePlayer(Username);
     }
 }

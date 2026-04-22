@@ -7,7 +7,7 @@ using SteamDatabase.ValvePak;
 
 namespace Skyjo.Game;
 
-public sealed class GameView
+public sealed partial class GameView
 {
     private static GameView _instance = null!;
 

@@ -42,6 +42,8 @@ public sealed class Application : Microsoft.Xna.Framework.Game
     private NetworkManager NetworkManager { get; } = new();
     private ConfigManager ConfigManager { get; } = new();
 
+    private GameManager? _gameManager;
+
     public Application()
     {
         var graphics = new GraphicsDeviceManager(this);
@@ -129,6 +131,8 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
         _gameView.Update();
         _testView.Update();
+
+        _gameManager?.Update();
     }
 
     protected override void Draw(GameTime gameTime)
@@ -157,11 +161,12 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         player.Spawn();
     }
 
-    private static void OnServerConnectionStateChanged(ConnectionState connectionState)
+    private void OnServerConnectionStateChanged(ConnectionState connectionState)
     {
         if (connectionState != ConnectionState.Started)
             return;
 
-        new GameManager().Spawn();
+        _gameManager = new GameManager();
+        _gameManager.Spawn();
     }
 }
