@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ScorePanel from "../shared/score/ScorePanel.tsx";
 import Separation from "../../ui/Separation.tsx";
 import CardGridWrapper from "../shared/card/CardGridWrapper.tsx";
@@ -10,7 +10,8 @@ interface Props {
 }
 
 const PlayerPanel = ({ player }: Props) => {
-  const cards: CardData[] = player.cards;
+  const { cards, username } = player;
+  const playerCards: CardData[] = cards;
   const [selectedCardsForInitiateGame, setSelectedCardsForInitiateGame] = useState<number[]>([]);
 
   const handleSelectedForInitiateGame = (i: number) => {
@@ -22,12 +23,16 @@ const PlayerPanel = ({ player }: Props) => {
     });
   };
 
+  useEffect(() => {
+    window.selectCard(username, selectedCardsForInitiateGame);
+  }, [selectedCardsForInitiateGame, username]);
+
   return (
     <section className="relative flex h-full w-full justify-center">
       <Separation className="right-1/3" />
       <div className="panel-base h-full w-2/3 justify-around gap-10 p-8">
         <CardGridWrapper
-          cards={cards}
+          cards={playerCards}
           className="w-full gap-10"
           belongsTo="player"
           onSelectedForRevealCard={handleSelectedForInitiateGame}
