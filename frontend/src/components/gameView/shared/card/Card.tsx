@@ -3,7 +3,7 @@ import type { CardBelongToType, CardData } from "../../../../interfaces/CardData
 interface Props {
   card: CardData;
   belongsTo: CardBelongToType;
-  isSelected: boolean;
+  isSelected?: boolean;
   handleOnClick?: () => void;
   className?: string;
 }
