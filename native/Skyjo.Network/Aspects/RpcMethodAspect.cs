@@ -38,12 +38,12 @@ public abstract class RpcMethodAspect : OverrideMethodAspect
     }
 
     [CompileTime]
-    protected static int GetMethodId()
+    protected static byte GetMethodId()
     {
         var methods = meta.Target.Type.Methods
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(RpcMethodAspect))));
 
-        var i = 0;
+        byte i = 0;
         foreach (var method in methods)
         {
             if (method == meta.Target.Method)

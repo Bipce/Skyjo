@@ -11,7 +11,7 @@ public sealed class RpcPacket : Packet
     {
     }
 
-    public RpcPacket(ushort entityId, int methodId)
+    public RpcPacket(ushort entityId, byte methodId)
     {
         EntityId = entityId;
         MethodId = methodId;
@@ -20,7 +20,7 @@ public sealed class RpcPacket : Packet
     public override PacketType Type => PacketType.Rpc;
 
     public ushort EntityId { get; private set; }
-    public int MethodId { get; private set; }
+    public byte MethodId { get; private set; }
 
     public override void Serialize(NetDataWriter writer)
     {
@@ -33,7 +33,7 @@ public sealed class RpcPacket : Packet
     public override void Deserialize(NetDataReader reader)
     {
         EntityId = reader.GetUShort();
-        MethodId = reader.GetInt();
+        MethodId = reader.GetByte();
         Reader = reader;
     }
 }
