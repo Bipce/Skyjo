@@ -9,8 +9,8 @@ interface Props {
 const CardDeck = ({ drawnCard, discardedCard }: Props) => {
   return (
     <section className="flex items-center justify-center gap-10">
-      <Card card={drawnCard} belongsTo="deck" />
       <Card card={discardedCard} belongsTo="deck" />
+      <Card card={drawnCard} belongsTo="deck" />
     </section>
   );
 };
