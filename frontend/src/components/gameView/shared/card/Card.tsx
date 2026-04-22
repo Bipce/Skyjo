@@ -10,6 +10,7 @@ interface Props {
 
 const Card = ({ card, belongsTo, isSelected, handleOnClick, className }: Props) => {
   const { number, isRevealed } = card;
+
   const getCardColor = (): string => {
     if (isRevealed) {
       if (number < 0) return "custom-card-dark-blue";
