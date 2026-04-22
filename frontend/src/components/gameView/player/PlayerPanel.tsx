@@ -9,20 +9,7 @@ interface Props {
 }
 
 const PlayerPanel = ({ player }: Props) => {
-  const cards: CardData[] = [
-    { number: 0, isRevealed: true },
-    { number: 1, isRevealed: false },
-    { number: 2, isRevealed: false },
-    { number: 5, isRevealed: true },
-    { number: 5, isRevealed: false },
-    { number: 9, isRevealed: true },
-    { number: 12, isRevealed: false },
-    { number: -2, isRevealed: true },
-    { number: 4, isRevealed: true },
-    { number: 5, isRevealed: false },
-    { number: 5, isRevealed: true },
-    { number: 5, isRevealed: true },
-  ];
+  const cards: CardData[] = player.cards;
 
   return (
     <section className="relative flex h-full w-full justify-center">
