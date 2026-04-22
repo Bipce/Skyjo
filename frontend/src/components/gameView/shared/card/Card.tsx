@@ -39,7 +39,7 @@ const Card = ({ card, belongsTo, className }: Props) => {
         className
       } ${cardColor} ${cardSize} card-number card-pattern text-zinc-950`}
     >
-      {card.isRevealed ? card.number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
+      {isRevealed ? number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
     </button>
   );
 };
