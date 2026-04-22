@@ -105,10 +105,9 @@ internal sealed class NetworkTemplates : ITemplateProvider
         {
             if (type is IArrayType { ElementType: INamedType elementType })
             {
-                var length = reader.GetInt();
-                field.Value = ExpressionFactory.Parse($"new {elementType}[length]");
+                field.Value = ExpressionFactory.Parse($"new {elementType}[reader.GetInt()]");
                 var element = meta.DefineLocalVariable("element", elementType);
-                for (var i = 0; i < length; i++)
+                for (var i = 0; i < field.Value!.Length; i++)
                 {
                     ReadType(elementType, reader, element);
                     field.Value![i] = element.Value;
