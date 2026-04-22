@@ -195,7 +195,7 @@ public sealed class ServerManager : ManagerBase
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public ReplicatedData<T> AddReplicatedData<T>(int netUpdateFrequency, byte channel, DeliveryMethod deliveryMethod,
-        NetPeer? excludePeer, NetPeer? peer, Entity entity, int id, T lastValue, T value)
+        NetPeer? excludePeer, NetPeer? peer, Entity entity, byte id, T lastValue, T value)
     {
         var data = new ReplicatedData<T>
         {

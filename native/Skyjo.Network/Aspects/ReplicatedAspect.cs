@@ -12,13 +12,13 @@ public sealed class ReplicatedAspect : TypeAspect
 {
     [Introduce(Accessibility = Accessibility.Private, WhenExists = OverrideStrategy.Ignore)]
     [EditorBrowsable(EditorBrowsableState.Never)]
-    private static int __GetReplicatedVarId(string name)
+    private static byte __GetReplicatedVarId(string name)
     {
         var replicatedVars = meta.Target.Type.FieldsAndProperties
             .Where(x => x.Attributes.Any(a => a.Type.IsConvertibleTo(typeof(ReplicatedAttribute))));
 
         var switchBuilder = new SwitchStatementBuilder(ExpressionFactory.Capture(name));
-        var i = meta.CompileTime(0);
+        var i = meta.CompileTime((byte)0);
         foreach (var replicatedVar in replicatedVars)
         {
             var label = SwitchStatementLabel.CreateLiteral(replicatedVar.Name);

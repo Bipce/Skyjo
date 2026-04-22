@@ -69,7 +69,7 @@ public sealed class ReplicatedAttribute : OverrideFieldOrPropertyAspect
                 return;
             }
 
-            var id = (int)meta.ThisType.__GetReplicatedVarId(meta.Target.FieldOrProperty.Name);
+            var id = meta.ThisType.__GetReplicatedVarId(meta.Target.FieldOrProperty.Name);
             var entity = (Entity)meta.This;
 
             if (_replicatedDataField!.Value == null)

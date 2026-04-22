@@ -5,7 +5,7 @@ namespace Skyjo.Network.Replication;
 public sealed class ReplicatedData<T> : IReplicatedData
 {
     public required Entity Entity { get; init; }
-    public required int Id { get; init; }
+    public required byte Id { get; init; }
     public required T LastValue { get; init; }
     public required T Value { get; set; }
 

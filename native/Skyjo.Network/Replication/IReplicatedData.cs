@@ -5,7 +5,7 @@ namespace Skyjo.Network.Replication;
 public interface IReplicatedData
 {
     Entity Entity { get; }
-    int Id { get; }
+    byte Id { get; }
     bool IsUnchanged { get; }
     Action<NetDataWriter> Serialize { get; }
     Action Done { get; }
