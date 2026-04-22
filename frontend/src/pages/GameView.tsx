@@ -21,7 +21,7 @@ const GameView = () => {
     };
 
     window.removePlayer = (username: string) => {
-      setPlayers(prev => prev.filter(p => p.username !== username));
+      setPlayers(prev => prev.filter(player => player.username !== username));
     };
 
     window.initGame = (drawnCard: CardData, discardedCard: CardData) => {
@@ -35,7 +35,7 @@ const GameView = () => {
       <div className="grid w-full max-w-6xl gap-8">
         <OpponentsGrid>
           {players
-            .filter(x => !x.isOwner)
+            .filter(player => !player.isOwner)
             .map(player => {
               return <OpponentPanel key={player.username} player={player} />;
             })}
