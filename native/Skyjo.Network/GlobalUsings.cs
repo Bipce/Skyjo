@@ -1,0 +1,1 @@
+﻿global using ConnectionState = Skyjo.Network.Enums.ConnectionState;

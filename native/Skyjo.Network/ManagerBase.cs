@@ -34,10 +34,24 @@ public abstract class ManagerBase : INetEventListener
     protected static ServerManager ServerManager => NetworkManager.ServerManager;
     protected static ClientManager ClientManager => NetworkManager.ClientManager;
 
+    public event Action<ConnectionState>? ConnectionStateChangedEvent;
+
+    public ConnectionState ConnectionState
+    {
+        get;
+        protected set
+        {
+            field = value;
+            ConnectionStateChangedEvent?.Invoke(value);
+        }
+    }
+
     public virtual bool Start()
     {
         if (IsRunning)
             return false;
+
+        ConnectionState = ConnectionState.Starting;
 
         NetManager = new NetManager(this);
         return true;
@@ -56,11 +70,14 @@ public abstract class ManagerBase : INetEventListener
         if (!IsRunning)
             return false;
 
+        ConnectionState = ConnectionState.Stopping;
+
         NetManager.Stop();
         _netManager = null;
         NetworkManager.Entities.Clear();
 
         Console.WriteLine($"[{Role}] Stopped");
+        ConnectionState = ConnectionState.Stopped;
         return true;
     }
 

@@ -78,6 +78,12 @@ public sealed class NetworkManager
         }
     }
 
+    public void Host()
+    {
+        if (ServerManager.Start())
+            ClientManager.Start();
+    }
+
     public void Stop()
     {
         ServerManager.Stop();

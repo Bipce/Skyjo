@@ -15,7 +15,6 @@ public sealed class ServerManager : ManagerBase
     private int _nextId = FirstEntityId;
 
     public event Action<NetPeer, NetDataReader>? OnPlayerConnected;
-    public event Action? OnServerStarted;
 
     private readonly IndexedCollection<int, NetPeer> _peers = new(x => x.Id);
     private NetDataReader _lastReader = null!;
@@ -25,14 +24,14 @@ public sealed class ServerManager : ManagerBase
 
     public override bool Start()
     {
-        if (!base.Start() || ClientManager.IsRunning)
+        if (!base.Start() || ClientManager.ConnectionState == ConnectionState.Started)
             return false;
 
         var state = NetManager.Start(Port);
         if (state)
         {
             Console.WriteLine($"[{Role}] Server listening on port {Port}");
-            OnServerStarted?.Invoke();
+            ConnectionState = ConnectionState.Started;
         }
 
         return state;

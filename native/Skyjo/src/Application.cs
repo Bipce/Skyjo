@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Skyjo.Config;
 using Skyjo.Game;
 using Skyjo.Network;
+using ConnectionState = Skyjo.Network.Enums.ConnectionState;
 
 #if !DEBUG
 using SDL3;
@@ -56,7 +57,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         NetworkManager.RegisterEntity<Player>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
-        NetworkManager.ServerManager.OnServerStarted += Server_OnStarted;
+        NetworkManager.ServerManager.ConnectionStateChangedEvent += OnServerConnectionStateChanged;
 
         NetworkManager.ClientManager.ConnectionData = writer => writer.Put(ConfigManager.Settings.Username);
 
@@ -106,8 +107,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
             case NetMode.Host:
             {
                 NetworkManager.ServerManager.Port = settings.Port;
-                if (NetworkManager.ServerManager.Start())
-                    NetworkManager.ClientManager.Start();
+                NetworkManager.Host();
                 break;
             }
             case NetMode.Join:
@@ -157,8 +157,11 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         player.Spawn();
     }
 
-    private void Server_OnStarted()
+    private static void OnServerConnectionStateChanged(ConnectionState connectionState)
     {
+        if (connectionState != ConnectionState.Started)
+            return;
+
         new GameManager().Spawn();
     }
 }

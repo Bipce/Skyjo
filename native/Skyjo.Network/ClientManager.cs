@@ -35,6 +35,12 @@ public sealed class ClientManager : ManagerBase
         return true;
     }
 
+    public override void OnPeerConnected(NetPeer peer)
+    {
+        base.OnPeerConnected(peer);
+        ConnectionState = ConnectionState.Started;
+    }
+
     public override void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
         base.OnPeerDisconnected(peer, disconnectInfo);
