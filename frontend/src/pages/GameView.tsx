@@ -24,11 +24,24 @@ const GameView = () => {
       setPlayers(prev => prev.filter(player => player.username !== username));
     };
 
+    window.updatePlayer = (username: string, playerData: PlayerData) => {
+      setPlayers(prev => {
+        const index = prev.findIndex(player => player.username === username);
+        const data = [...prev];
+        data[index] = playerData;
+        return data;
+      });
+
+      if (playerData.isOwner) {
+        setPlayer(player);
+      }
+    };
+
     window.initGame = (drawnCard: CardData, discardedCard: CardData) => {
       setDrawnCard(drawnCard);
       setDiscardedCard(discardedCard);
     };
-  }, []);
+  }, [player]);
 
   return (
     <main className="grid min-h-screen place-items-center py-10">
