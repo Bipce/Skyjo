@@ -10,24 +10,24 @@ interface Props {
 
 const OpponentPanel = ({ player }: Props) => {
   const cards: CardData[] = [
-    { number: 0, isRevealed: true, belongTo: "opponent" },
-    { number: 1, isRevealed: false, belongTo: "opponent" },
-    { number: 2, isRevealed: false, belongTo: "opponent" },
-    { number: 5, isRevealed: true, belongTo: "opponent" },
-    { number: 5, isRevealed: false, belongTo: "opponent" },
-    { number: 9, isRevealed: true, belongTo: "opponent" },
-    { number: 12, isRevealed: false, belongTo: "opponent" },
-    { number: 5, isRevealed: false, belongTo: "opponent" },
-    { number: 4, isRevealed: true, belongTo: "opponent" },
-    { number: 5, isRevealed: false, belongTo: "opponent" },
-    { number: 5, isRevealed: true, belongTo: "opponent" },
-    { number: 5, isRevealed: true, belongTo: "opponent" },
+    { number: 0, isRevealed: true },
+    { number: 1, isRevealed: false },
+    { number: 2, isRevealed: false },
+    { number: 5, isRevealed: true },
+    { number: 5, isRevealed: false },
+    { number: 9, isRevealed: true },
+    { number: 12, isRevealed: false },
+    { number: 5, isRevealed: false },
+    { number: 4, isRevealed: true },
+    { number: 5, isRevealed: false },
+    { number: 5, isRevealed: true },
+    { number: 5, isRevealed: true },
   ];
 
   return (
     <div className="panel-base relative mx-auto w-full max-w-md justify-between p-5">
       <Separation className="right-[38%]" />
-      <CardGridWrapper cards={cards} className="w-1/2 gap-4" />
+      <CardGridWrapper cards={cards} className="w-1/2 gap-4" belongsTo="opponent" />
       <ScorePanel player={player} />
     </div>
   );

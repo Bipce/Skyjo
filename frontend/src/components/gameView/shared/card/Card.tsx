@@ -1,12 +1,13 @@
-import type { CardData } from "../../../../interfaces/CardData.ts";
+import type { CardBelongToType, CardData } from "../../../../interfaces/CardData.ts";
 
 interface Props {
   card: CardData;
+  belongsTo: CardBelongToType;
   className?: string;
 }
 
-const Card = ({ card, className }: Props) => {
-  const { number, isRevealed, belongTo } = card;
+const Card = ({ card, belongsTo, className }: Props) => {
+  const { number, isRevealed } = card;
   const getCardColor = (): string => {
     if (isRevealed) {
       if (number < 0) return "custom-card-dark-blue";
@@ -20,7 +21,7 @@ const Card = ({ card, className }: Props) => {
   const cardColor = getCardColor();
 
   const getCardSize = (): string => {
-    switch (belongTo) {
+    switch (belongsTo) {
       case "opponent":
         return isRevealed ? "text-3xl" : "text-[9px]";
       case "player":
