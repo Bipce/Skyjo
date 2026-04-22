@@ -33,7 +33,7 @@ const GameView = () => {
       });
 
       if (playerData.isOwner) {
-        setPlayer(player);
+        setPlayer(playerData);
       }
     };
 
