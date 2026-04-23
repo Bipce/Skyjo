@@ -8,7 +8,6 @@ public sealed class CardData : ViewData
 
     public int Number { get; set; }
     public bool IsRevealed { get; set; }
-    public bool WillBeRevealed { get; set; }
 
     public static CardData Empty => new();
 }

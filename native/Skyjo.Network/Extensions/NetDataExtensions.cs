@@ -7,7 +7,7 @@ public static class NetDataExtensions
 {
     public static void Put(this NetDataWriter writer, Entity? entity)
     {
-        writer.Put(entity ? entity.Id : 0);
+        writer.Put(entity ? entity.Id : (ushort)0);
     }
 
     public static Entity? GetEntity(this NetDataReader reader)

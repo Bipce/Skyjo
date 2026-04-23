@@ -18,12 +18,28 @@ public sealed partial class GameManager : Entity
     private KeyboardState _keyboard;
     private KeyboardState _lastKeyboard;
 
+    [Replicated(OnRep = nameof(OnRep_DrawnCard))]
+    private Card _drawnCard = null!;
+
+    [Replicated(OnRep = nameof(OnRep_DiscardedCard))]
+    private Card _discardedCard = null!;
+
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
 
     protected override void OnSpawned()
     {
-        GameView.BindFunction<string, int[]>("selectCard", Server_OnPlayerSelectCard_PreMatch);
-        GameView.InitGame(CardData.Empty, CardData.Empty);
+        GameView.BindFunction<string, int[]>("selectCard", Server_SelectCard);
+
+        if (HasAuthority)
+        {
+            _drawnCard = new Card { CardType = (int)Enums.CardType.Draw };
+            _drawnCard.Spawn();
+            _discardedCard = new Card { CardType = (int)Enums.CardType.Discard };
+            _discardedCard.Spawn();
+
+            OnRep_DrawnCard();
+            OnRep_DiscardedCard();
+        }
     }
 
     public void Update()
@@ -55,33 +71,39 @@ public sealed partial class GameManager : Entity
         }
 
         var cards = data.Shuffle().ToArray();
-        Multicast_StartGame(cards);
-    }
 
-    [Multicast]
-    private void Multicast_StartGame(int[] cards)
-    {
         _drawPile = new Stack<CardData>(cards.Select(x => new CardData { Number = x }));
+        _discardPile.Push(_drawPile.Pop());
 
-        var discardedCard = _drawPile.Pop();
-        discardedCard.IsRevealed = true;
-        _discardPile.Push(discardedCard);
+        _drawnCard.Number = _drawPile.Peek().Number;
+        _drawnCard.UpdateView();
 
-        GameView.InitGame(_drawPile.Peek(), _discardPile.Peek());
+        _discardedCard.Number = _discardPile.Peek().Number;
+        _discardedCard.IsRevealed = true;
+        _discardedCard.UpdateView();
 
         foreach (var player in NetworkManager.GetEntities<Player>())
         {
             var newCards = GetPlayerCards();
-
-            for (var i = 0; i < player.Data.Cards.Count; i++)
+            for (var i = 0; i < player.Cards!.Length; i++)
             {
-                player.Data.Cards[i].Number = newCards[i].Number;
-                if (player.Data.Cards[i].WillBeRevealed)
-                    player.Data.Cards[i].IsRevealed = true;
+                player.Cards[i].Number = newCards[i].Number;
+                if (player.Cards[i].WillBeRevealed)
+                    player.Cards[i].IsRevealed = true;
             }
 
-            GameView.UpdatePlayer(player.Username, player.Data);
+            player.Cards.First().UpdateView();
         }
+    }
+
+    private void OnRep_DrawnCard()
+    {
+        GameView.UpdateDrawnCard(_drawnCard.Data);
+    }
+
+    private void OnRep_DiscardedCard()
+    {
+        GameView.UpdateDiscardedCard(_discardedCard.Data);
     }
 
     private CardData[] GetPlayerCards()
@@ -94,13 +116,18 @@ public sealed partial class GameManager : Entity
     }
 
     [Server]
-    private void Server_OnPlayerSelectCard_PreMatch(string username, int[] indexes)
+    private void Server_SelectCard(string username, int[] indexes)
     {
         if (indexes.Length == 0)
             return;
 
         var player = NetworkManager.GetEntities<Player>().First(x => x.Username == username);
-        player.RevealedCardIndexes = indexes;
-        player.OnRep_RevealedCardIndexes();
+        foreach (var card in player.Cards!)
+            card.WillBeRevealed = false;
+
+        foreach (var index in indexes)
+        {
+            player.Cards![index].WillBeRevealed = true;
+        }
     }
 }

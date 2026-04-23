@@ -14,13 +14,18 @@ partial class GameView
         EvaluateScript($"window.removePlayer(\"{username}\");");
     }
 
-    public static void InitGame(CardData drawnCard, CardData discardedCard)
-    {
-        EvaluateScript($"window.initGame({drawnCard.Serialize()}, {discardedCard.Serialize()});");
-    }
-
     public static void UpdatePlayer(string username, PlayerData data)
     {
         EvaluateScript($"window.updatePlayer(\"{username}\", {data.Serialize()});");
+    }
+
+    public static void UpdateDrawnCard(CardData data)
+    {
+        EvaluateScript($"window.updateDrawnCard({data.Serialize()})");
+    }
+
+    public static void UpdateDiscardedCard(CardData data)
+    {
+        EvaluateScript($"window.updateDiscardedCard({data.Serialize()})");
     }
 }

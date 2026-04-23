@@ -13,14 +13,14 @@ public sealed class SendWorldPacket : Packet
         base.Serialize(writer);
 
         writer.Put(NetworkManager.Entities.Count);
-        foreach (var entity in NetworkManager.Entities)
+        foreach (var entity in NetworkManager.Entities.OrderByDescending(x => x.Id))
         {
             writer.Put(NetworkManager.GetEntityTypeId(entity.GetType()));
             writer.Put(entity.Id);
             writer.Put(entity.OwnerId);
         }
 
-        foreach (var entity in NetworkManager.Entities)
+        foreach (var entity in NetworkManager.Entities.OrderByDescending(x => x.Id))
         {
             entity.__SerializeReplicatedVars(writer);
         }
@@ -37,7 +37,7 @@ public sealed class SendWorldPacket : Packet
             NetworkManager.Entities.Add(entity);
         }
 
-        foreach (var entity in NetworkManager.Entities)
+        foreach (var entity in NetworkManager.Entities.OrderByDescending(x => x.Id))
         {
             entity.__DeserializeReplicatedVars(reader);
             entity.OnSpawned();

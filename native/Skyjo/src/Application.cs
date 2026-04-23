@@ -57,6 +57,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
         NetworkManager.RegisterEntity<GameManager>();
         NetworkManager.RegisterEntity<Player>();
+        NetworkManager.RegisterEntity<Card>();
 
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
         NetworkManager.ServerManager.ConnectionStateChangedEvent += OnServerConnectionStateChanged;

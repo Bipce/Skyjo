@@ -8,24 +8,31 @@ public sealed partial class Player : Entity
 {
     private GameManager _gameManager = null!;
     [Replicated] public string Username { get; set; } = null!;
-    public PlayerData Data { get; private set; } = null!;
 
-    [Replicated(OnRep = nameof(OnRep_RevealedCardIndexes))]
-    public int[]? RevealedCardIndexes { get; set; }
+    [Replicated(OnRep = nameof(OnRep_Cards))]
+    public Card[]? Cards { get; private set; }
 
     protected override void OnSpawned()
     {
         _gameManager = NetworkManager.GetEntity<GameManager>();
 
-        var cards = Enumerable.Range(0, 12).Select(_ => CardData.Empty).ToList();
-
-        Data = new PlayerData
+        if (HasAuthority)
         {
-            Username = Username,
-            IsOwner = IsOwner,
-            Cards = cards
-        };
-        GameView.AddPlayer(Data);
+            var cards = Enumerable.Range(0, 12).Select(_ => new Card
+            {
+                Owner = Owner,
+                Player = this,
+                CardType = (int)Enums.CardType.Player
+            }).ToArray();
+
+            foreach (var card in cards)
+            {
+                card.Spawn();
+            }
+
+            Cards = cards;
+            OnRep_Cards();
+        }
     }
 
     protected override void OnDestroyed()
@@ -33,16 +40,16 @@ public sealed partial class Player : Entity
         GameView.RemovePlayer(Username);
     }
 
-    public void OnRep_RevealedCardIndexes()
+    private void OnRep_Cards()
     {
-        foreach (var card in Data.Cards)
-        {
-            card.WillBeRevealed = false;
-        }
-
-        foreach (var index in RevealedCardIndexes!)
-        {
-            Data.Cards[index].WillBeRevealed = true;
-        }
+        GameView.AddPlayer(Data);
     }
+
+    public PlayerData Data =>
+        new()
+        {
+            Username = Username,
+            IsOwner = IsOwner,
+            Cards = Cards!.Select(x => x.Data).ToArray()
+        };
 }
