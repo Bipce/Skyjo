@@ -9,17 +9,20 @@ interface GameState {
   discardedCard: CardData | null;
 }
 
-interface GameActions {
+interface GameCallbacks {
   addPlayer: (player: PlayerData) => void;
   removePlayer: (id: number) => void;
-  updatePlayer: (id: number, playerData: PlayerData) => void;
+  updatePlayer: (id: number, data: PlayerData) => void;
   updateDrawnCard: (card: CardData) => void;
   updateDiscardedCard: (card: CardData) => void;
-  selectCard: (cardId: number) => void;
   bindWindowCallbacks: () => void;
 }
 
-export const useGameStore = create<GameState & GameActions>(set => ({
+interface GameCommands {
+  selectCard: (id: number) => void;
+}
+
+export const useGameStore = create<GameState & GameCallbacks & GameCommands>(set => ({
   players: [],
   player: null,
   drawnCard: null,
