@@ -6,26 +6,26 @@ partial class GameView
 {
     public static void AddPlayer(PlayerData data)
     {
-        EvaluateScript($"window.addPlayer({data.Serialize()});");
+        View.EvaluateScript($"window.addPlayer({data.Serialize()});");
     }
 
     public static void RemovePlayer(string username)
     {
-        EvaluateScript($"window.removePlayer(\"{username}\");");
+        View.EvaluateScript($"window.removePlayer(\"{username}\");");
     }
 
     public static void UpdatePlayer(ushort id, PlayerData data)
     {
-        EvaluateScript($"window.updatePlayer({id}, {data.Serialize()});");
+        View.EvaluateScript($"window.updatePlayer({id}, {data.Serialize()});");
     }
 
     public static void UpdateDrawnCard(CardData data)
     {
-        EvaluateScript($"window.updateDrawnCard({data.Serialize()})");
+        View.EvaluateScript($"window.updateDrawnCard({data.Serialize()})");
     }
 
     public static void UpdateDiscardedCard(CardData data)
     {
-        EvaluateScript($"window.updateDiscardedCard({data.Serialize()})");
+        View.EvaluateScript($"window.updateDiscardedCard({data.Serialize()})");
     }
 }

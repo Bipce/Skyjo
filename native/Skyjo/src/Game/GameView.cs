@@ -38,6 +38,8 @@ public sealed partial class GameView
     private int CurrentWidth => _graphicsDevice.Viewport.Width;
     private int CurrentHeight => _graphicsDevice.Viewport.Height;
 
+    public static UltralightView View => _instance._view;
+
 #if !DEBUG
     private static ShaderSources GetShaders()
     {
@@ -85,30 +87,5 @@ public sealed partial class GameView
     public void Draw()
     {
         _spriteBatch.Draw(_view.Texture, Vector2.Zero, Color.White);
-    }
-
-    public static void EvaluateScript(string js)
-    {
-        _instance._view.EvaluateScript(js);
-    }
-
-    public static T EvaluateScript<T>(string js)
-    {
-        return _instance._view.EvaluateScript<T>(js);
-    }
-
-    public static void BindFunction(string name, Action callback)
-    {
-        _instance._view.BindFunction(name, callback);
-    }
-
-    public static void BindFunction<T, T1>(string name, Action<T, T1> callback)
-    {
-        _instance._view.BindFunction(name, callback);
-    }
-
-    public static void BindFunction<T, T1, T2>(string name, Action<T, T1, T2> callback)
-    {
-        _instance._view.BindFunction(name, callback);
     }
 }

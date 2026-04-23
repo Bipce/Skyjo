@@ -28,7 +28,7 @@ public sealed partial class GameManager : Entity
 
     protected override void OnSpawned()
     {
-        GameView.BindFunction<ushort, ushort>("selectCard", Server_SelectCard);
+        GameView.View.BindFunction<ushort>("selectCard", Server_SelectCard);
 
         if (HasAuthority)
         {
@@ -116,14 +116,11 @@ public sealed partial class GameManager : Entity
     }
 
     [Server]
-    private void Server_SelectCard(ushort playerId, ushort cardId)
+    private void Server_SelectCard(ushort cardId)
     {
-        var player = NetworkManager.GetEntity<Player>(playerId);
-        foreach (var card in player.Cards!)
-            card.WillBeRevealed = false;
-
         var cardEntity = NetworkManager.GetEntity<Card>(cardId);
         cardEntity.IsSelected = !cardEntity.IsSelected;
+        cardEntity.WillBeRevealed = cardEntity.IsSelected;
         cardEntity.UpdateView();
     }
 }
