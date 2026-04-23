@@ -14,9 +14,9 @@ partial class GameView
         EvaluateScript($"window.removePlayer(\"{username}\");");
     }
 
-    public static void UpdatePlayer(string username, PlayerData data)
+    public static void UpdatePlayer(ushort id, PlayerData data)
     {
-        EvaluateScript($"window.updatePlayer(\"{username}\", {data.Serialize()});");
+        EvaluateScript($"window.updatePlayer({id}, {data.Serialize()});");
     }
 
     public static void UpdateDrawnCard(CardData data)

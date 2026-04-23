@@ -48,6 +48,7 @@ public sealed partial class Player : Entity
     public PlayerData Data =>
         new()
         {
+            Id = Id,
             Username = Username,
             IsOwner = IsOwner,
             Cards = Cards!.Select(x => x.Data).ToArray()
