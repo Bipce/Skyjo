@@ -8,7 +8,6 @@ public sealed partial class Card : Entity
 {
     [Replicated] public int Number { get; set; }
     [Replicated] public bool IsRevealed { get; set; }
-    [Replicated] public bool WillBeRevealed { get; set; }
     [Replicated] public Player Player { get; set; } = null!;
     [Replicated] public bool IsSelected { get; set; }
 

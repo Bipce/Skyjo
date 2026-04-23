@@ -56,7 +56,7 @@ public sealed partial class GameManager : Entity
     private void StartGame()
     {
         var players = NetworkManager.GetEntities<Player>();
-        if (players.Any(p => p.Cards!.Count(c => c.WillBeRevealed) != 2))
+        if (players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
             return;
 
         var data = new List<int>(NumberOfCards);
@@ -92,8 +92,11 @@ public sealed partial class GameManager : Entity
             for (var i = 0; i < player.Cards!.Length; i++)
             {
                 player.Cards[i].Number = newCards[i].Number;
-                if (player.Cards[i].WillBeRevealed)
+                if (player.Cards[i].IsSelected)
+                {
                     player.Cards[i].IsRevealed = true;
+                    player.Cards[i].IsSelected = false;
+                }
             }
 
             player.Cards.First().UpdateView();
@@ -125,12 +128,11 @@ public sealed partial class GameManager : Entity
         var cardEntity = NetworkManager.GetEntity<Card>(cardId);
         if (!cardEntity.IsSelected)
         {
-            if (cardEntity.Player.Cards!.Count(x => x.WillBeRevealed) == 2)
+            if (cardEntity.Player.Cards!.Count(x => x.IsSelected) == 2)
                 return;
         }
 
         cardEntity.IsSelected = !cardEntity.IsSelected;
-        cardEntity.WillBeRevealed = cardEntity.IsSelected;
         cardEntity.UpdateView();
     }
 }
