@@ -37,9 +37,12 @@ const GameView = () => {
       }
     };
 
-    window.initGame = (drawnCard: CardData, discardedCard: CardData) => {
-      setDrawnCard(drawnCard);
-      setDiscardedCard(discardedCard);
+    window.updateDrawnCard = (card: CardData) => {
+      setDrawnCard(card);
+    };
+
+    window.updateDiscardedCard = (card: CardData) => {
+      setDiscardedCard(card);
     };
   }, [player]);
 
