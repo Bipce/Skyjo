@@ -1,4 +1,5 @@
 import type { CardBelongToType, CardData } from "../../../../interfaces/CardData.ts";
+import { useGameStore } from "../../../../store/gameStore.ts";
 
 interface Props {
   card: CardData;
@@ -8,6 +9,7 @@ interface Props {
 
 const Card = ({ card, belongsTo, className }: Props) => {
   const { number, isRevealed, isSelected } = card;
+  const selectCard = useGameStore(s => s.selectCard);
 
   const getCardColor = (): string => {
     if (isRevealed) {
@@ -35,7 +37,7 @@ const Card = ({ card, belongsTo, className }: Props) => {
   const cardSize = getCardSize();
 
   const handleSelectedForInitiateGame = (cardId: number) => {
-    if (belongsTo === "player") window.selectCard(cardId);
+    if (belongsTo === "player") selectCard(cardId);
   };
 
   return (

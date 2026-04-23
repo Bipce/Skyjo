@@ -1,50 +1,25 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useShallow } from "zustand/react/shallow";
 import OpponentsGrid from "../components/gameView/opponent/OpponentsGrid.tsx";
 import OpponentPanel from "../components/gameView/opponent/OpponentPanel.tsx";
 import CardDeck from "../components/gameView/shared/card/CardDeck.tsx";
 import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
-import type { PlayerData } from "../interfaces/PlayerData.ts";
-import type { CardData } from "../interfaces/CardData.ts";
+import { useGameStore } from "../store/gameStore.ts";
 
 const GameView = () => {
-  const [players, setPlayers] = useState<PlayerData[]>([]);
-  const [player, setPlayer] = useState<PlayerData | null>(null);
-  const [drawnCard, setDrawnCard] = useState<CardData | null>(null);
-  const [discardedCard, setDiscardedCard] = useState<CardData | null>(null);
+  const { bindWindowCallbacks, players, player, drawnCard, discardedCard } = useGameStore(
+    useShallow(s => ({
+      bindWindowCallbacks: s.bindWindowCallbacks,
+      players: s.players,
+      player: s.player,
+      drawnCard: s.drawnCard,
+      discardedCard: s.discardedCard,
+    })),
+  );
 
   useEffect(() => {
-    window.startNetwork();
-
-    window.addPlayer = (player: PlayerData) => {
-      setPlayers(prev => [...prev, player]);
-      if (player.isOwner) setPlayer(player);
-    };
-
-    window.removePlayer = (id: number) => {
-      setPlayers(prev => prev.filter(player => player.id !== id));
-    };
-
-    window.updatePlayer = (id: number, playerData: PlayerData) => {
-      setPlayers(prev => {
-        const index = prev.findIndex(player => player.id === id);
-        const data = [...prev];
-        data[index] = playerData;
-        return data;
-      });
-
-      if (playerData.isOwner) {
-        setPlayer(playerData);
-      }
-    };
-
-    window.updateDrawnCard = (card: CardData) => {
-      setDrawnCard(card);
-    };
-
-    window.updateDiscardedCard = (card: CardData) => {
-      setDiscardedCard(card);
-    };
-  }, [player]);
+    bindWindowCallbacks();
+  }, [bindWindowCallbacks]);
 
   return (
     <main className="grid min-h-screen place-items-center py-10">
@@ -53,7 +28,7 @@ const GameView = () => {
           {players
             .filter(player => !player.isOwner)
             .map(player => {
-              return <OpponentPanel key={player.username} player={player} />;
+              return <OpponentPanel key={player.id} player={player} />;
             })}
         </OpponentsGrid>
 
