@@ -13,7 +13,7 @@ const PlayerPanel = ({ player }: Props) => {
   const playerCards: CardData[] = cards;
 
   const handleSelectedForInitiateGame = (cardId: number) => {
-    window.selectCard(player.id, cardId);
+    window.selectCard(cardId);
   };
 
   return (
