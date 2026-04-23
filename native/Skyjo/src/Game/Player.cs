@@ -37,7 +37,7 @@ public sealed partial class Player : Entity
 
     protected override void OnDestroyed()
     {
-        GameView.RemovePlayer(Username);
+        GameView.RemovePlayer(Id);
     }
 
     private void OnRep_Cards()

@@ -9,9 +9,9 @@ partial class GameView
         View.EvaluateScript($"window.addPlayer({data.Serialize()});");
     }
 
-    public static void RemovePlayer(string username)
+    public static void RemovePlayer(int id)
     {
-        View.EvaluateScript($"window.removePlayer(\"{username}\");");
+        View.EvaluateScript($"window.removePlayer({id});");
     }
 
     public static void UpdatePlayer(ushort id, PlayerData data)
