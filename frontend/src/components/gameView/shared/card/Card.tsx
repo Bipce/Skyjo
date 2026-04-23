@@ -4,10 +4,9 @@ interface Props {
   card: CardData;
   belongsTo: CardBelongToType;
   className?: string;
-  handleOnClick?: () => void;
 }
 
-const Card = ({ card, belongsTo, handleOnClick, className }: Props) => {
+const Card = ({ card, belongsTo, className }: Props) => {
   const { number, isRevealed, isSelected } = card;
 
   const getCardColor = (): string => {
@@ -35,9 +34,13 @@ const Card = ({ card, belongsTo, handleOnClick, className }: Props) => {
   };
   const cardSize = getCardSize();
 
+  const handleSelectedForInitiateGame = (cardId: number) => {
+    if (belongsTo === "player") window.selectCard(cardId);
+  };
+
   return (
     <button
-      onClick={handleOnClick}
+      onClick={() => handleSelectedForInitiateGame(card.id)}
       className={`center aspect-2/3 max-h-28 w-full max-w-20 rounded-xl bg-size-[100%_100%] bg-no-repeat font-bold ${
         isSelected ? "border-2 border-rose-600 shadow-md shadow-rose-600" : "border border-zinc-500"
       } ${className} ${cardColor} ${cardSize} card-number card-pattern text-zinc-950`}
