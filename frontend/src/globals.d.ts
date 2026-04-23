@@ -5,7 +5,7 @@ declare global {
   interface Window {
     startNetwork: () => void;
     addPlayer: (value: PlayerData) => void;
-    removePlayer: (username: string) => void;
+    removePlayer: (id: number) => void;
     updatePlayer: (id: number, playerData: PlayerData) => void;
     selectCard: (cardId: number) => void;
     updateDrawnCard: (card: CardData) => void;

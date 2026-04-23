@@ -20,8 +20,8 @@ const GameView = () => {
       if (player.isOwner) setPlayer(player);
     };
 
-    window.removePlayer = (username: string) => {
-      setPlayers(prev => prev.filter(player => player.username !== username));
+    window.removePlayer = (id: number) => {
+      setPlayers(prev => prev.filter(player => player.id !== id));
     };
 
     window.updatePlayer = (id: number, playerData: PlayerData) => {
