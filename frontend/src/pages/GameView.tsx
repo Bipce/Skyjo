@@ -24,9 +24,9 @@ const GameView = () => {
       setPlayers(prev => prev.filter(player => player.username !== username));
     };
 
-    window.updatePlayer = (username: string, playerData: PlayerData) => {
+    window.updatePlayer = (id: number, playerData: PlayerData) => {
       setPlayers(prev => {
-        const index = prev.findIndex(player => player.username === username);
+        const index = prev.findIndex(player => player.id === id);
         const data = [...prev];
         data[index] = playerData;
         return data;

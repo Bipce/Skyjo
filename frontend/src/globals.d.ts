@@ -6,8 +6,8 @@ declare global {
     startNetwork: () => void;
     addPlayer: (value: PlayerData) => void;
     removePlayer: (username: string) => void;
-    updatePlayer: (username: string, playerData: PlayerData) => void;
-    selectCard: (username: string, indexes: number[]) => void;
+    updatePlayer: (id: number, playerData: PlayerData) => void;
+    selectCard: (playerId: number, cardId: number) => void;
     updateDrawnCard: (card: CardData) => void;
     updateDiscardedCard: (card: CardData) => void;
   }

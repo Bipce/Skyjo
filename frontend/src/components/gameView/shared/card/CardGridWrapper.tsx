@@ -5,26 +5,18 @@ interface Props {
   className?: string;
   cards: CardData[];
   belongsTo: CardBelongToType;
-  onSelectedForRevealCard?: (index: number) => void;
-  selectedCardsForInitiateGame?: number[];
+  onSelectedForRevealCard?: (id: number) => void;
 }
 
-const CardGridWrapper = ({
-  cards,
-  belongsTo,
-  selectedCardsForInitiateGame,
-  onSelectedForRevealCard,
-  className,
-}: Props) => {
+const CardGridWrapper = ({ cards, belongsTo, onSelectedForRevealCard, className }: Props) => {
   return (
     <div className={`grid grid-cols-4 ${className}`}>
-      {cards.map((card, i) => (
+      {cards.map(card => (
         <Card
-          key={i}
+          key={card.id}
           card={card}
           belongsTo={belongsTo}
-          handleOnClick={onSelectedForRevealCard ? () => onSelectedForRevealCard(i) : undefined}
-          isSelected={selectedCardsForInitiateGame?.includes(i) ?? false}
+          handleOnClick={onSelectedForRevealCard ? () => onSelectedForRevealCard(card.id) : undefined}
         />
       ))}
     </div>

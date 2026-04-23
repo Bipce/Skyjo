@@ -3,13 +3,12 @@ import type { CardBelongToType, CardData } from "../../../../interfaces/CardData
 interface Props {
   card: CardData;
   belongsTo: CardBelongToType;
-  isSelected?: boolean;
-  handleOnClick?: () => void;
   className?: string;
+  handleOnClick?: () => void;
 }
 
-const Card = ({ card, belongsTo, isSelected, handleOnClick, className }: Props) => {
-  const { number, isRevealed } = card;
+const Card = ({ card, belongsTo, handleOnClick, className }: Props) => {
+  const { number, isRevealed, isSelected } = card;
 
   const getCardColor = (): string => {
     if (isRevealed) {
