@@ -53,11 +53,9 @@ const Card = ({ card, belongsTo, className, isDraggable = false, isDroppable = f
     <button
       ref={isDroppable ? refDrop : undefined}
       onClick={() => handleSelected(card.id)}
-      className={`center aspect-2/3 max-h-28 w-full max-w-20 cursor-pointer rounded-xl bg-size-[100%_100%] bg-no-repeat font-bold ${
+      className={`center button-card-base card-number ${className} ${cardColor} ${cardSize} ${
         isSelected ? "border-2 border-rose-600 shadow-md shadow-rose-600" : "border border-zinc-500"
-      } ${isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80"} ${className} ${cardColor} ${
-        cardSize
-      } card-number card-pattern text-zinc-950 hover:scale-50`}
+      } ${isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80"}`}
     >
       {isRevealed ? number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
     </button>
@@ -66,7 +64,7 @@ const Card = ({ card, belongsTo, className, isDraggable = false, isDroppable = f
   if (!isDraggable) return button;
 
   return (
-    <div ref={refDrag} className="w-full max-w-20" style={{ opacity: isDragSource ? 0 : 1 }}>
+    <div ref={refDrag} className={`w-full max-w-20 ${isDragSource ? "opacity-0" : "opacity-100"} `}>
       {button}
     </div>
   );

@@ -29,3 +29,7 @@
 .card-number {
   font-family: "Luckiest Guy", cursive;
 }
+
+.button-card-base {
+  @apply aspect-2/3 max-h-28 w-full max-w-20 cursor-pointer rounded-xl bg-size-[100%_100%] bg-no-repeat font-bold text-zinc-950;
+}
