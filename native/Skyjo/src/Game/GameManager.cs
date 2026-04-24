@@ -32,6 +32,7 @@ public sealed partial class GameManager : Entity
     protected override void OnSpawned()
     {
         GameView.View.BindFunction<ushort>("selectCard", Server_SelectCard);
+        GameView.View.BindFunction<ushort, ushort>("dropCard", Server_DropCard);
 
         if (HasAuthority)
         {
@@ -159,5 +160,17 @@ public sealed partial class GameManager : Entity
             cardEntity.IsRevealed = true;
             cardEntity.UpdateView();
         }
+    }
+
+    [Server]
+    private void Server_DropCard(ushort sourceId, ushort targetId)
+    {
+        var sourceCard = NetworkManager.GetEntity<Card>(sourceId);
+        var targetCard = NetworkManager.GetEntity<Card>(targetId);
+
+        (sourceCard.Number, targetCard.Number) = (targetCard.Number, sourceCard.Number);
+        targetCard.IsRevealed = true;
+        sourceCard.UpdateView();
+        targetCard.UpdateView();
     }
 }
