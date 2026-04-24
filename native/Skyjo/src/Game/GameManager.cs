@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using Skyjo.Enums;
 using Skyjo.Network;
 using Skyjo.Network.Attributes;
 using Skyjo.ViewData;
@@ -34,9 +35,9 @@ public sealed partial class GameManager : Entity
 
         if (HasAuthority)
         {
-            _drawnCard = new Card { CardType = (int)Enums.CardType.Draw };
+            _drawnCard = new Card { CardType = (int)CardType.Draw };
             _drawnCard.Spawn();
-            _discardedCard = new Card { CardType = (int)Enums.CardType.Discard };
+            _discardedCard = new Card { CardType = (int)CardType.Discard };
             _discardedCard.Spawn();
 
             OnRep_DrawnCard();
@@ -137,17 +138,26 @@ public sealed partial class GameManager : Entity
     [Server]
     private void Server_SelectCard(ushort cardId)
     {
-        if (_gameHasStarted)
-            return;
-
         var cardEntity = NetworkManager.GetEntity<Card>(cardId);
-        if (!cardEntity.IsSelected)
+        var cardType = (CardType)cardEntity.CardType;
+
+        if (!_gameHasStarted && cardType == CardType.Player)
         {
-            if (cardEntity.Player.Cards!.Count(x => x.IsSelected) == 2)
-                return;
+            if (!cardEntity.IsSelected)
+            {
+                if (cardEntity.Player.Cards!.Count(x => x.IsSelected) == 2)
+                    return;
+            }
+
+            cardEntity.IsSelected = !cardEntity.IsSelected;
+            cardEntity.UpdateView();
+            return;
         }
 
-        cardEntity.IsSelected = !cardEntity.IsSelected;
-        cardEntity.UpdateView();
+        if (_gameHasStarted && cardType == CardType.Draw)
+        {
+            cardEntity.IsRevealed = true;
+            cardEntity.UpdateView();
+        }
     }
 }
