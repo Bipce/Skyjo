@@ -103,7 +103,6 @@ public sealed partial class GameManager : Entity
             }
 
             player.CurrentScore = (byte)player.Cards.Where(x => x.IsRevealed).Sum(x => x.Number);
-            player.UpdateView();
         }
 
         var maxScore = players.Max(x => x.CurrentScore);
@@ -111,7 +110,8 @@ public sealed partial class GameManager : Entity
         var randomPlayer = playersWithHighScore.OrderBy(_ => Random.Shared.Next()).First();
         randomPlayer.IsCurrentPlayer = true;
 
-        randomPlayer.UpdateView();
+        foreach (var player in players)
+            player.UpdateView();
 
         _gameHasStarted = true;
     }
