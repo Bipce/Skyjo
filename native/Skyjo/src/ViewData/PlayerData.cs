@@ -10,4 +10,7 @@ public sealed class PlayerData : ViewData
     public string Username { get; set; } = null!;
     public bool IsOwner { get; set; }
     public CardData[] Cards { get; init; } = null!;
+    public byte CurrentScore { get; init; }
+    public byte TotalScore { get; init; }
+    public bool IsCurrentPlayer { get; init; }
 }

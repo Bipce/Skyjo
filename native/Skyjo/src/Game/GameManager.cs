@@ -24,6 +24,8 @@ public sealed partial class GameManager : Entity
     [Replicated(OnRep = nameof(OnRep_DiscardedCard))]
     private Card _discardedCard = null!;
 
+    [Replicated] private bool _gameHasStarted;
+
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
 
     protected override void OnSpawned()
@@ -55,7 +57,7 @@ public sealed partial class GameManager : Entity
 
     private void StartGame()
     {
-        var players = NetworkManager.GetEntities<Player>();
+        var players = NetworkManager.GetEntities<Player>().ToArray();
         if (players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
             return;
 
@@ -86,7 +88,7 @@ public sealed partial class GameManager : Entity
         _discardedCard.IsRevealed = true;
         _discardedCard.UpdateView();
 
-        foreach (var player in NetworkManager.GetEntities<Player>())
+        foreach (var player in players)
         {
             var newCards = GetPlayerCards();
             for (var i = 0; i < player.Cards!.Length; i++)
@@ -99,8 +101,18 @@ public sealed partial class GameManager : Entity
                 }
             }
 
-            player.Cards.First().UpdateView();
+            player.CurrentScore = (byte)player.Cards.Where(x => x.IsRevealed).Sum(x => x.Number);
+            player.UpdateView();
         }
+
+        var maxScore = players.Max(x => x.CurrentScore);
+        var playersWithHighScore = players.Where(x => x.CurrentScore == maxScore);
+        var randomPlayer = playersWithHighScore.OrderBy(_ => Random.Shared.Next()).First();
+        randomPlayer.IsCurrentPlayer = true;
+
+        randomPlayer.UpdateView();
+
+        _gameHasStarted = true;
     }
 
     private void OnRep_DrawnCard()
@@ -125,6 +137,9 @@ public sealed partial class GameManager : Entity
     [Server]
     private void Server_SelectCard(ushort cardId)
     {
+        if (_gameHasStarted)
+            return;
+
         var cardEntity = NetworkManager.GetEntity<Card>(cardId);
         if (!cardEntity.IsSelected)
         {

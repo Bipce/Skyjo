@@ -12,6 +12,15 @@ public sealed partial class Player : Entity
     [Replicated(OnRep = nameof(OnRep_Cards))]
     public Card[]? Cards { get; private set; }
 
+    [Replicated] public byte CurrentScore { get; set; }
+    [Replicated] public byte TotalScore { get; set; }
+
+    [Replicated] public bool IsCurrentPlayer { get; set; }
+
+    // ReSharper disable once NotAccessedField.Local
+    [Replicated(OnRep = nameof(OnRep_UpdateValue))]
+    private int _updateViewCount;
+
     protected override void OnSpawned()
     {
         _gameManager = NetworkManager.GetEntity<GameManager>();
@@ -51,6 +60,20 @@ public sealed partial class Player : Entity
             Id = Id,
             Username = Username,
             IsOwner = IsOwner,
-            Cards = Cards!.Select(x => x.Data).ToArray()
+            Cards = Cards!.Select(x => x.Data).ToArray(),
+            CurrentScore = CurrentScore,
+            TotalScore = TotalScore,
+            IsCurrentPlayer = IsCurrentPlayer
         };
+
+    private void OnRep_UpdateValue()
+    {
+        GameView.UpdatePlayer(Id, Data);
+    }
+
+    public void UpdateView()
+    {
+        _updateViewCount++;
+        OnRep_UpdateValue();
+    }
 }
