@@ -5,4 +5,7 @@ export interface PlayerData {
   username: string;
   isOwner: boolean;
   cards: CardData[];
+  currentScore: number;
+  totalScore: number;
+  isCurrentPlayer: boolean;
 }

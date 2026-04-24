@@ -8,12 +8,12 @@ interface Props {
 }
 
 const PlayerPanel = ({ player }: Props) => {
-  const { cards } = player;
+  const { cards, isCurrentPlayer } = player;
 
   return (
     <section className="relative flex h-full w-full justify-center">
       <Separation className="right-1/3" />
-      <div className="panel-base h-full w-2/3 justify-around gap-10 p-8">
+      <div className={`panel-base h-full w-2/3 justify-around gap-10 p-8 ${isCurrentPlayer && "current-player"}`}>
         <CardGridWrapper cards={cards} className="w-full gap-10" belongsTo="player" />
         <ScorePanel player={player} />
       </div>

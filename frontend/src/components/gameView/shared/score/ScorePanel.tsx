@@ -7,17 +7,19 @@ interface Props {
 }
 
 const ScorePanel = ({ player }: Props) => {
+  const { username, currentScore, totalScore } = player;
+
   return (
     <aside className="w-32 shrink-0 text-lg">
-      <p className="mb-8 text-2xl font-bold">{player.username}</p>
+      <p className="mb-8 text-2xl font-bold">{username}</p>
 
       <div className="flex flex-col gap-3">
         <IconWrapper>
-          <Hourglass className="text-purple-400" /> : 12
+          <Hourglass className="text-purple-400" /> : {currentScore}
         </IconWrapper>
 
         <IconWrapper>
-          <Trophy className="text-yellow-400" /> : 25 / 100
+          <Trophy className="text-yellow-400" /> : {totalScore} / 100
         </IconWrapper>
       </div>
     </aside>

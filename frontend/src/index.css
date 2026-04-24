@@ -12,3 +12,7 @@ body {
 .panel-base {
   @apply flex items-center rounded-xl bg-zinc-950 shadow;
 }
+
+.current-player {
+  @apply rounded-lg border border-sky-400 shadow-xl shadow-sky-400;
+}
