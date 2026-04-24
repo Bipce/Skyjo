@@ -11,7 +11,12 @@ const CardGridWrapper = ({ cards, belongsTo, className }: Props) => {
   return (
     <div className={`grid grid-cols-4 ${className}`}>
       {cards.map(card => (
-        <Card key={card.id} card={card} belongsTo={belongsTo} />
+        <Card
+          key={card.id}
+          card={card}
+          belongsTo={belongsTo}
+          isDroppable={belongsTo === "player"}
+        />
       ))}
     </div>
   );

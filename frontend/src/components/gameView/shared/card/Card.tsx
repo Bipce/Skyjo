@@ -1,15 +1,23 @@
 import type { CardBelongToType, CardData } from "../../../../interfaces/CardData.ts";
 import { useGameStore } from "../../../../store/gameStore.ts";
+import { useDraggable, useDroppable } from "@dnd-kit/react";
+import { useDragActive } from "../../../../hooks/useDragActive.ts";
 
 interface Props {
   card: CardData;
   belongsTo: CardBelongToType;
   className?: string;
+  isDraggable?: boolean;
+  isDroppable?: boolean;
 }
 
-const Card = ({ card, belongsTo, className }: Props) => {
+const Card = ({ card, belongsTo, className, isDraggable = false, isDroppable = false }: Props) => {
   const { number, isRevealed, isSelected } = card;
   const selectCard = useGameStore(s => s.selectCard);
+  const isDragActive = useDragActive();
+
+  const { ref: refDrag, isDragSource } = useDraggable({ id: card.id, disabled: !isDraggable });
+  const { ref: refDrop, isDropTarget } = useDroppable({ id: card.id, disabled: !isDroppable });
 
   const getCardColor = (): string => {
     if (isRevealed) {
@@ -36,19 +44,31 @@ const Card = ({ card, belongsTo, className }: Props) => {
   };
   const cardSize = getCardSize();
 
-  const handleSelectedForInitiateGame = (cardId: number) => {
+  const handleSelected = (cardId: number) => {
     if (belongsTo === "player") selectCard(cardId);
+    if (belongsTo === "deck" && !isRevealed) selectCard(cardId);
   };
 
-  return (
+  const button = (
     <button
-      onClick={() => handleSelectedForInitiateGame(card.id)}
-      className={`center aspect-2/3 max-h-28 w-full max-w-20 rounded-xl bg-size-[100%_100%] bg-no-repeat font-bold ${
+      ref={isDroppable ? refDrop : undefined}
+      onClick={() => handleSelected(card.id)}
+      className={`center aspect-2/3 max-h-28 w-full max-w-20 cursor-pointer rounded-xl bg-size-[100%_100%] bg-no-repeat font-bold ${
         isSelected ? "border-2 border-rose-600 shadow-md shadow-rose-600" : "border border-zinc-500"
-      } ${className} ${cardColor} ${cardSize} card-number card-pattern text-zinc-950`}
+      } ${isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80"} ${className} ${cardColor} ${
+        cardSize
+      } card-number card-pattern text-zinc-950 hover:scale-50`}
     >
       {isRevealed ? number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
     </button>
+  );
+
+  if (!isDraggable) return button;
+
+  return (
+    <div ref={refDrag} className="w-full max-w-20" style={{ opacity: isDragSource ? 0 : 1 }}>
+      {button}
+    </div>
   );
 };
 
