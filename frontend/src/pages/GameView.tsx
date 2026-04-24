@@ -11,7 +11,7 @@ import { useGameStore } from "../store/gameStore.ts";
 
 const SENSORS = [
   PointerSensor.configure({
-    activationConstraints: [new PointerActivationConstraints.Distance({ value: 5 })],
+    activationConstraints: [new PointerActivationConstraints.Distance({ value: 8 })],
     preventActivation: () => false,
   }),
 ];
