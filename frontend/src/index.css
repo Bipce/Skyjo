@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "./styles/cards.css";
 
+@variant hover (&:hover);
+
 body {
   @apply h-screen overflow-hidden bg-zinc-900 text-zinc-100 select-none;
 }

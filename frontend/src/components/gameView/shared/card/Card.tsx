@@ -54,8 +54,10 @@ const Card = ({ card, belongsTo, className, isDraggable = false, isDroppable = f
       ref={isDroppable ? refDrop : undefined}
       onClick={() => handleSelected(card.id)}
       className={`center button-card-base card-number ${className} ${cardColor} ${cardSize} ${
-        isSelected ? "border-2 border-rose-600 shadow-md shadow-rose-600" : "border border-zinc-500"
-      } ${isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80"}`}
+        isSelected ? "border border-rose-600 shadow-md shadow-rose-600 hover:ring-rose-600" : "border border-zinc-500"
+      } ${isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80"} ${
+        belongsTo !== "opponent" && "hover:ring-2 hover:ring-amber-300/80"
+      }`}
     >
       {isRevealed ? number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
     </button>
