@@ -12,7 +12,7 @@ public sealed partial class Player : Entity
     [Replicated(OnRep = nameof(OnRep_Cards))]
     public Card[]? Cards { get; set; }
 
-    [Replicated] public byte CurrentScore { get; set; }
+    [Replicated] public short CurrentScore { get; set; }
     [Replicated] public byte TotalScore { get; set; }
 
     [Replicated] public bool IsCurrentPlayer { get; set; }
@@ -84,6 +84,6 @@ public sealed partial class Player : Entity
 
     public void UpdateScore()
     {
-        CurrentScore = (byte)Cards!.Where(x => x.IsRevealed).Sum(x => x.Number);
+        CurrentScore = (short)Cards!.Where(x => x.IsRevealed).Sum(x => x.Number);
     }
 }

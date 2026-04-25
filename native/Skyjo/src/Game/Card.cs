@@ -6,7 +6,7 @@ namespace Skyjo.Game;
 
 public sealed partial class Card : Entity
 {
-    [Replicated] public int Number { get; set; }
+    [Replicated] public sbyte Number { get; set; }
     [Replicated] public bool IsRevealed { get; set; }
     [Replicated] public Player Player { get; set; } = null!;
     [Replicated] public bool IsSelected { get; set; }

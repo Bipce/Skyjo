@@ -68,7 +68,7 @@ public sealed partial class GameManager : Entity
         if (_players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
             return;
 
-        var data = new List<int>(NumberOfCards);
+        var data = new List<sbyte>(NumberOfCards);
         for (var i = 0; i < NumberOfMinosTwoCards; i++)
             data.Add(-2);
         for (var i = 0; i < NumberOfZeroCards; i++)
@@ -80,7 +80,7 @@ public sealed partial class GameManager : Entity
                 continue;
 
             for (var j = 0; j < NumberOfOtherCards; j++)
-                data.Add(i);
+                data.Add((sbyte)i);
         }
 
         _drawPile = new Stack<CardData>(data.Shuffle().Select(x => new CardData { Number = x }));
