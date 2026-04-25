@@ -14,7 +14,6 @@ public sealed partial class GameManager : Entity
     private const int NumberOfOtherCards = 10;
 
     private Stack<CardData> _drawPile = null!;
-    private readonly Stack<CardData> _discardPile = [];
 
     private KeyboardState _keyboard;
     private KeyboardState _lastKeyboard;
@@ -25,14 +24,19 @@ public sealed partial class GameManager : Entity
     [Replicated(OnRep = nameof(OnRep_DiscardedCard))]
     private Card _discardedCard = null!;
 
-    [Replicated] private bool _gameHasStarted;
+    private bool _gameHasStarted;
+    private bool _needToRevealCard;
 
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
 
+    private Player[] _players = null!;
+    private Player _currentPlayer = null!;
+    private int _currentPlayerIndex;
+
     protected override void OnSpawned()
     {
-        GameView.View.BindFunction<ushort>("selectCard", Server_SelectCard);
-        GameView.View.BindFunction<ushort, ushort>("dropCard", Server_DropCard);
+        GameView.View.BindFunction<ushort, ushort>("selectCard", Server_SelectCard);
+        GameView.View.BindFunction<ushort, ushort, ushort>("dropCard", Server_DropCard);
 
         if (HasAuthority)
         {
@@ -59,8 +63,8 @@ public sealed partial class GameManager : Entity
 
     private void StartGame()
     {
-        var players = NetworkManager.GetEntities<Player>().ToArray();
-        if (players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
+        _players = NetworkManager.GetEntities<Player>().ToArray();
+        if (_players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
             return;
 
         var data = new List<int>(NumberOfCards);
@@ -81,16 +85,15 @@ public sealed partial class GameManager : Entity
         var cards = data.Shuffle().ToArray();
 
         _drawPile = new Stack<CardData>(cards.Select(x => new CardData { Number = x }));
-        _discardPile.Push(_drawPile.Pop());
 
         _drawnCard.Number = _drawPile.Peek().Number;
         _drawnCard.UpdateView();
 
-        _discardedCard.Number = _discardPile.Peek().Number;
+        _discardedCard.Number = _drawPile.Pop().Number;
         _discardedCard.IsRevealed = true;
         _discardedCard.UpdateView();
 
-        foreach (var player in players)
+        foreach (var player in _players)
         {
             var newCards = GetPlayerCards();
             for (var i = 0; i < player.Cards!.Length; i++)
@@ -106,13 +109,13 @@ public sealed partial class GameManager : Entity
             player.CurrentScore = (byte)player.Cards.Where(x => x.IsRevealed).Sum(x => x.Number);
         }
 
-        var maxScore = players.Max(x => x.CurrentScore);
-        var playersWithHighScore = players.Where(x => x.CurrentScore == maxScore);
-        var randomPlayer = playersWithHighScore.OrderBy(_ => Random.Shared.Next()).First();
-        randomPlayer.IsCurrentPlayer = true;
+        var maxScore = _players.Max(x => x.CurrentScore);
+        var playersWithHighScore = _players.Where(x => x.CurrentScore == maxScore);
+        _currentPlayer = playersWithHighScore.OrderBy(_ => Random.Shared.Next()).First();
+        _currentPlayer.IsCurrentPlayer = true;
+        _currentPlayerIndex = _players.IndexOf(_currentPlayer);
 
-        foreach (var player in players)
-            player.UpdateView();
+        UpdatePlayersView();
 
         _gameHasStarted = true;
     }
@@ -137,40 +140,90 @@ public sealed partial class GameManager : Entity
     }
 
     [Server]
-    private void Server_SelectCard(ushort cardId)
+    private void Server_SelectCard(ushort playerId, ushort cardId)
     {
-        var cardEntity = NetworkManager.GetEntity<Card>(cardId);
-        var cardType = (CardType)cardEntity.CardType;
+        var card = NetworkManager.GetEntity<Card>(cardId);
+        var cardType = (CardType)card.CardType;
 
         if (!_gameHasStarted && cardType == CardType.Player)
         {
-            if (!cardEntity.IsSelected)
+            if (!card.IsSelected)
             {
-                if (cardEntity.Player.Cards!.Count(x => x.IsSelected) == 2)
+                if (card.Player.Cards!.Count(x => x.IsSelected) == 2)
                     return;
             }
 
-            cardEntity.IsSelected = !cardEntity.IsSelected;
-            cardEntity.UpdateView();
+            card.IsSelected = !card.IsSelected;
+            card.UpdateView();
             return;
         }
 
-        if (_gameHasStarted && cardType == CardType.Draw)
+        if (_gameHasStarted)
         {
-            cardEntity.IsRevealed = true;
-            cardEntity.UpdateView();
+            var player = NetworkManager.GetEntity<Player>(playerId);
+            if (player != _currentPlayer)
+                return;
+
+            if (!_needToRevealCard && cardType == CardType.Draw)
+            {
+                card.IsRevealed = true;
+                card.UpdateView();
+            }
+            else if (_needToRevealCard && cardType == CardType.Player && !card.IsRevealed)
+            {
+                card.IsRevealed = true;
+                card.UpdateView();
+                _needToRevealCard = false;
+                NextPlayer();
+            }
         }
     }
 
     [Server]
-    private void Server_DropCard(ushort sourceId, ushort targetId)
+    private void Server_DropCard(ushort playerId, ushort sourceId, ushort targetId)
     {
+        var player = NetworkManager.GetEntity<Player>(playerId);
+        if (!player.IsCurrentPlayer || _needToRevealCard)
+            return;
+
         var sourceCard = NetworkManager.GetEntity<Card>(sourceId);
         var targetCard = NetworkManager.GetEntity<Card>(targetId);
 
         (sourceCard.Number, targetCard.Number) = (targetCard.Number, sourceCard.Number);
         targetCard.IsRevealed = true;
+
+        if (sourceCard.CardType == (int)CardType.Draw)
+        {
+            sourceCard.IsRevealed = false;
+            sourceCard.Number = _drawPile.Pop().Number;
+        }
+
         sourceCard.UpdateView();
         targetCard.UpdateView();
+
+        if (sourceCard.CardType == (int)CardType.Draw && targetCard.CardType == (int)CardType.Discard)
+        {
+            _needToRevealCard = true;
+            return;
+        }
+
+        NextPlayer();
+    }
+
+    private void NextPlayer()
+    {
+        _currentPlayer.IsCurrentPlayer = false;
+        _currentPlayerIndex++;
+        if (_currentPlayerIndex == _players.Length)
+            _currentPlayerIndex = 0;
+        _currentPlayer = _players[_currentPlayerIndex];
+        _currentPlayer.IsCurrentPlayer = true;
+        UpdatePlayersView();
+    }
+
+    private void UpdatePlayersView()
+    {
+        foreach (var player in _players)
+            player.UpdateView();
     }
 }
