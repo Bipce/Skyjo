@@ -10,7 +10,7 @@ public sealed partial class Player : Entity
     [Replicated] public string Username { get; set; } = null!;
 
     [Replicated(OnRep = nameof(OnRep_Cards))]
-    public Card[]? Cards { get; private set; }
+    public Card[]? Cards { get; set; }
 
     [Replicated] public byte CurrentScore { get; set; }
     [Replicated] public byte TotalScore { get; set; }
@@ -51,7 +51,12 @@ public sealed partial class Player : Entity
 
     private void OnRep_Cards()
     {
-        GameView.AddPlayer(Data);
+        _gameManager = NetworkManager.GetEntity<GameManager>();
+
+        if (!_gameManager.GameHasStarted)
+        {
+            GameView.AddPlayer(Data);
+        }
     }
 
     public PlayerData Data =>

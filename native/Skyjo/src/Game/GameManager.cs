@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Xna.Framework.Input;
 using Skyjo.Enums;
 using Skyjo.Network;
 using Skyjo.Network.Attributes;
@@ -24,7 +25,7 @@ public sealed partial class GameManager : Entity
     [Replicated(OnRep = nameof(OnRep_DiscardedCard))]
     private Card _discardedCard = null!;
 
-    private bool _gameHasStarted;
+    [Replicated] public bool GameHasStarted { get; private set; }
     private bool _needToRevealCard;
 
     private bool IsKeyJustPressed(Keys key) => _keyboard.IsKeyDown(key) && _lastKeyboard.IsKeyUp(key);
@@ -115,7 +116,7 @@ public sealed partial class GameManager : Entity
 
         UpdatePlayersView();
 
-        _gameHasStarted = true;
+        GameHasStarted = true;
     }
 
     private void OnRep_DrawnCard()
@@ -143,7 +144,7 @@ public sealed partial class GameManager : Entity
         var card = NetworkManager.GetEntity<Card>(cardId);
         var cardType = (CardType)card.CardType;
 
-        if (!_gameHasStarted && cardType == CardType.Player)
+        if (!GameHasStarted && cardType == CardType.Player)
         {
             if (!card.IsSelected)
             {
@@ -156,7 +157,7 @@ public sealed partial class GameManager : Entity
             return;
         }
 
-        if (_gameHasStarted)
+        if (GameHasStarted)
         {
             var player = NetworkManager.GetEntity<Player>(playerId);
             if (player != _currentPlayer)
@@ -173,6 +174,7 @@ public sealed partial class GameManager : Entity
                 card.UpdateView();
                 _needToRevealCard = false;
                 player.UpdateScore();
+                CheckCardsSameColumn();
                 NextPlayer();
             }
         }
@@ -207,7 +209,21 @@ public sealed partial class GameManager : Entity
             return;
         }
 
+        CheckCardsSameColumn();
         NextPlayer();
+    }
+
+    private void CheckCardsSameColumn()
+    {
+        if (IsCardsSameColumn(out var cards))
+        {
+            foreach (var card in cards)
+            {
+                card.Destroy();
+            }
+
+            _currentPlayer.Cards = _currentPlayer.Cards!.Where(x => !x.IsPendingDestroy).ToArray();
+        }
     }
 
     private void NextPlayer()
@@ -225,5 +241,27 @@ public sealed partial class GameManager : Entity
     {
         foreach (var player in _players)
             player.UpdateView();
+    }
+
+    private bool IsCardsSameColumn([NotNullWhen(true)] out Card[]? cards)
+    {
+        var increment = _currentPlayer.Cards!.Length / 3;
+        var currentCards = _currentPlayer.Cards;
+
+        for (var i = 0; i < increment; i++)
+        {
+            if (!currentCards[i].IsRevealed || !currentCards[i + increment].IsRevealed ||
+                !currentCards[i + increment * 2].IsRevealed)
+                continue;
+            if (currentCards[i].Number == currentCards[i + increment].Number &&
+                currentCards[i].Number == currentCards[i + increment * 2].Number)
+            {
+                cards = [currentCards[i], currentCards[i + increment], currentCards[i + increment * 2]];
+                return true;
+            }
+        }
+
+        cards = null;
+        return false;
     }
 }
