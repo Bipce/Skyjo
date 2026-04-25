@@ -223,6 +223,7 @@ public sealed partial class GameManager : Entity
             }
 
             _currentPlayer.Cards = _currentPlayer.Cards!.Where(x => !x.IsPendingDestroy).ToArray();
+            _currentPlayer.UpdateScore();
         }
     }
 
