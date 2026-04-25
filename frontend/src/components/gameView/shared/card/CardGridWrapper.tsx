@@ -8,15 +8,12 @@ interface Props {
 }
 
 const CardGridWrapper = ({ cards, belongsTo, className }: Props) => {
+  const nbrOfColumns = cards.length / 3;
+
   return (
-    <div className={`grid grid-cols-4 ${className}`}>
+    <div className={`grid grid-cols-${nbrOfColumns} ${className}`}>
       {cards.map(card => (
-        <Card
-          key={card.id}
-          card={card}
-          belongsTo={belongsTo}
-          isDroppable={belongsTo === "player"}
-        />
+        <Card key={card.id} card={card} belongsTo={belongsTo} isDroppable={belongsTo === "player"} />
       ))}
     </div>
   );
