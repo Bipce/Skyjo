@@ -1,5 +1,6 @@
 import type { CardBelongToType, CardData } from "../../../../interfaces/CardData.ts";
 import { useGameStore } from "../../../../store/gameStore.ts";
+import { useShallow } from "zustand/react/shallow";
 import { useDraggable, useDroppable } from "@dnd-kit/react";
 import { useDragActive } from "../../../../hooks/useDragActive.ts";
 
@@ -13,11 +14,18 @@ interface Props {
 
 const Card = ({ card, belongsTo, className, isDraggable = false, isDroppable = false }: Props) => {
   const { number, isRevealed, isSelected } = card;
-  const selectCard = useGameStore(s => s.selectCard);
+  const { selectCard, isCurrentPlayer, hasGameStarted } = useGameStore(
+    useShallow(s => ({
+      selectCard: s.selectCard,
+      isCurrentPlayer: s.player?.isCurrentPlayer,
+      hasGameStarted: s.players.some(player => player.isCurrentPlayer === true),
+    })),
+  );
+
   const isDragActive = useDragActive();
 
-  const { ref: refDrag, isDragSource } = useDraggable({ id: card.id, disabled: !isDraggable });
-  const { ref: refDrop, isDropTarget } = useDroppable({ id: card.id, disabled: !isDroppable });
+  const { ref: refDrag, isDragSource } = useDraggable({ id: card.id, disabled: !isDraggable || !isCurrentPlayer });
+  const { ref: refDrop, isDropTarget } = useDroppable({ id: card.id, disabled: !isDroppable || !isCurrentPlayer });
 
   const getCardColor = (): string => {
     if (isRevealed) {
@@ -56,7 +64,8 @@ const Card = ({ card, belongsTo, className, isDraggable = false, isDroppable = f
       className={`center button-card-base card-number ${className} ${cardColor} ${cardSize} ${
         isSelected ? "border border-rose-600 shadow-md shadow-rose-600 hover:ring-rose-600" : "border border-zinc-500"
       } ${isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80"} ${
-        belongsTo !== "opponent" && "hover:ring-2 hover:ring-amber-300/80"
+        ((!hasGameStarted && belongsTo !== "opponent") || (isCurrentPlayer && belongsTo !== "opponent")) &&
+        "hover:ring-2 hover:ring-amber-300/80"
       }`}
     >
       {isRevealed ? number : <span className="-rotate-45 tracking-widest text-zinc-100">SKYJO</span>}
