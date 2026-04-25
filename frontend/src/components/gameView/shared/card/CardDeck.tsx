@@ -14,6 +14,7 @@ const CardDeck = ({ drawnCard, discardedCard }: Props) => {
         isDroppable={drawnCard.isRevealed}
         card={discardedCard}
         belongsTo="deck"
+        isDiscarded
       />
       <Card isDraggable={drawnCard.isRevealed} card={drawnCard} belongsTo="deck" />
     </section>
