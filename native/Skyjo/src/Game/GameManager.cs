@@ -82,9 +82,7 @@ public sealed partial class GameManager : Entity
                 data.Add(i);
         }
 
-        var cards = data.Shuffle().ToArray();
-
-        _drawPile = new Stack<CardData>(cards.Select(x => new CardData { Number = x }));
+        _drawPile = new Stack<CardData>(data.Shuffle().Select(x => new CardData { Number = x }));
 
         _drawnCard.Number = _drawPile.Peek().Number;
         _drawnCard.UpdateView();
