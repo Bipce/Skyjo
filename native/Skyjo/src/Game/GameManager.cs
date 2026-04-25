@@ -190,6 +190,7 @@ public sealed partial class GameManager : Entity
         var sourceCard = NetworkManager.GetEntity<Card>(sourceId);
         var targetCard = NetworkManager.GetEntity<Card>(targetId);
 
+        var lastTargetNumber = targetCard.Number;
         (sourceCard.Number, targetCard.Number) = (targetCard.Number, sourceCard.Number);
         targetCard.IsRevealed = true;
 
@@ -197,6 +198,12 @@ public sealed partial class GameManager : Entity
         {
             sourceCard.IsRevealed = false;
             sourceCard.Number = _drawPile.Pop().Number;
+
+            if (targetCard.CardType == (int)CardType.Player)
+            {
+                _discardedCard.Number = lastTargetNumber;
+                _discardedCard.UpdateView();
+            }
         }
 
         player.UpdateScore();
@@ -224,6 +231,8 @@ public sealed partial class GameManager : Entity
 
             _currentPlayer.Cards = _currentPlayer.Cards!.Where(x => !x.IsPendingDestroy).ToArray();
             _currentPlayer.UpdateScore();
+            _discardedCard.Number = cards.First().Number;
+            _discardedCard.UpdateView();
         }
     }
 
