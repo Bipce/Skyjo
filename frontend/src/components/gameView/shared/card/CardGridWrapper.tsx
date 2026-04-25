@@ -11,7 +11,12 @@ const CardGridWrapper = ({ cards, belongsTo, className }: Props) => {
   const nbrOfColumns = cards.length / 3;
 
   return (
-    <div className={`grid grid-cols-${nbrOfColumns} ${className}`}>
+    <div
+      className={`grid ${className}`}
+      style={{
+        gridTemplateColumns: `repeat(${nbrOfColumns}, ${belongsTo === "opponent" ? "45px" : "80px"})`,
+      }}
+    >
       {cards.map(card => (
         <Card key={card.id} card={card} belongsTo={belongsTo} isDroppable={belongsTo === "player"} />
       ))}
