@@ -85,7 +85,7 @@ public sealed partial class GameManager : Entity
 
         _drawPile = new Stack<CardData>(data.Shuffle().Select(x => new CardData { Number = x }));
 
-        _drawnCard.Number = _drawPile.Peek().Number;
+        _drawnCard.Number = _drawPile.Pop().Number;
         _drawnCard.UpdateView();
 
         _discardedCard.Number = _drawPile.Pop().Number;
@@ -189,33 +189,33 @@ public sealed partial class GameManager : Entity
 
         var sourceCard = NetworkManager.GetEntity<Card>(sourceId);
         var targetCard = NetworkManager.GetEntity<Card>(targetId);
-
+        
         var lastTargetNumber = targetCard.Number;
         (sourceCard.Number, targetCard.Number) = (targetCard.Number, sourceCard.Number);
         targetCard.IsRevealed = true;
-
+        
         if (sourceCard.CardType == (int)CardType.Draw)
         {
             sourceCard.IsRevealed = false;
             sourceCard.Number = _drawPile.Pop().Number;
-
+        
             if (targetCard.CardType == (int)CardType.Player)
             {
                 _discardedCard.Number = lastTargetNumber;
                 _discardedCard.UpdateView();
             }
         }
-
+        
         player.UpdateScore();
         sourceCard.UpdateView();
         targetCard.UpdateView();
-
+        
         if (sourceCard.CardType == (int)CardType.Draw && targetCard.CardType == (int)CardType.Discard)
         {
             _needToRevealCard = true;
             return;
         }
-
+        
         CheckCardsSameColumn();
         NextPlayer();
     }
