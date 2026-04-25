@@ -168,6 +168,19 @@ public sealed partial class GameManager : Entity
                 card.IsRevealed = true;
                 card.UpdateView();
             }
+            else if (!_needToRevealCard && cardType == CardType.Player && !card.IsRevealed && _drawnCard.IsRevealed)
+            {
+                _discardedCard.Number = _drawnCard.Number;
+                _discardedCard.UpdateView();
+                _drawnCard.IsRevealed = false;
+                _drawnCard.Number = _drawPile.Pop().Number;
+                _drawnCard.UpdateView();
+                card.IsRevealed = true;
+                card.UpdateView();
+                player.UpdateScore();
+                CheckCardsSameColumn();
+                NextPlayer();
+            }
             else if (_needToRevealCard && cardType == CardType.Player && !card.IsRevealed)
             {
                 card.IsRevealed = true;
@@ -189,33 +202,33 @@ public sealed partial class GameManager : Entity
 
         var sourceCard = NetworkManager.GetEntity<Card>(sourceId);
         var targetCard = NetworkManager.GetEntity<Card>(targetId);
-        
+
         var lastTargetNumber = targetCard.Number;
         (sourceCard.Number, targetCard.Number) = (targetCard.Number, sourceCard.Number);
         targetCard.IsRevealed = true;
-        
+
         if (sourceCard.CardType == (int)CardType.Draw)
         {
             sourceCard.IsRevealed = false;
             sourceCard.Number = _drawPile.Pop().Number;
-        
+
             if (targetCard.CardType == (int)CardType.Player)
             {
                 _discardedCard.Number = lastTargetNumber;
                 _discardedCard.UpdateView();
             }
         }
-        
+
         player.UpdateScore();
         sourceCard.UpdateView();
         targetCard.UpdateView();
-        
+
         if (sourceCard.CardType == (int)CardType.Draw && targetCard.CardType == (int)CardType.Discard)
         {
             _needToRevealCard = true;
             return;
         }
-        
+
         CheckCardsSameColumn();
         NextPlayer();
     }
