@@ -20,10 +20,11 @@ interface GameCallbacks {
 
 interface GameCommands {
   selectCard: (id: number) => void;
+  dropCard: (sourceId: number, targetId: number) => void;
   startNetwork: () => void;
 }
 
-export const useGameStore = create<GameState & GameCallbacks & GameCommands>(set => ({
+export const useGameStore = create<GameState & GameCallbacks & GameCommands>((set, get) => ({
   players: [],
   player: null,
   drawnCard: null,
@@ -52,7 +53,16 @@ export const useGameStore = create<GameState & GameCallbacks & GameCommands>(set
   updateDiscardedCard: card => set({ discardedCard: card }),
 
   selectCard: cardId => {
-    window.selectCard(cardId);
+    const player = get().player;
+    if (!player) return null;
+
+    window.selectCard(player.id, cardId);
+  },
+
+  dropCard: (sourceId, targetId) => {
+    const player = get().player;
+    if (!player) return null;
+    window.dropCard(player.id, sourceId, targetId);
   },
 
   startNetwork: () => {

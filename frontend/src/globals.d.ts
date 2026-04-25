@@ -7,7 +7,8 @@ declare global {
     addPlayer: (player: PlayerData) => void;
     removePlayer: (id: number) => void;
     updatePlayer: (id: number, data: PlayerData) => void;
-    selectCard: (id: number) => void;
+    selectCard: (playerId: number, id: number) => void;
+    dropCard: (playerId: number, sourceId: number, targetId: number) => void;
     updateDrawnCard: (card: CardData) => void;
     updateDiscardedCard: (card: CardData) => void;
   }

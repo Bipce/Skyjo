@@ -16,12 +16,13 @@ const SENSORS = [
 ];
 
 const GameView = () => {
-  const { players, player, drawnCard, discardedCard } = useGameStore(
+  const { players, player, drawnCard, discardedCard, dropCard } = useGameStore(
     useShallow(s => ({
       players: s.players,
       player: s.player,
       drawnCard: s.drawnCard,
       discardedCard: s.discardedCard,
+      dropCard: s.dropCard,
     })),
   );
 
@@ -33,7 +34,7 @@ const GameView = () => {
 
         const sourceCardId = Number(event.operation.source?.id);
         const targetCardId = Number(event.operation.target.id);
-        // window.dropCard(sourceCardId, targetCardId);
+        dropCard(sourceCardId, targetCardId);
       }}
     >
       <main className="grid min-h-screen place-items-center py-10">
