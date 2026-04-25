@@ -76,4 +76,9 @@ public sealed partial class Player : Entity
         _updateViewCount++;
         OnRep_UpdateValue();
     }
+
+    public void UpdateScore()
+    {
+        CurrentScore = (byte)Cards!.Where(x => x.IsRevealed).Sum(x => x.Number);
+    }
 }

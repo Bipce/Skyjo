@@ -106,7 +106,7 @@ public sealed partial class GameManager : Entity
                 }
             }
 
-            player.CurrentScore = (byte)player.Cards.Where(x => x.IsRevealed).Sum(x => x.Number);
+            player.UpdateScore();
         }
 
         var maxScore = _players.Max(x => x.CurrentScore);
@@ -174,6 +174,7 @@ public sealed partial class GameManager : Entity
                 card.IsRevealed = true;
                 card.UpdateView();
                 _needToRevealCard = false;
+                player.UpdateScore();
                 NextPlayer();
             }
         }
@@ -198,6 +199,7 @@ public sealed partial class GameManager : Entity
             sourceCard.Number = _drawPile.Pop().Number;
         }
 
+        player.UpdateScore();
         sourceCard.UpdateView();
         targetCard.UpdateView();
 
