@@ -76,6 +76,8 @@ public sealed partial class GameManager : Entity
 
         foreach (var player in _players)
         {
+            GivePlayerCards(player);
+
             foreach (var card in player.Cards!)
             {
                 card.IsRevealed = false;
@@ -159,6 +161,27 @@ public sealed partial class GameManager : Entity
         GameHasStarted = true;
     }
 
+    private void GivePlayerCards(Player player)
+    {
+        var data = player.Cards!.ToList();
+        var delta = 12 - data.Count;
+        for (var i = 0; i < delta; i++)
+        {
+            var card = new Card
+            {
+                Owner = Owner,
+                Player = player,
+                CardType = (int)CardType.Player
+            };
+
+            card.Spawn();
+            data.Add(card);
+        }
+
+        if (delta > 0)
+            player.Cards = data.ToArray();
+    }
+
     private void OnRep_DrawnCard()
     {
         GameView.UpdateDrawnCard(_drawnCard.Data);
@@ -221,7 +244,7 @@ public sealed partial class GameManager : Entity
                 card.IsRevealed = true;
                 card.UpdateView();
                 player.UpdateScore();
-                CheckCardsSameColumn();
+                CheckCardsSameColumn(_currentPlayer);
                 NextPlayer();
             }
             else if (_needToRevealCard && cardType == CardType.Player && !card.IsRevealed)
@@ -230,7 +253,7 @@ public sealed partial class GameManager : Entity
                 card.UpdateView();
                 _needToRevealCard = false;
                 player.UpdateScore();
-                CheckCardsSameColumn();
+                CheckCardsSameColumn(_currentPlayer);
                 NextPlayer();
             }
         }
@@ -275,21 +298,21 @@ public sealed partial class GameManager : Entity
             return;
         }
 
-        CheckCardsSameColumn();
+        CheckCardsSameColumn(_currentPlayer);
         NextPlayer();
     }
 
-    private void CheckCardsSameColumn()
+    private void CheckCardsSameColumn(Player player)
     {
-        if (IsCardsSameColumn(out var cards))
+        if (IsCardsSameColumn(player, out var cards))
         {
             foreach (var card in cards)
             {
                 card.Destroy();
             }
 
-            _currentPlayer.Cards = _currentPlayer.Cards!.Where(x => !x.IsPendingDestroy).ToArray();
-            _currentPlayer.UpdateScore();
+            player.Cards = player.Cards!.Where(x => !x.IsPendingDestroy).ToArray();
+            player.UpdateScore();
             _discardedCard.Number = cards.First().Number;
             _discardedCard.UpdateView();
         }
@@ -325,17 +348,27 @@ public sealed partial class GameManager : Entity
                 {
                     card.IsRevealed = true;
                     card.IsSelected = true; // todo: IsHighlighted
+                    CheckCardsSameColumn(player);
                 }
             }
 
             player.UpdateScore();
         }
 
-        var minScore = _players.Min(x => x.CurrentScore);
-        var playerMinScore = _players.SingleOrDefault(x => x.CurrentScore == minScore);
-        if (_endGamePlayer != playerMinScore)
+        Player? playerMinScore = null;
+        try
         {
-            _endGamePlayer.TotalScore += (byte)_endGamePlayer.CurrentScore;
+            var minScore = _players.Min(x => x.CurrentScore);
+            playerMinScore = _players.SingleOrDefault(x => x.CurrentScore == minScore);
+        }
+        catch
+        {
+            // ignored
+        }
+        finally
+        {
+            if (_endGamePlayer != playerMinScore)
+                _endGamePlayer.TotalScore += (byte)_endGamePlayer.CurrentScore;
         }
 
         foreach (var player in _players)
@@ -353,10 +386,10 @@ public sealed partial class GameManager : Entity
             player.UpdateView();
     }
 
-    private bool IsCardsSameColumn([NotNullWhen(true)] out Card[]? cards)
+    private bool IsCardsSameColumn(Player player, [NotNullWhen(true)] out Card[]? cards)
     {
-        var increment = _currentPlayer.Cards!.Length / 3;
-        var currentCards = _currentPlayer.Cards;
+        var increment = player.Cards!.Length / 3;
+        var currentCards = player.Cards;
 
         for (var i = 0; i < increment; i++)
         {
