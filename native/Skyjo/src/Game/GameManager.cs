@@ -34,6 +34,9 @@ public sealed partial class GameManager : Entity
     private Player _currentPlayer = null!;
     private int _currentPlayerIndex;
 
+    private Player? _endGamePlayer;
+    private bool _isGameEnded;
+
     protected override void OnSpawned()
     {
         GameView.View.BindFunction<ushort, ushort>("selectCard", Server_SelectCard);
@@ -62,8 +65,45 @@ public sealed partial class GameManager : Entity
         }
     }
 
+    private void Reset()
+    {
+        _drawnCard.IsRevealed = false;
+        _drawnCard.UpdateView();
+        _discardedCard.IsRevealed = false;
+        _discardedCard.UpdateView();
+
+        var needResetTotalScore = _players.Any(x => x.TotalScore >= 100);
+
+        foreach (var player in _players)
+        {
+            foreach (var card in player.Cards!)
+            {
+                card.IsRevealed = false;
+                card.IsSelected = false; // todo: IsHighlighted
+            }
+
+            if (needResetTotalScore)
+                player.TotalScore = 0;
+
+            player.UpdateScore();
+            player.UpdateView();
+        }
+
+        GameHasStarted = false;
+        _isGameEnded = false;
+    }
+
     private void StartGame()
     {
+        if (_isGameEnded)
+        {
+            Reset();
+            return;
+        }
+
+        if (GameHasStarted)
+            return;
+
         _players = NetworkManager.GetEntities<Player>().ToArray();
         if (_players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
             return;
@@ -141,6 +181,9 @@ public sealed partial class GameManager : Entity
     [Server]
     private void Server_SelectCard(ushort playerId, ushort cardId)
     {
+        if (_isGameEnded)
+            return;
+
         var card = NetworkManager.GetEntity<Card>(cardId);
         var cardType = (CardType)card.CardType;
 
@@ -196,6 +239,9 @@ public sealed partial class GameManager : Entity
     [Server]
     private void Server_DropCard(ushort playerId, ushort sourceId, ushort targetId)
     {
+        if (_isGameEnded)
+            return;
+
         var player = NetworkManager.GetEntity<Player>(playerId);
         if (!player.IsCurrentPlayer || _needToRevealCard)
             return;
@@ -251,13 +297,54 @@ public sealed partial class GameManager : Entity
 
     private void NextPlayer()
     {
+        if (!_endGamePlayer && _currentPlayer.Cards!.All(x => x.IsRevealed))
+            _endGamePlayer = _currentPlayer;
+
         _currentPlayer.IsCurrentPlayer = false;
         _currentPlayerIndex++;
         if (_currentPlayerIndex == _players.Length)
             _currentPlayerIndex = 0;
         _currentPlayer = _players[_currentPlayerIndex];
         _currentPlayer.IsCurrentPlayer = true;
+
+        CheckEndGame();
         UpdatePlayersView();
+    }
+
+    private void CheckEndGame()
+    {
+        if (_currentPlayer != _endGamePlayer)
+            return;
+
+        _currentPlayer.IsCurrentPlayer = false;
+        foreach (var player in _players)
+        {
+            foreach (var card in player.Cards!)
+            {
+                if (!card.IsRevealed)
+                {
+                    card.IsRevealed = true;
+                    card.IsSelected = true; // todo: IsHighlighted
+                }
+            }
+
+            player.UpdateScore();
+        }
+
+        var minScore = _players.Min(x => x.CurrentScore);
+        var playerMinScore = _players.SingleOrDefault(x => x.CurrentScore == minScore);
+        if (_endGamePlayer != playerMinScore)
+        {
+            _endGamePlayer.TotalScore += (byte)_endGamePlayer.CurrentScore;
+        }
+
+        foreach (var player in _players)
+        {
+            player.TotalScore += (byte)player.CurrentScore;
+        }
+
+        _isGameEnded = true;
+        _endGamePlayer = null;
     }
 
     private void UpdatePlayersView()
