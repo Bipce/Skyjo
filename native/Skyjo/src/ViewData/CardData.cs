@@ -10,6 +10,7 @@ public sealed class CardData : ViewData
     public sbyte Number { get; set; }
     public bool IsRevealed { get; set; }
     public bool IsSelected { get; set; }
+    public bool IsHighlighted { get; set; }
 
     public static CardData Empty => new();
 }

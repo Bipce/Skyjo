@@ -81,7 +81,7 @@ public sealed partial class GameManager : Entity
             foreach (var card in player.Cards!)
             {
                 card.IsRevealed = false;
-                card.IsSelected = false; // todo: IsHighlighted
+                card.IsHighlighted = false;
             }
 
             if (needResetTotalScore)
@@ -169,7 +169,7 @@ public sealed partial class GameManager : Entity
         {
             var card = new Card
             {
-                Owner = Owner,
+                Owner = player.Owner,
                 Player = player,
                 CardType = (int)CardType.Player
             };
@@ -242,6 +242,7 @@ public sealed partial class GameManager : Entity
                 _drawnCard.Number = _drawPile.Pop().Number;
                 _drawnCard.UpdateView();
                 card.IsRevealed = true;
+                card.IsHighlighted = true;
                 card.UpdateView();
                 player.UpdateScore();
                 CheckCardsSameColumn(_currentPlayer);
@@ -250,6 +251,7 @@ public sealed partial class GameManager : Entity
             else if (_needToRevealCard && cardType == CardType.Player && !card.IsRevealed)
             {
                 card.IsRevealed = true;
+                card.IsHighlighted = true;
                 card.UpdateView();
                 _needToRevealCard = false;
                 player.UpdateScore();
@@ -287,6 +289,8 @@ public sealed partial class GameManager : Entity
                 _discardedCard.UpdateView();
             }
         }
+
+        targetCard.IsHighlighted = true;
 
         player.UpdateScore();
         sourceCard.UpdateView();
@@ -330,6 +334,9 @@ public sealed partial class GameManager : Entity
         _currentPlayer = _players[_currentPlayerIndex];
         _currentPlayer.IsCurrentPlayer = true;
 
+        foreach (var cards in _currentPlayer.Cards!)
+            cards.IsHighlighted = false;
+
         CheckEndGame();
         UpdatePlayersView();
     }
@@ -347,7 +354,7 @@ public sealed partial class GameManager : Entity
                 if (!card.IsRevealed)
                 {
                     card.IsRevealed = true;
-                    card.IsSelected = true; // todo: IsHighlighted
+                    card.IsHighlighted = true;
                     CheckCardsSameColumn(player);
                 }
             }

@@ -10,6 +10,7 @@ public sealed partial class Card : Entity
     [Replicated] public bool IsRevealed { get; set; }
     [Replicated] public Player Player { get; set; } = null!;
     [Replicated] public bool IsSelected { get; set; }
+    [Replicated] public bool IsHighlighted { get; set; }
 
     // ReSharper disable once NotAccessedField.Local
     [Replicated(OnRep = nameof(OnRep_UpdateValue))]
@@ -24,6 +25,7 @@ public sealed partial class Card : Entity
             Number = Number,
             IsRevealed = IsRevealed,
             IsSelected = IsSelected,
+            IsHighlighted = IsHighlighted
         };
 
     private void OnRep_UpdateValue()
