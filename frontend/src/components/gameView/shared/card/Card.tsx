@@ -60,9 +60,26 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
     if (belongsTo === "deck" && !isRevealed) selectCard(cardId);
   };
 
-  const isDrawnCardRevealed = drawnCard?.isRevealed ?? false;
-  const canHover =
-    belongsTo !== "opponent" && (!hasGameStarted || isCurrentPlayer) && !(isDiscarded && isDrawnCardRevealed);
+  const hasDrawn = drawnCard?.isRevealed ?? false;
+
+  const canHover = (() => {
+    switch (belongsTo) {
+      case "player":
+        if (!hasGameStarted) return true;
+        if (!isDiscarded && hasDrawn) return true;
+        return isCurrentPlayer && hasDrawn;
+
+      case "deck":
+        if (!isCurrentPlayer) return false;
+        if (hasDrawn) {
+          if (!isDiscarded) return true;
+        }
+        return (isCurrentPlayer && !hasDrawn) || (hasDrawn && !drawnCard?.isRevealed);
+
+      default:
+        return false;
+    }
+  })();
 
   const buttonClass = clsx(
     "center button-card-base card-number",
