@@ -15,6 +15,7 @@ interface GameCallbacks {
   updatePlayer: (id: number, data: PlayerData) => void;
   updateDrawnCard: (card: CardData) => void;
   updateDiscardedCard: (card: CardData) => void;
+  hasGameStarted: () => boolean;
   bindWindowCallbacks: () => void;
 }
 
@@ -67,6 +68,11 @@ export const useGameStore = create<GameState & GameCallbacks & GameCommands>((se
 
   startNetwork: () => {
     window.startNetwork();
+  },
+
+  hasGameStarted: () => {
+    const players = get().players;
+    return players.some(player => player.isCurrentPlayer);
   },
 
   bindWindowCallbacks: () => {

@@ -15,12 +15,12 @@ interface Props {
 }
 
 const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, isDroppable = false }: Props) => {
-  const { number, isRevealed, isSelected } = card;
+  const { number, isRevealed, isSelected, isHighlighted } = card;
   const { selectCard, isCurrentPlayer, hasGameStarted, drawnCard } = useGameStore(
     useShallow(s => ({
       selectCard: s.selectCard,
       isCurrentPlayer: s.player?.isCurrentPlayer,
-      hasGameStarted: s.players.some(player => player.isCurrentPlayer === true),
+      hasGameStarted: s.hasGameStarted,
       drawnCard: s.drawnCard,
     })),
   );
@@ -70,6 +70,7 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
     cardColor,
     cardSize,
     isSelected ? "border border-rose-600 shadow-md shadow-rose-600 hover:ring-rose-600" : "border border-zinc-500",
+    isHighlighted && "ring-2 ring-zinc-200",
     isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80",
     canHover && "hover:ring-2 hover:ring-amber-300/80",
   );

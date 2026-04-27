@@ -3,6 +3,7 @@ export interface CardData {
   number: number;
   isRevealed: boolean;
   isSelected: boolean;
+  isHighlighted: boolean;
 }
 
 export type CardBelongToType = "player" | "opponent" | "deck";
