@@ -87,6 +87,8 @@ public sealed partial class GameManager : Entity
             if (needResetTotalScore)
                 player.TotalScore = 0;
 
+            player.HasDoublePoint = false;
+
             player.UpdateScore();
             player.UpdateView();
         }
@@ -362,6 +364,14 @@ public sealed partial class GameManager : Entity
             player.UpdateScore();
         }
 
+        UpdateTotalPlayersScore();
+
+        _isGameEnded = true;
+        _endGamePlayer = null;
+    }
+
+    private void UpdateTotalPlayersScore()
+    {
         Player? playerMinScore = null;
         try
         {
@@ -375,16 +385,16 @@ public sealed partial class GameManager : Entity
         finally
         {
             if (_endGamePlayer != playerMinScore)
-                _endGamePlayer.TotalScore += (byte)_endGamePlayer.CurrentScore;
+            {
+                _endGamePlayer!.TotalScore += (byte)_endGamePlayer.CurrentScore;
+                _endGamePlayer.HasDoublePoint = true;
+            }
         }
 
         foreach (var player in _players)
         {
             player.TotalScore += (byte)player.CurrentScore;
         }
-
-        _isGameEnded = true;
-        _endGamePlayer = null;
     }
 
     private void UpdatePlayersView()

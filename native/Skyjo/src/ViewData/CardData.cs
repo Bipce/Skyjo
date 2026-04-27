@@ -11,6 +11,7 @@ public sealed class CardData : ViewData
     public bool IsRevealed { get; set; }
     public bool IsSelected { get; set; }
     public bool IsHighlighted { get; set; }
+    public bool HasDoublePoint { get; set; }
 
     public static CardData Empty => new();
 }

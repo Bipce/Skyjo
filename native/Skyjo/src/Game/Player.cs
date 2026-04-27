@@ -21,6 +21,8 @@ public sealed partial class Player : Entity
     [Replicated(OnRep = nameof(OnRep_UpdateValue))]
     private int _updateViewCount;
 
+    [Replicated] public bool HasDoublePoint { get; set; }
+
     protected override void OnSpawned()
     {
         _gameManager = NetworkManager.GetEntity<GameManager>();
