@@ -7,6 +7,7 @@ interface GameState {
   player: PlayerData | null;
   drawnCard: CardData | null;
   discardedCard: CardData | null;
+  hasDiscardedDrawnCard: boolean;
 }
 
 interface GameCallbacks {
@@ -16,6 +17,7 @@ interface GameCallbacks {
   updateDrawnCard: (card: CardData) => void;
   updateDiscardedCard: (card: CardData) => void;
   hasGameStarted: () => boolean;
+  setHasDiscardedDrawnCard: (value: boolean) => void;
   bindWindowCallbacks: () => void;
 }
 
@@ -47,11 +49,14 @@ export const useGameStore = create<GameState & GameCallbacks & GameCommands>((se
       const players = [...state.players];
       const index = players.findIndex(p => p.id === id);
       players[index] = playerData;
-      return { players, player: playerData.isOwner ? playerData : state.player };
+      return { players, player: playerData.isOwner ? playerData : state.player, hasDiscardedDrawnCard: false };
     }),
 
   updateDrawnCard: card => set({ drawnCard: card }),
   updateDiscardedCard: card => set({ discardedCard: card }),
+
+  hasDiscardedDrawnCard: false,
+  setHasDiscardedDrawnCard: value => set({ hasDiscardedDrawnCard: value }),
 
   selectCard: cardId => {
     const player = get().player;

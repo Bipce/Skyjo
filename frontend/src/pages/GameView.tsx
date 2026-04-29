@@ -1,12 +1,12 @@
 import { useShallow } from "zustand/react/shallow";
 import { DragDropProvider, PointerSensor } from "@dnd-kit/react";
 import { PointerActivationConstraints } from "@dnd-kit/dom";
+import { useGameStore } from "../store/gameStore.ts";
 import OpponentsGrid from "../components/gameView/opponent/OpponentsGrid.tsx";
 import OpponentPanel from "../components/gameView/opponent/OpponentPanel.tsx";
 import CardDeck from "../components/gameView/shared/card/CardDeck.tsx";
 import PlayerPanel from "../components/gameView/player/PlayerPanel.tsx";
 import Overlay from "../components/ui/Overlay.tsx";
-import { useGameStore } from "../store/gameStore.ts";
 
 const SENSORS = [
   PointerSensor.configure({
@@ -16,13 +16,14 @@ const SENSORS = [
 ];
 
 const GameView = () => {
-  const { players, player, drawnCard, discardedCard, dropCard } = useGameStore(
+  const { players, player, drawnCard, discardedCard, dropCard, setHasDiscardedDrawnCard } = useGameStore(
     useShallow(s => ({
       players: s.players,
       player: s.player,
       drawnCard: s.drawnCard,
       discardedCard: s.discardedCard,
       dropCard: s.dropCard,
+      setHasDiscardedDrawnCard: s.setHasDiscardedDrawnCard,
     })),
   );
 
@@ -34,6 +35,9 @@ const GameView = () => {
 
         const sourceCardId = Number(event.operation.source?.id);
         const targetCardId = Number(event.operation.target.id);
+
+        if (drawnCard?.id === sourceCardId && discardedCard?.id === targetCardId) setHasDiscardedDrawnCard(true);
+
         dropCard(sourceCardId, targetCardId);
       }}
     >
