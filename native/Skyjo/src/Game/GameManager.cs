@@ -44,9 +44,9 @@ public sealed partial class GameManager : Entity
 
         if (HasAuthority)
         {
-            _drawnCard = new Card { CardType = (int)CardType.Draw };
+            _drawnCard = new Card { Type = (int)CardType.Draw };
             _drawnCard.Spawn();
-            _discardedCard = new Card { CardType = (int)CardType.Discard };
+            _discardedCard = new Card { Type = (int)CardType.Discard };
             _discardedCard.Spawn();
 
             OnRep_DrawnCard();
@@ -173,7 +173,7 @@ public sealed partial class GameManager : Entity
             {
                 Owner = player.Owner,
                 Player = player,
-                CardType = (int)CardType.Player
+                Type = (int)CardType.Player
             };
 
             card.Spawn();
@@ -210,7 +210,7 @@ public sealed partial class GameManager : Entity
             return;
 
         var card = NetworkManager.GetEntity<Card>(cardId);
-        var cardType = (CardType)card.CardType;
+        var cardType = (CardType)card.Type;
 
         if (!GameHasStarted && cardType == CardType.Player)
         {
@@ -282,12 +282,12 @@ public sealed partial class GameManager : Entity
         (sourceCard.Number, targetCard.Number) = (targetCard.Number, sourceCard.Number);
         targetCard.IsRevealed = true;
 
-        if (sourceCard.CardType == (int)CardType.Draw)
+        if (sourceCard.Type == (int)CardType.Draw)
         {
             sourceCard.IsRevealed = false;
             sourceCard.Number = _drawPile.Pop().Number;
 
-            if (targetCard.CardType == (int)CardType.Player)
+            if (targetCard.Type == (int)CardType.Player)
             {
                 _discardedCard.Number = lastTargetNumber;
                 _discardedCard.UpdateView();
@@ -300,7 +300,7 @@ public sealed partial class GameManager : Entity
         sourceCard.UpdateView();
         targetCard.UpdateView();
 
-        if (sourceCard.CardType == (int)CardType.Draw && targetCard.CardType == (int)CardType.Discard)
+        if (sourceCard.Type == (int)CardType.Draw && targetCard.Type == (int)CardType.Discard)
         {
             _needToRevealCard = true;
             return;

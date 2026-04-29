@@ -1,4 +1,5 @@
-﻿using Skyjo.Network;
+﻿using Skyjo.Enums;
+using Skyjo.Network;
 using Skyjo.Network.Attributes;
 using Skyjo.ViewData;
 
@@ -16,7 +17,7 @@ public sealed partial class Card : Entity
     [Replicated(OnRep = nameof(OnRep_UpdateValue))]
     private int _updateViewCount;
 
-    [Replicated] public int CardType { get; set; }
+    [Replicated] public int Type { get; set; }
 
     public CardData Data =>
         new()
@@ -25,12 +26,13 @@ public sealed partial class Card : Entity
             Number = Number,
             IsRevealed = IsRevealed,
             IsSelected = IsSelected,
-            IsHighlighted = IsHighlighted
+            IsHighlighted = IsHighlighted,
+            Type = (CardType)Type
         };
 
     private void OnRep_UpdateValue()
     {
-        switch (CardType)
+        switch (Type)
         {
             case (int)Enums.CardType.Player:
                 GameView.UpdatePlayer(Player.Id, Player.Data);

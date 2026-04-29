@@ -35,7 +35,7 @@ public sealed partial class Player : Entity
             {
                 Owner = Owner,
                 Player = this,
-                CardType = (int)Enums.CardType.Player
+                Type = (int)Enums.CardType.Player
             }).ToArray();
 
             foreach (var card in cards)
