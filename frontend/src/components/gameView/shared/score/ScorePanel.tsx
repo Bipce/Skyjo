@@ -17,7 +17,7 @@ const ScorePanel = ({ player }: Props) => {
         <IconWrapper>
           <Hourglass className="text-purple-400" /> :
           <span className={`${hasDoublePoint && "text-red-500"}`}>
-            {currentScore} {hasDoublePoint && <span className="text-sm">x2 = {currentScore * 2}</span>}
+            {currentScore} {hasDoublePoint && <span className="text-sm italic">({currentScore * 2})</span>}
           </span>
         </IconWrapper>
 
