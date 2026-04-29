@@ -61,7 +61,7 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
   };
 
   const isDrawnCardRevealed = drawnCard?.isRevealed ?? false;
-  const canHover =
+  const canHoverPointer =
     belongsTo !== "opponent" && (!hasGameStarted || isCurrentPlayer) && !(isDiscarded && isDrawnCardRevealed);
 
   const buttonClass = clsx(
@@ -72,7 +72,7 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
     isSelected ? "border border-rose-600 shadow-md shadow-rose-600 hover:ring-rose-600" : "border border-zinc-500",
     isHighlighted && "ring-2 ring-zinc-200",
     isDroppable && isDropTarget && isDragActive && "ring-2 ring-amber-300/80",
-    canHover && "hover:ring-2 hover:ring-amber-300/80",
+    canHoverPointer && "hover:ring-2 hover:ring-amber-300/80 cursor-pointer",
   );
 
   const button = (
