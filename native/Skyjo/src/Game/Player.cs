@@ -6,6 +6,8 @@ namespace Skyjo.Game;
 
 public sealed partial class Player : Entity
 {
+    public const int NumberOfCards = 12;
+
     private GameManager _gameManager = null!;
     [Replicated] public string Username { get; set; } = null!;
 
@@ -29,7 +31,7 @@ public sealed partial class Player : Entity
 
         if (HasAuthority)
         {
-            var cards = Enumerable.Range(0, 12).Select(_ => new Card
+            var cards = Enumerable.Range(0, NumberOfCards).Select(_ => new Card
             {
                 Owner = Owner,
                 Player = this,

@@ -166,7 +166,7 @@ public sealed partial class GameManager : Entity
     private void GivePlayerCards(Player player)
     {
         var data = player.Cards!.ToList();
-        var delta = 12 - data.Count;
+        var delta = Player.NumberOfCards - data.Count;
         for (var i = 0; i < delta; i++)
         {
             var card = new Card
@@ -196,7 +196,7 @@ public sealed partial class GameManager : Entity
 
     private CardData[] GetPlayerCards()
     {
-        var cards = new CardData[12];
+        var cards = new CardData[Player.NumberOfCards];
         for (var i = 0; i < cards.Length; i++)
             cards[i] = _drawPile.Pop();
 
