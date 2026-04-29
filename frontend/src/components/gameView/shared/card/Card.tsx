@@ -64,7 +64,8 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
   const hasDrawn = drawnCard?.isRevealed ?? false;
   const canHoverPointer = (() => {
     if (belongsTo === "player") {
-      return (isCurrentPlayer && hasDrawn) || hasDiscardedDrawnCard || !hasGameStarted();
+      if (!hasGameStarted()) return true;
+      return isCurrentPlayer && (hasDrawn || hasDiscardedDrawnCard);
     }
 
     if (belongsTo === "deck") {
