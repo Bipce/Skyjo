@@ -256,6 +256,8 @@ public sealed partial class GameManager : Entity
                 card.IsHighlighted = true;
                 card.UpdateView();
                 _needToRevealCard = false;
+                _discardedCard.IsHighlighted = false;
+                _discardedCard.UpdateView();
                 player.UpdateScore();
                 CheckCardsSameColumn(_currentPlayer);
                 NextPlayer();
