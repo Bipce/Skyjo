@@ -20,7 +20,7 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
     useShallow(s => ({
       selectCard: s.selectCard,
       isCurrentPlayer: s.player?.isCurrentPlayer,
-      hasGameStarted: s.players.some(player => player.isCurrentPlayer === true),
+      hasGameStarted: s.players.some(player => player.isCurrentPlayer),
       drawnCard: s.drawnCard,
     })),
   );
@@ -65,21 +65,20 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
   const canHover = (() => {
     switch (belongsTo) {
       case "player":
-        if (!hasGameStarted) return true;
-        if (!isDiscarded && hasDrawn) return true;
-        return isCurrentPlayer && hasDrawn;
+        return !hasGameStarted || isCurrentPlayer;
 
       case "deck":
         if (!isCurrentPlayer) return false;
-        if (hasDrawn) {
-          if (!isDiscarded) return true;
-        }
+        // if (!hasDrawn && !isDiscarded) return false;
+        // if (!hasDrawn && isDiscarded) return false;
+        // return (isCurrentPlayer && !hasDrawn) || (hasDrawn && !drawnCard?.isRevealed);
         return (isCurrentPlayer && !hasDrawn) || (hasDrawn && !drawnCard?.isRevealed);
-
       default:
         return false;
     }
   })();
+
+  console.log(hasDrawn);
 
   const buttonClass = clsx(
     "center button-card-base card-number",
