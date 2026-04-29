@@ -12,7 +12,7 @@ const CardGridWrapper = ({ cards, belongsTo, className }: Props) => {
 
   return (
     <div
-      className={`grid justify-center ${className}`}
+      className={`grid justify-center ${belongsTo === "player" ? "mr-2" : "ml-4"} ${className}`}
       style={{
         gridTemplateColumns: `repeat(${nbrOfColumns}, ${belongsTo === "opponent" ? "45px" : "80px"})`,
       }}
