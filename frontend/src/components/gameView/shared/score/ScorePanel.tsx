@@ -7,7 +7,7 @@ interface Props {
 }
 
 const ScorePanel = ({ player }: Props) => {
-  const { username, currentScore, totalScore } = player;
+  const { username, currentScore, totalScore, hasDoublePoint } = player;
 
   return (
     <aside className="w-32 shrink-0 text-lg">
@@ -15,7 +15,10 @@ const ScorePanel = ({ player }: Props) => {
 
       <div className="flex flex-col gap-3">
         <IconWrapper>
-          <Hourglass className="text-purple-400" /> : {currentScore}
+          <Hourglass className="text-purple-400" /> :
+          <span className={`${hasDoublePoint && "text-red-500"}`}>
+            {currentScore} {hasDoublePoint && <span className="text-sm">x2 = {currentScore * 2}</span>}
+          </span>
         </IconWrapper>
 
         <IconWrapper>

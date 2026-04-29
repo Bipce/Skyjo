@@ -8,4 +8,5 @@ export interface PlayerData {
   currentScore: number;
   totalScore: number;
   isCurrentPlayer: boolean;
+  hasDoublePoint: boolean;
 }
