@@ -13,4 +13,5 @@ public sealed class PlayerData : ViewData
     public short CurrentScore { get; init; }
     public byte TotalScore { get; init; }
     public bool IsCurrentPlayer { get; init; }
+    public bool HasDoublePoint { get; set; }
 }

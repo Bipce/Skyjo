@@ -72,7 +72,8 @@ public sealed partial class Player : Entity
             Cards = Cards!.Select(x => x.Data).ToArray(),
             CurrentScore = CurrentScore,
             TotalScore = TotalScore,
-            IsCurrentPlayer = IsCurrentPlayer
+            IsCurrentPlayer = IsCurrentPlayer,
+            HasDoublePoint = HasDoublePoint,
         };
 
     private void OnRep_UpdateValue()
