@@ -4,7 +4,7 @@
 @variant hover (&:hover);
 
 body {
-  @apply h-screen overflow-hidden bg-zinc-900 text-zinc-100 select-none;
+  @apply h-screen cursor-alias overflow-hidden bg-zinc-900 text-zinc-100 select-none;
 }
 
 .center {
