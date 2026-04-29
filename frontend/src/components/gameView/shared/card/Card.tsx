@@ -16,12 +16,13 @@ interface Props {
 
 const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, isDroppable = false }: Props) => {
   const { number, isRevealed, isSelected, isHighlighted } = card;
-  const { selectCard, isCurrentPlayer, hasGameStarted, drawnCard } = useGameStore(
+  const { selectCard, isCurrentPlayer, hasGameStarted, drawnCard, hasDiscardedDrawnCard } = useGameStore(
     useShallow(s => ({
       selectCard: s.selectCard,
-      isCurrentPlayer: s.player?.isCurrentPlayer,
+      isCurrentPlayer: s.player?.isCurrentPlayer ?? false,
       hasGameStarted: s.hasGameStarted,
       drawnCard: s.drawnCard,
+      hasDiscardedDrawnCard: s.hasDiscardedDrawnCard,
     })),
   );
 
@@ -60,9 +61,17 @@ const Card = ({ card, belongsTo, className, isDiscarded, isDraggable = false, is
     if (belongsTo === "deck" && !isRevealed) selectCard(cardId);
   };
 
-  const isDrawnCardRevealed = drawnCard?.isRevealed ?? false;
-  const canHoverPointer =
-    belongsTo !== "opponent" && (!hasGameStarted || isCurrentPlayer) && !(isDiscarded && isDrawnCardRevealed);
+  const hasDrawn = drawnCard?.isRevealed ?? false;
+  const canHoverPointer = (() => {
+    if (belongsTo === "player") return !hasGameStarted() || (isCurrentPlayer && hasDrawn);
+
+    if (belongsTo === "deck") {
+      if (!isCurrentPlayer || hasDiscardedDrawnCard) return false;
+      return hasGameStarted() && !(hasDrawn && isDiscarded);
+    }
+
+    return false;
+  })();
 
   const buttonClass = clsx(
     "center button-card-base card-number",
