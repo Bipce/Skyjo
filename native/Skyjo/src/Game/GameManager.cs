@@ -370,6 +370,9 @@ public sealed partial class GameManager : Entity
 
         _isGameEnded = true;
         _endGamePlayer = null;
+
+        var isGameOver = _players.Any(x => x.TotalScore >= 100);
+        GameView.RoundOver(isGameOver);
     }
 
     private void UpdateTotalPlayersScore()

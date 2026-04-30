@@ -28,4 +28,9 @@ partial class GameView
     {
         View.EvaluateScript($"window.updateDiscardedCard({data.Serialize()})");
     }
+
+    public static void RoundOver(bool isGameOver)
+    {
+        View.EvaluateScript($"window.roundOver({isGameOver})");
+    }
 }
