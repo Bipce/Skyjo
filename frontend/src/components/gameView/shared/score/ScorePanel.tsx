@@ -1,5 +1,8 @@
 import { Trophy, Hourglass } from "lucide-react";
+import { useGameStore } from "../../../../store/gameStore.ts";
+import { useScorePopup } from "../../../../hooks/useScorePopup.ts";
 import IconWrapper from "../../../ui/IconWrapper.tsx";
+import PopUp from "../../../ui/PopUp.tsx";
 import type { PlayerData } from "../../../../interfaces/PlayerData.ts";
 
 interface Props {
@@ -7,10 +10,13 @@ interface Props {
 }
 
 const ScorePanel = ({ player }: Props) => {
-  const { username, currentScore, totalScore, hasDoublePoint } = player;
+  const { username, currentScore, totalScore, hasDoublePoint, isCurrentPlayer, isOwner } = player;
+  const players = useGameStore(s => s.players);
+  const { popupEvent } = useScorePopup(isCurrentPlayer, hasDoublePoint, players, currentScore, totalScore, isOwner);
 
   return (
-    <aside className="w-32 shrink-0 text-lg">
+    <aside className="relative flex h-full w-32 shrink-0 flex-col justify-center text-lg">
+      {popupEvent && <PopUp event={popupEvent} />}
       <p className="mb-8 text-2xl font-bold">{username}</p>
 
       <div className="flex flex-col gap-3">

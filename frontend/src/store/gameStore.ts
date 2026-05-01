@@ -1,6 +1,6 @@
+import { create } from "zustand";
 import type { PlayerData } from "../interfaces/PlayerData.ts";
 import type { CardData } from "../interfaces/CardData.ts";
-import { create } from "zustand";
 
 interface GameState {
   players: PlayerData[];
@@ -8,6 +8,7 @@ interface GameState {
   drawnCard: CardData | null;
   discardedCard: CardData | null;
   hasDiscardedDrawnCard: boolean;
+  roundOverEvent: { isGameOver: boolean } | null;
 }
 
 interface GameCallbacks {
@@ -17,6 +18,8 @@ interface GameCallbacks {
   updateDrawnCard: (card: CardData) => void;
   updateDiscardedCard: (card: CardData) => void;
   hasGameStarted: () => boolean;
+  roundOver: (isGameOver: boolean) => void;
+  clearRoundOverEvent: () => void;
   setHasDiscardedDrawnCard: (value: boolean) => void;
   bindWindowCallbacks: () => void;
 }
@@ -55,6 +58,10 @@ export const useGameStore = create<GameState & GameCallbacks & GameCommands>((se
   updateDrawnCard: card => set({ drawnCard: card }),
   updateDiscardedCard: card => set({ discardedCard: card }),
 
+  roundOverEvent: null,
+  roundOver: isGameOver => set({ roundOverEvent: { isGameOver } }),
+  clearRoundOverEvent: () => set({ roundOverEvent: null }),
+
   hasDiscardedDrawnCard: false,
   setHasDiscardedDrawnCard: value => set({ hasDiscardedDrawnCard: value }),
 
@@ -81,12 +88,14 @@ export const useGameStore = create<GameState & GameCallbacks & GameCommands>((se
   },
 
   bindWindowCallbacks: () => {
-    const { addPlayer, removePlayer, updatePlayer, updateDrawnCard, updateDiscardedCard } = useGameStore.getState();
+    const { addPlayer, removePlayer, updatePlayer, updateDrawnCard, updateDiscardedCard, roundOver } =
+      useGameStore.getState();
 
     window.addPlayer = addPlayer;
     window.removePlayer = removePlayer;
     window.updatePlayer = updatePlayer;
     window.updateDrawnCard = updateDrawnCard;
     window.updateDiscardedCard = updateDiscardedCard;
+    window.roundOver = roundOver;
   },
 }));

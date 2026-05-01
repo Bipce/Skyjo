@@ -11,6 +11,7 @@ declare global {
     dropCard: (playerId: number, sourceId: number, targetId: number) => void;
     updateDrawnCard: (card: CardData) => void;
     updateDiscardedCard: (card: CardData) => void;
+    roundOver: (isGameOver: boolean) => void;
   }
 }
 
