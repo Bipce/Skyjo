@@ -7,8 +7,6 @@ interface GameState {
   player: PlayerData | null;
   drawnCard: CardData | null;
   discardedCard: CardData | null;
-  hasDiscardedDrawnCard: boolean;
-  roundOverEvent: { isGameOver: boolean } | null;
 }
 
 interface GameCallbacks {
@@ -17,10 +15,7 @@ interface GameCallbacks {
   updatePlayer: (id: number, data: PlayerData) => void;
   updateDrawnCard: (card: CardData) => void;
   updateDiscardedCard: (card: CardData) => void;
-  hasGameStarted: () => boolean;
   roundOver: (isGameOver: boolean) => void;
-  clearRoundOverEvent: () => void;
-  setHasDiscardedDrawnCard: (value: boolean) => void;
   bindWindowCallbacks: () => void;
 }
 
@@ -30,7 +25,15 @@ interface GameCommands {
   startNetwork: () => void;
 }
 
-export const useGameStore = create<GameState & GameCallbacks & GameCommands>((set, get) => ({
+interface GameUI {
+  hasDiscardedDrawnCard: boolean;
+  roundOverEvent: { isGameOver: boolean } | null;
+  setHasDiscardedDrawnCard: (value: boolean) => void;
+  clearRoundOverEvent: () => void;
+  hasGameStarted: () => boolean;
+}
+
+export const useGameStore = create<GameState & GameCallbacks & GameCommands & GameUI>((set, get) => ({
   players: [],
   player: null,
   drawnCard: null,

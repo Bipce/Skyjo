@@ -55,7 +55,6 @@ export const useScorePopup = (
     };
 
     const event = roundOverEvent.isGameOver ? getScoreEvent("game") : getScoreEvent("round");
-    console.log("roundOverEvent", roundOverEvent);
     if (!event) return;
 
     const timeout = setTimeout(() => {
