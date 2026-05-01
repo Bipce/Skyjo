@@ -372,6 +372,12 @@ public sealed partial class GameManager : Entity
         _endGamePlayer = null;
 
         var isGameOver = _players.Any(x => x.TotalScore >= 100);
+        Multicast_RoundOver(isGameOver);
+    }
+
+    [Multicast]
+    private void Multicast_RoundOver(bool isGameOver)
+    {
         GameView.RoundOver(isGameOver);
     }
 

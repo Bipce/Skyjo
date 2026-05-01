@@ -31,6 +31,6 @@ partial class GameView
 
     public static void RoundOver(bool isGameOver)
     {
-        View.EvaluateScript($"window.roundOver({isGameOver})");
+        View.EvaluateScript($"window.roundOver({isGameOver.ToString().ToLower()})");
     }
 }
