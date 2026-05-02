@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Skyjo.Config;
 using Ultralight.FNA;
 #if !DEBUG
 using SteamDatabase.ValvePak;
@@ -13,23 +14,34 @@ public sealed partial class GameView
 
     private readonly GraphicsDevice _graphicsDevice;
     private readonly SpriteBatch _spriteBatch;
+    private readonly ViewRenderer _viewRenderer;
     private readonly UltralightRenderer _renderer;
     private readonly UltralightView _view;
 
-    public GameView(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch)
+    public GameView(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, ViewRenderer viewRenderer)
     {
         _instance = this;
 
         _graphicsDevice = graphicsDevice;
         _spriteBatch = spriteBatch;
+        _viewRenderer = viewRenderer;
 
 #if DEBUG
         const string url = "http://localhost:5173";
         _renderer = new UltralightRendererSDLGPU(_graphicsDevice, assetsDir: "data", enableLog: true);
 #else
         const string url = "file:///index.html";
-        _renderer = new UltralightRendererSDLGPU(_graphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
-            shaders: GetShaders(), enableLog: false);
+        _renderer = viewRenderer switch
+        {
+            ViewRenderer.SdlGpu => new UltralightRendererSDLGPU(_graphicsDevice,
+                fileSystem: new VpkFileSystem("data/ui.vpk"), shaders: GetShaders(), enableLog: false),
+            ViewRenderer.D3D11 => new UltralightRendererD3D11(_graphicsDevice,
+                fileSystem: new VpkFileSystem("data/ui.vpk"), shaders: GetShaders(), enableLog: false),
+            ViewRenderer.Cpu => new UltralightRendererCPU(_graphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
+                enableLog: false),
+            _ => _renderer
+        } ?? throw new InvalidOperationException("Invalid view renderer");
+
 #endif
         _view = new UltralightView(_renderer, CurrentWidth, CurrentHeight);
         _view.LoadUrl(url);
@@ -41,19 +53,35 @@ public sealed partial class GameView
     public static UltralightView View => _instance._view;
 
 #if !DEBUG
-    private static ShaderSources GetShaders()
+    private ShaderSources GetShaders()
     {
         var package = new Package();
         package.OptimizeEntriesForBinarySearch(StringComparison.OrdinalIgnoreCase);
         package.Read("data/shaders.vpk");
 
-        return new ShaderSources
+        if (_viewRenderer == ViewRenderer.SdlGpu)
         {
-            FillVert = GetDataInPackage(package, "fill.vert.spv"),
-            FillFrag = GetDataInPackage(package, "fill.frag.spv"),
-            PathVert = GetDataInPackage(package, "fill_path.vert.spv"),
-            PathFrag = GetDataInPackage(package, "fill_path.frag.spv"),
-        };
+            return new ShaderSources
+            {
+                FillVert = GetDataInPackage(package, "sdlgpu/fill.vert.spv"),
+                FillFrag = GetDataInPackage(package, "sdlgpu/fill.frag.spv"),
+                PathVert = GetDataInPackage(package, "sdlgpu/fill_path.vert.spv"),
+                PathFrag = GetDataInPackage(package, "sdlgpu/fill_path.frag.spv"),
+            };
+        }
+
+        if (_viewRenderer == ViewRenderer.D3D11)
+        {
+            return new ShaderSources
+            {
+                FillVert = GetDataInPackage(package, "d3d11/v2f_c4f_t2f_t2f_d28f.hlsl"),
+                FillFrag = GetDataInPackage(package, "d3d11/fill.hlsl"),
+                PathVert = GetDataInPackage(package, "d3d11/v2f_c4f_t2f.hlsl"),
+                PathFrag = GetDataInPackage(package, "d3d11/fill_path.hlsl"),
+            };
+        }
+
+        throw new InvalidOperationException("Invalid view renderer");
     }
 
     private static byte[] GetDataInPackage(Package package, string path)

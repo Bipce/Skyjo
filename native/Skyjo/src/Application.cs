@@ -40,12 +40,14 @@ public sealed class Application : Microsoft.Xna.Framework.Game
     private SpriteBatch _spriteBatch = null!;
 
     private NetworkManager NetworkManager { get; } = new();
-    private ConfigManager ConfigManager { get; } = new();
 
     private GameManager? _gameManager;
+    private readonly ConfigManager _configManager;
 
-    public Application()
+    public Application(ConfigManager configManager)
     {
+        _configManager = configManager;
+
         var graphics = new GraphicsDeviceManager(this);
         graphics.PreferredBackBufferWidth = 1280;
         graphics.PreferredBackBufferHeight = 720;
@@ -62,9 +64,9 @@ public sealed class Application : Microsoft.Xna.Framework.Game
         NetworkManager.ServerManager.OnPlayerConnected += Server_OnPlayerConnected;
         NetworkManager.ServerManager.ConnectionStateChangedEvent += OnServerConnectionStateChanged;
 
-        NetworkManager.ClientManager.ConnectionData = writer => writer.Put(ConfigManager.Settings.Username);
+        NetworkManager.ClientManager.ConnectionData = writer => writer.Put(_configManager.Settings.Username);
 
-        ConfigManager.Load();
+        TargetElapsedTime = TimeSpan.FromSeconds(1.0 / _configManager.Settings.TargetFramerate);
     }
 
     private void OnResize(object? sender, EventArgs e)
@@ -87,7 +89,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _gameView = new GameView(GraphicsDevice, _spriteBatch);
+        _gameView = new GameView(GraphicsDevice, _spriteBatch, _configManager.Settings.ViewRenderer);
         _testView = new TestView(GraphicsDevice, _spriteBatch);
 
         GameView.View.BindFunction("startNetwork", StartNetwork);
@@ -101,11 +103,11 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 #if DEBUG
         if (InstanceNumber == 1)
             NetworkManager.ServerManager.Start();
-        ConfigManager.Settings.Username = $"Player {InstanceNumber}";
+        _configManager.Settings.Username = $"Player {InstanceNumber}";
         NetworkManager.ClientManager.Start();
 #else
-        var settings = ConfigManager.Settings;
-        switch (ConfigManager.Settings.NetMode)
+        var settings = _configManager.Settings;
+        switch (_configManager.Settings.NetMode)
         {
             case NetMode.Host:
             {
