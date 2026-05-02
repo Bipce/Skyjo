@@ -27,6 +27,15 @@ const GameView = () => {
     })),
   );
 
+  const allSortedIds = [...players].map(p => p.id).sort((a, b) => a - b);
+  const ownerIndex = player ? allSortedIds.indexOf(player.id) : -1;
+  const opponents =
+    ownerIndex === -1
+      ? players.filter(p => !p.isOwner).sort((a, b) => a.id - b.id)
+      : [...allSortedIds.slice(ownerIndex + 1), ...allSortedIds.slice(0, ownerIndex)]
+          .map(id => players.find(p => p.id === id))
+          .filter(p => p !== undefined);
+
   return (
     <DragDropProvider
       sensors={SENSORS}
@@ -44,11 +53,9 @@ const GameView = () => {
       <main className="grid min-h-screen place-items-center py-10">
         <div className="grid w-full max-w-6xl gap-8">
           <OpponentsGrid>
-            {players
-              .filter(player => !player.isOwner)
-              .map(player => {
-                return <OpponentPanel key={player.id} player={player} />;
-              })}
+            {opponents.map(player => (
+              <OpponentPanel key={player.id} player={player} />
+            ))}
           </OpponentsGrid>
 
           {drawnCard && discardedCard && <CardDeck drawnCard={drawnCard} discardedCard={discardedCard} />}
