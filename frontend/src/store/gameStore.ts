@@ -27,11 +27,21 @@ interface GameCommands {
 
 interface GameUI {
   hasDiscardedDrawnCard: boolean;
-  roundOverEvent: { isGameOver: boolean } | null;
+  roundOverEvent: {
+    isGameOver: boolean;
+    id: number;
+  } | null;
   setHasDiscardedDrawnCard: (value: boolean) => void;
-  clearRoundOverEvent: () => void;
   hasGameStarted: () => boolean;
 }
+
+let roundOverEventId = 0;
+
+const isRoundSetupPlayer = (player: PlayerData) =>
+  !player.isCurrentPlayer &&
+  player.currentScore === 0 &&
+  !player.hasDoublePoint &&
+  player.cards.every(card => !card.isRevealed && !card.isSelected && !card.isHighlighted);
 
 export const useGameStore = create<GameState & GameCallbacks & GameCommands & GameUI>((set, get) => ({
   players: [],
@@ -55,15 +65,25 @@ export const useGameStore = create<GameState & GameCallbacks & GameCommands & Ga
       const players = [...state.players];
       const index = players.findIndex(p => p.id === id);
       players[index] = playerData;
-      return { players, player: playerData.isOwner ? playerData : state.player, hasDiscardedDrawnCard: false };
+
+      const hasRoundBeenCleaned = state.roundOverEvent && isRoundSetupPlayer(playerData);
+
+      return {
+        players,
+        player: playerData.isOwner ? playerData : state.player,
+        hasDiscardedDrawnCard: false,
+        roundOverEvent: hasRoundBeenCleaned ? null : state.roundOverEvent,
+      };
     }),
 
   updateDrawnCard: card => set({ drawnCard: card }),
   updateDiscardedCard: card => set({ discardedCard: card }),
 
   roundOverEvent: null,
-  roundOver: isGameOver => set({ roundOverEvent: { isGameOver } }),
-  clearRoundOverEvent: () => set({ roundOverEvent: null }),
+  roundOver: isGameOver =>
+    set({
+      roundOverEvent: { isGameOver, id: ++roundOverEventId },
+    }),
 
   hasDiscardedDrawnCard: false,
   setHasDiscardedDrawnCard: value => set({ hasDiscardedDrawnCard: value }),
