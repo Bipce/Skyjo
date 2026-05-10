@@ -89,7 +89,7 @@ public sealed class Application : Microsoft.Xna.Framework.Game
 
         _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-        _gameView = new GameView(GraphicsDevice, _spriteBatch, _configManager.Settings.ViewRenderer);
+        _gameView = new GameView(GraphicsDevice, _spriteBatch, _configManager.Settings);
         _testView = new TestView(GraphicsDevice, _spriteBatch);
 
         GameView.View.BindFunction("startNetwork", StartNetwork);

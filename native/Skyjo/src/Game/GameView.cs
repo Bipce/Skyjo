@@ -14,29 +14,32 @@ public sealed partial class GameView
 
     private readonly GraphicsDevice _graphicsDevice;
     private readonly SpriteBatch _spriteBatch;
-    private readonly ViewRenderer _viewRenderer;
+    private readonly Settings _settings;
     private readonly UltralightRenderer _renderer;
     private readonly UltralightView _view;
 
-    public GameView(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, ViewRenderer viewRenderer)
+    public GameView(GraphicsDevice graphicsDevice, SpriteBatch spriteBatch, Settings settings)
     {
         _instance = this;
 
         _graphicsDevice = graphicsDevice;
         _spriteBatch = spriteBatch;
-        _viewRenderer = viewRenderer;
+        _settings = settings;
 
 #if DEBUG
         const string url = "http://localhost:5173";
-        _renderer = new UltralightRendererSDLGPU(_graphicsDevice, assetsDir: "data", enableLog: true);
+        _renderer = new UltralightRendererSDLGPU(_graphicsDevice, assetsDir: "data", enableLog: true,
+            msaaCount: (uint)settings.MsaaCount);
 #else
         const string url = "file:///index.html";
-        _renderer = viewRenderer switch
+        _renderer = _settings.ViewRenderer switch
         {
             ViewRenderer.SdlGpu => new UltralightRendererSDLGPU(_graphicsDevice,
-                fileSystem: new VpkFileSystem("data/ui.vpk"), shaders: GetShaders(), enableLog: false),
+                fileSystem: new VpkFileSystem("data/ui.vpk"), shaders: GetShaders(), enableLog: false,
+                msaaCount: (uint)settings.MsaaCount),
             ViewRenderer.D3D11 => new UltralightRendererD3D11(_graphicsDevice,
-                fileSystem: new VpkFileSystem("data/ui.vpk"), shaders: GetShaders(), enableLog: false),
+                fileSystem: new VpkFileSystem("data/ui.vpk"), shaders: GetShaders(), enableLog: false,
+                msaaCount: (uint)settings.MsaaCount),
             ViewRenderer.Cpu => new UltralightRendererCPU(_graphicsDevice, fileSystem: new VpkFileSystem("data/ui.vpk"),
                 enableLog: false),
             _ => _renderer
@@ -59,7 +62,7 @@ public sealed partial class GameView
         package.OptimizeEntriesForBinarySearch(StringComparison.OrdinalIgnoreCase);
         package.Read("data/shaders.vpk");
 
-        if (_viewRenderer == ViewRenderer.SdlGpu)
+        if (_settings.ViewRenderer == ViewRenderer.SdlGpu)
         {
             return new ShaderSources
             {
@@ -70,7 +73,7 @@ public sealed partial class GameView
             };
         }
 
-        if (_viewRenderer == ViewRenderer.D3D11)
+        if (_settings.ViewRenderer == ViewRenderer.D3D11)
         {
             return new ShaderSources
             {

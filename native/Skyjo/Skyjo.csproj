@@ -12,7 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\FNA\FNA.Core.csproj"/>
-        <PackageReference Include="Exec-Ultralight.FNA" Version="0.1.8"/>
+        <PackageReference Include="Exec-Ultralight.FNA" Version="0.2.0"/>
         <PackageReference Include="ValvePak" Version="4.0.0.142"/>
         <ProjectReference Include="..\Skyjo.Network\Skyjo.Network.csproj" />
     </ItemGroup>
