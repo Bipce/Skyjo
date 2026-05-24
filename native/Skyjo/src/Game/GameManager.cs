@@ -112,22 +112,7 @@ public sealed partial class GameManager : Entity
         if (_players.Any(p => p.Cards!.Count(c => c.IsSelected) != 2))
             return;
 
-        var data = new List<sbyte>(NumberOfCards);
-        for (var i = 0; i < NumberOfMinosTwoCards; i++)
-            data.Add(-2);
-        for (var i = 0; i < NumberOfZeroCards; i++)
-            data.Add(0);
-
-        for (var i = -1; i <= 12; i++)
-        {
-            if (i == 0)
-                continue;
-
-            for (var j = 0; j < NumberOfOtherCards; j++)
-                data.Add((sbyte)i);
-        }
-
-        _drawPile = new Stack<CardData>(data.Shuffle().Select(x => new CardData { Number = x }));
+        GenerateDrawnCards();
 
         _drawnCard.Number = _drawPile.Pop().Number;
         _drawnCard.UpdateView();
@@ -161,6 +146,26 @@ public sealed partial class GameManager : Entity
         UpdatePlayersView();
 
         GameHasStarted = true;
+    }
+
+    private void GenerateDrawnCards()
+    {
+        var data = new List<sbyte>(NumberOfCards);
+        for (var i = 0; i < NumberOfMinosTwoCards; i++)
+            data.Add(-2);
+        for (var i = 0; i < NumberOfZeroCards; i++)
+            data.Add(0);
+
+        for (var i = -1; i <= 12; i++)
+        {
+            if (i == 0)
+                continue;
+
+            for (var j = 0; j < NumberOfOtherCards; j++)
+                data.Add((sbyte)i);
+        }
+
+        _drawPile = new Stack<CardData>(data.Shuffle().Select(x => new CardData { Number = x }));
     }
 
     private void GivePlayerCards(Player player)
@@ -241,7 +246,7 @@ public sealed partial class GameManager : Entity
                 _discardedCard.Number = _drawnCard.Number;
                 _discardedCard.UpdateView();
                 _drawnCard.IsRevealed = false;
-                _drawnCard.Number = _drawPile.Pop().Number;
+                _drawnCard.Number = GetDrawnCardNumber();
                 _drawnCard.UpdateView();
                 card.IsRevealed = true;
                 card.IsHighlighted = true;
@@ -285,7 +290,7 @@ public sealed partial class GameManager : Entity
         if (sourceCard.Type == (int)CardType.Draw)
         {
             sourceCard.IsRevealed = false;
-            sourceCard.Number = _drawPile.Pop().Number;
+            sourceCard.Number = GetDrawnCardNumber();
 
             if (targetCard.Type == (int)CardType.Player)
             {
@@ -308,6 +313,17 @@ public sealed partial class GameManager : Entity
 
         CheckCardsSameColumn(_currentPlayer);
         NextPlayer();
+    }
+
+    private sbyte GetDrawnCardNumber()
+    {
+        if (_drawPile.TryPop(out var card))
+        {
+            return card.Number;
+        }
+
+        GenerateDrawnCards();
+        return _drawPile.Pop().Number;
     }
 
     private void CheckCardsSameColumn(Player player)
