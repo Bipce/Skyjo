@@ -144,7 +144,7 @@ frontend and backend systems.
 
 ---
 
-## 📝 Project Status
+## 📊  Project Status
 
 The project is considered feature-complete and is actively used for private multiplayer sessions.
 
